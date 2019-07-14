@@ -1,6 +1,8 @@
 package me.glaremasters.deluxequeues.listeners;
 
+import ch.jalu.configme.SettingsManager;
 import me.glaremasters.deluxequeues.DeluxeQueues;
+import me.glaremasters.deluxequeues.configuration.sections.ConfigOptions;
 import me.glaremasters.deluxequeues.queues.DeluxeQueue;
 import me.glaremasters.deluxequeues.queues.QueueHandler;
 import net.md_5.bungee.api.config.ServerInfo;
@@ -19,10 +21,12 @@ public class ConnectionListener implements Listener {
 
     private DeluxeQueues deluxeQueues;
     private QueueHandler queueHandler;
+    private SettingsManager settingsManager;
 
     public ConnectionListener(DeluxeQueues deluxeQueues) {
         this.deluxeQueues = deluxeQueues;
         this.queueHandler = deluxeQueues.getQueueHandler();
+        this.settingsManager = deluxeQueues.getSettingsHandler().getSettingsManager();
     }
 
     @EventHandler
@@ -31,6 +35,10 @@ public class ConnectionListener implements Listener {
         ServerInfo server = event.getTarget();
         // Get the player in the event
         ProxiedPlayer player = event.getPlayer();
+        // Bypass if they are a donator
+        if (player.hasPermission(settingsManager.getProperty(ConfigOptions.DONATOR_PERMISSION))) {
+            return;
+        }
         // Check if the server has a queue
         if (queueHandler.checkForQueue(server)) {
             // Get the queue

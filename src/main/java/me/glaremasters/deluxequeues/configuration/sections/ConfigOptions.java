@@ -29,6 +29,11 @@ public class ConfigOptions implements SettingsHolder {
     public static Property<List<String>> QUEUE_SERVERS =
             newListProperty("settings.servers", "");
 
+    @Comment({"What would you like the donator permission node to be?",
+    "Donators will bypass the queue!"})
+    public static Property<String> DONATOR_PERMISSION =
+            newProperty("settings.donator-permission", "deluxequeues.vip");
+
     @Comment({"How would you like to inform the player that they are in the queue?",
     "Currently supports: ACTIONBAR, TEXT, TITLE"})
     public static Property<String> INFORM_METHOD =
