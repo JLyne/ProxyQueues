@@ -2,6 +2,7 @@ package me.glaremasters.deluxequeues.configuration.sections;
 
 import ch.jalu.configme.Comment;
 import ch.jalu.configme.SettingsHolder;
+import ch.jalu.configme.configurationdata.CommentsConfiguration;
 import ch.jalu.configme.properties.Property;
 
 import java.util.List;
@@ -18,15 +19,15 @@ public class ConfigOptions implements SettingsHolder {
 
     @Comment("How many players need to be online for the queues to start?")
     public static Property<Integer> PLAYERS_REQUIRED =
-            newProperty("players-required", 25);
+            newProperty("settings.players-required", 25);
 
     @Comment("How many seconds should be inbetween each queue movement?")
     public static Property<Integer> DELAY_LENGTH =
-            newProperty("delay-length", 2);
+            newProperty("settings.delay-length", 2);
 
     @Comment("List all the servers here that you would like to have a queue for.")
     public static Property<List<String>> QUEUE_SERVERS =
-            newListProperty("servers", "");
+            newListProperty("settings.servers", "");
 
     @Comment({"How would you like to inform the player that they are in the queue?",
     "Currently supports: ACTIONBAR, TEXT, TITLE"})
@@ -47,5 +48,18 @@ public class ConfigOptions implements SettingsHolder {
 
     public static Property<String> TITLE_FOOTER =
             newProperty("notify.title.subtitle", "Position: {pos} / {total}");
+
+    @Override
+    public void registerComments(CommentsConfiguration configuration) {
+        String[] pluginHeader = {
+                "DeluxeQueues",
+                "Creator: Glare",
+                "Contributors: https://github.com/darbyjack/DeluxeQueues/graphs/contributors",
+                "Issues: https://github.com/darbyjack/DeluxeQueues/issues",
+                "Spigot: TBD",
+                "Discord: https://helpch.at/discord"
+        };
+        configuration.setComment("settings", pluginHeader);
+    }
 
 }
