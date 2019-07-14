@@ -31,7 +31,10 @@ public class ConnectionListener implements Listener {
         ProxiedPlayer player = event.getPlayer();
         if (queueHandler.checkForQueue(server)) {
             DeluxeQueue queue = queueHandler.getQueue(server);
-            if (!queue.getQueue().contains(player)) {
+            if (queue.getQueue().contains(player)) {
+                return;
+            }
+            if (event.getReason() != ServerConnectEvent.Reason.JOIN_PROXY) {
                 event.setCancelled(true);
                 queue.addPlayer(player);
             }

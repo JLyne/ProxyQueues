@@ -1,6 +1,5 @@
 package me.glaremasters.deluxequeues.tasks;
 
-import me.glaremasters.deluxequeues.DeluxeQueues;
 import me.glaremasters.deluxequeues.queues.DeluxeQueue;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
@@ -12,12 +11,10 @@ import net.md_5.bungee.api.connection.ProxiedPlayer;
  */
 public class QueueMoveTask implements Runnable {
 
-    private DeluxeQueues deluxeQueues;
     private DeluxeQueue queue;
     private ServerInfo server;
 
-    public QueueMoveTask(DeluxeQueues deluxeQueues, DeluxeQueue queue, ServerInfo server) {
-        this.deluxeQueues = deluxeQueues;
+    public QueueMoveTask(DeluxeQueue queue, ServerInfo server) {
         this.queue = queue;
         this.server = server;
     }

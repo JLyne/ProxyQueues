@@ -3,6 +3,7 @@ package me.glaremasters.deluxequeues.queues;
 import ch.jalu.configme.SettingsManager;
 import co.aikar.commands.ACFBungeeUtil;
 import lombok.Getter;
+import lombok.ToString;
 import me.glaremasters.deluxequeues.DeluxeQueues;
 import me.glaremasters.deluxequeues.configuration.sections.ConfigOptions;
 import me.glaremasters.deluxequeues.tasks.QueueMoveTask;
@@ -23,6 +24,7 @@ import java.util.concurrent.TimeUnit;
  * Time: 10:30 PM
  */
 @Getter
+@ToString
 public class DeluxeQueue {
 
     private DeluxeQueues deluxeQueues;
@@ -40,7 +42,7 @@ public class DeluxeQueue {
         this.delayLength = settingsManager.getProperty(ConfigOptions.DELAY_LENGTH);
         this.playersRequired = settingsManager.getProperty(ConfigOptions.PLAYERS_REQUIRED);
 
-        deluxeQueues.getProxy().getScheduler().schedule(deluxeQueues, new QueueMoveTask(deluxeQueues, this, server), 0, delayLength, TimeUnit.SECONDS);
+        deluxeQueues.getProxy().getScheduler().schedule(deluxeQueues, new QueueMoveTask(this, server), 0, delayLength, TimeUnit.SECONDS);
     }
 
     /**
@@ -49,7 +51,7 @@ public class DeluxeQueue {
      */
     public void addPlayer(ProxiedPlayer player) {
         int online = deluxeQueues.getProxy().getPlayers().size();
-        if (playersRequired >= online) {
+        if (online >= playersRequired) {
             if (!queue.contains(player)) {
                 queue.add(player);
                 notifyPlayer(player);
