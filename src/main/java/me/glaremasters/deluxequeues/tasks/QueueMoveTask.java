@@ -21,14 +21,18 @@ public class QueueMoveTask implements Runnable {
 
     @Override
     public void run() {
+        // Make sure the queue isn't empty
         if (queue.getQueue().isEmpty()) {
             return;
         }
-
+        // Get the player next in line
         ProxiedPlayer player = (ProxiedPlayer) queue.getQueue().element();
+        // Make sure the player exists
         if (player != null) {
+            // Move the player to that server
             player.connect(server);
         }
+        // Remove the player from the queue
         queue.getQueue().remove(player);
     }
 }
