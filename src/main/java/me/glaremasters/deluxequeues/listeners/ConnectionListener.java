@@ -44,7 +44,7 @@ public class ConnectionListener implements Listener {
             // Get the queue
             DeluxeQueue queue = queueHandler.getQueue(server);
             // Make sure it doesn't contain the player
-            if (!queue.getQueue().contains(player)) {
+            if (!queue.checkForPlayer(player)) {
                 // Make sure they aren't joining the proxy for the first time
                 if (event.getReason() != ServerConnectEvent.Reason.JOIN_PROXY) {
                     // Cancel the event so they don't go right away
