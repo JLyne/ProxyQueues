@@ -1,0 +1,4 @@
+name: DeluxeQueues
+version: ${project.version}
+main: me.glaremasters.deluxequeues.DeluxeQueues
+description: DeluxeQueues
