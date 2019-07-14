@@ -1,4 +1,5 @@
 name: DeluxeQueues
+author: Glare
 version: ${project.version}
 main: me.glaremasters.deluxequeues.DeluxeQueues
 description: DeluxeQueues
