@@ -1,10 +1,14 @@
 package me.glaremasters.deluxequeues.queues;
 
+import ch.jalu.configme.SettingsManager;
+import lombok.Getter;
+import me.glaremasters.deluxequeues.DeluxeQueues;
+import me.glaremasters.deluxequeues.configuration.sections.ConfigOptions;
+import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import org.jetbrains.annotations.NotNull;
-import lombok.Getter;
-import net.md_5.bungee.api.config.ServerInfo;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -17,10 +21,14 @@ public class QueueHandler {
 
     private List<DeluxeQueue> queues;
     private List<ServerInfo> servers;
+    private SettingsManager settingsManager;
+    private DeluxeQueues deluxeQueues;
 
-    public QueueHandler(List<DeluxeQueue> queues, List<ServerInfo> servers) {
-        this.queues = queues;
-        this.servers = servers;
+    public QueueHandler(SettingsManager settingsManager, DeluxeQueues deluxeQueues) {
+        this.settingsManager = settingsManager;
+        this.deluxeQueues = deluxeQueues;
+        this.queues = new ArrayList<>();
+        this.servers = new ArrayList<>();
     }
 
     /**
@@ -78,5 +86,15 @@ public class QueueHandler {
      */
     public boolean checkForQueue(ServerInfo server) {
         return servers.contains(server);
+    }
+
+    /**
+     * Enable all the queues on the server
+     */
+    public void enableQueues() {
+        settingsManager.getProperty(ConfigOptions.QUEUE_SERVERS).forEach(s -> {
+            DeluxeQueue queue = new DeluxeQueue(deluxeQueues, deluxeQueues.getProxy().getServerInfo(s));
+            createQueue(queue);
+        });
     }
 }

@@ -3,6 +3,8 @@ package me.glaremasters.deluxequeues;
 import co.aikar.commands.BungeeCommandManager;
 import lombok.Getter;
 import me.glaremasters.deluxequeues.configuration.SettingsHandler;
+import me.glaremasters.deluxequeues.listeners.ConnectionListener;
+import me.glaremasters.deluxequeues.queues.QueueHandler;
 import net.md_5.bungee.api.plugin.Plugin;
 
 import java.io.File;
@@ -15,12 +17,16 @@ public final class DeluxeQueues extends Plugin {
 
     private BungeeCommandManager commandManager;
     private SettingsHandler settingsHandler;
+    private QueueHandler queueHandler;
 
     @Override
     public void onEnable() {
         createFile("config.yml");
         settingsHandler = new SettingsHandler(this);
         loadACF();
+        queueHandler = new QueueHandler(settingsHandler.getSettingsManager(), this);
+        queueHandler.enableQueues();
+        getProxy().getPluginManager().registerListener(this, new ConnectionListener(this));
     }
 
     @Override
