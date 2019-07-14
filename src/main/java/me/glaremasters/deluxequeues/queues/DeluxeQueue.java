@@ -15,7 +15,6 @@ import net.md_5.bungee.api.connection.ProxiedPlayer;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Queue;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -28,7 +27,7 @@ import java.util.concurrent.TimeUnit;
 public class DeluxeQueue {
 
     private DeluxeQueues deluxeQueues;
-    private Queue queue;
+    private LinkedList<ProxiedPlayer> queue = new LinkedList<>();
     private ServerInfo server;
     private int delayLength;
     private int playersRequired;
@@ -36,7 +35,6 @@ public class DeluxeQueue {
 
     public DeluxeQueue(DeluxeQueues deluxeQueues, ServerInfo server) {
         this.deluxeQueues = deluxeQueues;
-        this.queue = new LinkedList();
         this.server = server;
         this.settingsManager = deluxeQueues.getSettingsHandler().getSettingsManager();
         this.delayLength = settingsManager.getProperty(ConfigOptions.DELAY_LENGTH);
@@ -65,8 +63,7 @@ public class DeluxeQueue {
      * @return their position
      */
     public int getQueuePos(ProxiedPlayer player) {
-        List list = (LinkedList) queue;
-        return list.indexOf(player);
+        return queue.indexOf(player);
     }
 
     /**

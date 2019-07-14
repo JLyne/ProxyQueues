@@ -26,13 +26,13 @@ public class QueueMoveTask implements Runnable {
             return;
         }
         // Get the player next in line
-        ProxiedPlayer player = (ProxiedPlayer) queue.getQueue().element();
+        ProxiedPlayer player = queue.getQueue().getFirst();
         // Make sure the player exists
         if (player != null) {
             // Move the player to that server
             player.connect(server);
         }
         // Remove the player from the queue
-        queue.getQueue().remove(player);
+        queue.getQueue().pollFirst();
     }
 }
