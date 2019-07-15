@@ -17,15 +17,13 @@ import static ch.jalu.configme.properties.PropertyInitializer.newProperty;
  */
 public class ConfigOptions implements SettingsHolder {
 
-    @Comment("How many players need to be online for the queues to start?")
-    public static Property<Integer> PLAYERS_REQUIRED =
-            newProperty("settings.players-required", 25);
-
     @Comment("How many seconds should be inbetween each queue movement?")
     public static Property<Integer> DELAY_LENGTH =
             newProperty("settings.delay-length", 2);
 
-    @Comment("List all the servers here that you would like to have a queue for.")
+    @Comment({"List all the servers here that you would like to have a queue for.",
+    "This is also where you specify how many players need to be on each server.",
+    "Example: hub;50"})
     public static Property<List<String>> QUEUE_SERVERS =
             newListProperty("settings.servers", "");
 

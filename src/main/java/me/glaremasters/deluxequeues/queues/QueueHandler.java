@@ -93,7 +93,8 @@ public class QueueHandler {
      */
     public void enableQueues() {
         settingsManager.getProperty(ConfigOptions.QUEUE_SERVERS).forEach(s -> {
-            DeluxeQueue queue = new DeluxeQueue(deluxeQueues, deluxeQueues.getProxy().getServerInfo(s));
+            String[] split = s.split(";");
+            DeluxeQueue queue = new DeluxeQueue(deluxeQueues, deluxeQueues.getProxy().getServerInfo(split[0]), Integer.valueOf(split[1]));
             createQueue(queue);
         });
     }

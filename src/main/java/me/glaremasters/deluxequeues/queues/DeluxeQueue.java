@@ -14,7 +14,6 @@ import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
 import java.util.LinkedList;
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -33,12 +32,12 @@ public class DeluxeQueue {
     private int playersRequired;
     private SettingsManager settingsManager;
 
-    public DeluxeQueue(DeluxeQueues deluxeQueues, ServerInfo server) {
+    public DeluxeQueue(DeluxeQueues deluxeQueues, ServerInfo server, int playersRequired) {
         this.deluxeQueues = deluxeQueues;
         this.server = server;
         this.settingsManager = deluxeQueues.getSettingsHandler().getSettingsManager();
         this.delayLength = settingsManager.getProperty(ConfigOptions.DELAY_LENGTH);
-        this.playersRequired = settingsManager.getProperty(ConfigOptions.PLAYERS_REQUIRED);
+        this.playersRequired = playersRequired;
 
         deluxeQueues.getProxy().getScheduler().schedule(deluxeQueues, new QueueMoveTask(this, server), 0, delayLength, TimeUnit.SECONDS);
     }
@@ -48,7 +47,7 @@ public class DeluxeQueue {
      * @param player the player to add
      */
     public void addPlayer(ProxiedPlayer player) {
-        int online = deluxeQueues.getProxy().getPlayers().size();
+        int online = server.getPlayers().size();
         if (online >= playersRequired) {
             if (!queue.contains(player)) {
                 queue.add(player);
