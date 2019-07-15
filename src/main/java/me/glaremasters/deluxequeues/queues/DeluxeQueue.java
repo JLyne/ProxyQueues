@@ -47,13 +47,18 @@ public class DeluxeQueue {
      * @param player the player to add
      */
     public void addPlayer(ProxiedPlayer player) {
-        int online = server.getPlayers().size();
-        if (online >= playersRequired) {
             if (!queue.contains(player)) {
                 queue.add(player);
                 notifyPlayer(player);
-            }
         }
+    }
+
+    /**
+     * Add in a check to make sure the player can be added to the queue
+     * @return added or not
+     */
+    public boolean canAddPlayer() {
+        return server.getPlayers().size() >= playersRequired;
     }
 
     /**

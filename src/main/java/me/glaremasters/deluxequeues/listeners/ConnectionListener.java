@@ -32,6 +32,10 @@ public class ConnectionListener implements Listener {
 
     @EventHandler(priority = EventPriority.LOW)
     public void onJoin(ServerConnectEvent event) {
+        // Don't go further if they are just joining the proxy
+        if (event.getReason() == ServerConnectEvent.Reason.JOIN_PROXY) {
+            return;
+        }
         // Get the server in the event
         ServerInfo server = event.getTarget();
         // Get the player in the event
@@ -46,8 +50,8 @@ public class ConnectionListener implements Listener {
                 DeluxeQueue queue = queueHandler.getQueue(server);
                 // Make sure it doesn't contain the player
                 if (!queue.checkForPlayer(player)) {
-                    // Make sure they aren't joining the proxy for the first time
-                    if (event.getReason() != ServerConnectEvent.Reason.JOIN_PROXY) {
+                    // Make sure the player can actually be added
+                    if (queue.canAddPlayer()) {
                         // Cancel the event so they don't go right away
                         event.setCancelled(true);
                         // Add the player to the queue
