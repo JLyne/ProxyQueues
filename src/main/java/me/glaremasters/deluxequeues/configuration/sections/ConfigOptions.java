@@ -22,18 +22,20 @@ public class ConfigOptions implements SettingsHolder {
             newProperty("settings.delay-length", 2);
 
     @Comment({"List all the servers here that you would like to have a queue for.",
-    "This is also where you specify how many players need to be on each server.",
-    "Example: hub;50"})
+            "This is also where you specify how many players need to be on each server.",
+            "You also set the max slots of the server here, make sure it always stays the same as the actual max.",
+            "Synxtax: server name; amount of players to start the queue at; max slots of server",
+            "Example: hub;50;200"})
     public static Property<List<String>> QUEUE_SERVERS =
             newListProperty("settings.servers", "");
 
     @Comment({"What would you like the donator permission node to be?",
-    "Donators will bypass the queue!"})
+            "Donators will bypass the queue!"})
     public static Property<String> DONATOR_PERMISSION =
             newProperty("settings.donator-permission", "deluxequeues.vip");
 
     @Comment({"How would you like to inform the player that they are in the queue?",
-    "Currently supports: ACTIONBAR, TEXT, TITLE"})
+            "Currently supports: ACTIONBAR, TEXT, TITLE"})
     public static Property<String> INFORM_METHOD =
             newProperty("notify.method", "ACTIONBAR");
 

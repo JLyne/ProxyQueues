@@ -25,6 +25,10 @@ public class QueueMoveTask implements Runnable {
         if (queue.getQueue().isEmpty()) {
             return;
         }
+        // Check if the max amount of players on the server are the max slots
+        if (queue.getServer().getPlayers().size() >= queue.getMaxSlots()) {
+            return;
+        }
         // Get the player next in line
         ProxiedPlayer player = queue.getQueue().getFirst();
         // Make sure the player exists

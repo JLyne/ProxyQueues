@@ -30,14 +30,16 @@ public class DeluxeQueue {
     private ServerInfo server;
     private int delayLength;
     private int playersRequired;
+    private int maxSlots;
     private SettingsManager settingsManager;
 
-    public DeluxeQueue(DeluxeQueues deluxeQueues, ServerInfo server, int playersRequired) {
+    public DeluxeQueue(DeluxeQueues deluxeQueues, ServerInfo server, int playersRequired, int maxSlots) {
         this.deluxeQueues = deluxeQueues;
         this.server = server;
         this.settingsManager = deluxeQueues.getSettingsHandler().getSettingsManager();
         this.delayLength = settingsManager.getProperty(ConfigOptions.DELAY_LENGTH);
         this.playersRequired = playersRequired;
+        this.maxSlots = maxSlots;
 
         deluxeQueues.getProxy().getScheduler().schedule(deluxeQueues, new QueueMoveTask(this, server), 0, delayLength, TimeUnit.SECONDS);
     }

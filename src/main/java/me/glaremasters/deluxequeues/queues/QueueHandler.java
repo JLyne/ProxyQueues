@@ -95,7 +95,7 @@ public class QueueHandler {
         settingsManager.getProperty(ConfigOptions.QUEUE_SERVERS).forEach(s -> {
             try {
                 String[] split = s.split(";");
-                DeluxeQueue queue = new DeluxeQueue(deluxeQueues, deluxeQueues.getProxy().getServerInfo(split[0]), Integer.valueOf(split[1]));
+                DeluxeQueue queue = new DeluxeQueue(deluxeQueues, deluxeQueues.getProxy().getServerInfo(split[0]), Integer.valueOf(split[1]), Integer.valueOf(split[2]));
                 createQueue(queue);
             } catch (Exception ex) {
                 deluxeQueues.getLogger().warning("It seems like one of your servers was configured invalidly in the config.");
