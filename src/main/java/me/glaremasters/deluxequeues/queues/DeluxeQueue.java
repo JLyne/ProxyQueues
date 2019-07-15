@@ -32,6 +32,7 @@ public class DeluxeQueue {
     private int playersRequired;
     private int maxSlots;
     private SettingsManager settingsManager;
+    private String notifyMethod;
 
     public DeluxeQueue(DeluxeQueues deluxeQueues, ServerInfo server, int playersRequired, int maxSlots) {
         this.deluxeQueues = deluxeQueues;
@@ -40,7 +41,7 @@ public class DeluxeQueue {
         this.delayLength = settingsManager.getProperty(ConfigOptions.DELAY_LENGTH);
         this.playersRequired = playersRequired;
         this.maxSlots = maxSlots;
-
+        this.notifyMethod = settingsManager.getProperty(ConfigOptions.INFORM_METHOD);
         deluxeQueues.getProxy().getScheduler().schedule(deluxeQueues, new QueueMoveTask(this, server), 0, delayLength, TimeUnit.SECONDS);
     }
 
@@ -77,12 +78,11 @@ public class DeluxeQueue {
      * @param player the player to check
      */
     public void notifyPlayer(ProxiedPlayer player) {
-        String method = settingsManager.getProperty(ConfigOptions.INFORM_METHOD);
         String actionbar = settingsManager.getProperty(ConfigOptions.ACTIONBAR_DESIGN);
         String message = settingsManager.getProperty(ConfigOptions.TEXT_DESIGN);
         String title_top = settingsManager.getProperty(ConfigOptions.TITLE_HEADER);
         String title_bottom = settingsManager.getProperty(ConfigOptions.TITLE_FOOTER);
-        switch (method.toLowerCase()) {
+        switch (notifyMethod.toLowerCase()) {
             case "actionbar":
                 actionbar = actionbar.replace("{pos}", String.valueOf(getQueuePos(player) + 1));
                 actionbar = actionbar.replace("{total}", String.valueOf(queue.size()));
