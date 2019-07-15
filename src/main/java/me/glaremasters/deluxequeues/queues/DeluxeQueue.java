@@ -84,19 +84,19 @@ public class DeluxeQueue {
         String title_bottom = settingsManager.getProperty(ConfigOptions.TITLE_FOOTER);
         switch (method.toLowerCase()) {
             case "actionbar":
-                actionbar = actionbar.replace("{pos}", String.valueOf(getQueuePos(player)));
+                actionbar = actionbar.replace("{pos}", String.valueOf(getQueuePos(player) + 1));
                 actionbar = actionbar.replace("{total}", String.valueOf(queue.size()));
                 player.sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(ACFBungeeUtil.color(actionbar)));
                 break;
             case "text":
-                message = message.replace("{pos}", String.valueOf(getQueuePos(player)));
+                message = message.replace("{pos}", String.valueOf(getQueuePos(player) + 1));
                 message = message.replace("{total}", String.valueOf(queue.size()));
                 player.sendMessage(new TextComponent(ACFBungeeUtil.color(message)));
                 break;
             case "title":
                 Title title = deluxeQueues.getProxy().createTitle();
                 title.title(new TextComponent(ACFBungeeUtil.color(title_top)));
-                title_bottom = title_bottom.replace("{pos}", String.valueOf(getQueuePos(player)));
+                title_bottom = title_bottom.replace("{pos}", String.valueOf(getQueuePos(player) + 1));
                 title_bottom = title_bottom.replace("{total}", String.valueOf(queue.size()));
                 title.subTitle(new TextComponent(ACFBungeeUtil.color(title_bottom)));
                 player.sendTitle(title);
