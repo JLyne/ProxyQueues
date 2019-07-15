@@ -25,7 +25,7 @@ public class QueueMoveTask implements Runnable {
         if (queue.getQueue().isEmpty()) {
             return;
         }
-        
+
         // Persist the actionbar
         if (queue.getNotifyMethod().toLowerCase().equalsIgnoreCase("actionbar")) {
             queue.getQueue().forEach(p -> queue.notifyPlayer(p));

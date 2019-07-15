@@ -57,6 +57,8 @@ public class ConnectionListener implements Listener {
                         // Add the player to the queue
                         queue.addPlayer(player);
                     }
+                } else {
+                    event.setCancelled(true);
                 }
             }
         }
