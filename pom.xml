@@ -6,7 +6,7 @@
 
     <groupId>me.glaremasters</groupId>
     <artifactId>deluxequeues</artifactId>
-    <version>1.0</version>
+    <version>1.1</version>
     <packaging>jar</packaging>
 
     <name>DeluxeQueues</name>
@@ -115,5 +115,11 @@
             <version>0.5.0-SNAPSHOT</version>
             <scope>compile</scope>
         </dependency>
+        <dependency>
+            <groupId>commons-lang</groupId>
+            <artifactId>commons-lang</artifactId>
+            <version>2.6</version>
+        </dependency>
+
     </dependencies>
 </project>

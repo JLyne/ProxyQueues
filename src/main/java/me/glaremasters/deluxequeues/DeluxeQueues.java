@@ -5,6 +5,7 @@ import lombok.Getter;
 import me.glaremasters.deluxequeues.configuration.SettingsHandler;
 import me.glaremasters.deluxequeues.listeners.ConnectionListener;
 import me.glaremasters.deluxequeues.queues.QueueHandler;
+import me.glaremasters.deluxequeues.updater.UpdateChecker;
 import net.md_5.bungee.api.plugin.Plugin;
 
 import java.io.File;
@@ -23,6 +24,7 @@ public final class DeluxeQueues extends Plugin {
     public void onEnable() {
         createFile("config.yml");
         settingsHandler = new SettingsHandler(this);
+        UpdateChecker.runCheck(this, settingsHandler.getSettingsManager());
         loadACF();
         queueHandler = new QueueHandler(settingsHandler.getSettingsManager(), this);
         queueHandler.enableQueues();

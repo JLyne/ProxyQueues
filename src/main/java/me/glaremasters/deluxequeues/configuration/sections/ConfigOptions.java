@@ -17,6 +17,10 @@ import static ch.jalu.configme.properties.PropertyInitializer.newProperty;
  */
 public class ConfigOptions implements SettingsHolder {
 
+    @Comment("Would you like to check for updates?")
+    public static Property<Boolean> UPDATE_CHECK =
+            newProperty("settings.update-check", true);
+
     @Comment("How many seconds should be inbetween each queue movement?")
     public static Property<Integer> DELAY_LENGTH =
             newProperty("settings.delay-length", 2);
