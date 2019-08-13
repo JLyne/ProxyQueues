@@ -3,3 +3,10 @@ author: Glare
 version: ${project.version}
 main: me.glaremasters.deluxequeues.DeluxeQueues
 description: DeluxeQueues
+
+permissions:
+  deluxequeues.group.member:
+    children:
+      deluxequeues.leave: true
+      deluxequeues.help: true
+    default: true

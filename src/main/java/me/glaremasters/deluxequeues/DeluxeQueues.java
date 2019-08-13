@@ -1,6 +1,8 @@
 package me.glaremasters.deluxequeues;
 
 import co.aikar.commands.BungeeCommandManager;
+import me.glaremasters.deluxequeues.acf.ACFHandler;
+import me.glaremasters.deluxequeues.commands.CommandLeave;
 import me.glaremasters.deluxequeues.configuration.SettingsHandler;
 import me.glaremasters.deluxequeues.listeners.ConnectionListener;
 import me.glaremasters.deluxequeues.queues.QueueHandler;
@@ -17,15 +19,17 @@ public final class DeluxeQueues extends Plugin {
     private BungeeCommandManager commandManager;
     private SettingsHandler settingsHandler;
     private QueueHandler queueHandler;
+    private ACFHandler acfHandler;
 
     @Override
     public void onEnable() {
         createFile("config.yml");
         settingsHandler = new SettingsHandler(this);
         UpdateChecker.runCheck(this, settingsHandler.getSettingsManager());
-        loadACF();
         queueHandler = new QueueHandler(settingsHandler.getSettingsManager(), this);
         queueHandler.enableQueues();
+        commandManager = new BungeeCommandManager(this);
+        acfHandler = new ACFHandler(this, commandManager);
         getProxy().getPluginManager().registerListener(this, new ConnectionListener(this));
     }
 
@@ -33,12 +37,6 @@ public final class DeluxeQueues extends Plugin {
     public void onDisable() {
         // Plugin shutdown logic
     }
-
-    private void loadACF() {
-        // Load the command manager
-        commandManager = new BungeeCommandManager(this);
-    }
-
     /**
      * Create a file to be used in the plugin
      * @param name the name of the file

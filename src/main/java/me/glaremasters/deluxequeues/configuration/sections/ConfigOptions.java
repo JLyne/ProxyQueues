@@ -65,7 +65,7 @@ public class ConfigOptions implements SettingsHolder {
                 "Creator: Glare",
                 "Contributors: https://github.com/darbyjack/DeluxeQueues/graphs/contributors",
                 "Issues: https://github.com/darbyjack/DeluxeQueues/issues",
-                "Spigot: TBD",
+                "Spigot: https://www.spigotmc.org/resources/69390/",
                 "Discord: https://helpch.at/discord"
         };
         configuration.setComment("settings", pluginHeader);
