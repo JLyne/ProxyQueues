@@ -1,7 +1,6 @@
 package me.glaremasters.deluxequeues.queues;
 
 import ch.jalu.configme.SettingsManager;
-import lombok.Getter;
 import me.glaremasters.deluxequeues.DeluxeQueues;
 import me.glaremasters.deluxequeues.configuration.sections.ConfigOptions;
 import net.md_5.bungee.api.config.ServerInfo;
@@ -16,7 +15,6 @@ import java.util.List;
  * Date: 7/13/2019
  * Time: 10:31 PM
  */
-@Getter
 public class QueueHandler {
 
     private List<DeluxeQueue> queues;
@@ -101,5 +99,21 @@ public class QueueHandler {
                 deluxeQueues.getLogger().warning("It seems like one of your servers was configured invalidly in the config.");
             }
         });
+    }
+
+    public List<DeluxeQueue> getQueues() {
+        return this.queues;
+    }
+
+    public List<ServerInfo> getServers() {
+        return this.servers;
+    }
+
+    public SettingsManager getSettingsManager() {
+        return this.settingsManager;
+    }
+
+    public DeluxeQueues getDeluxeQueues() {
+        return this.deluxeQueues;
     }
 }

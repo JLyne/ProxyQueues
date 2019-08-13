@@ -2,8 +2,6 @@ package me.glaremasters.deluxequeues.queues;
 
 import ch.jalu.configme.SettingsManager;
 import co.aikar.commands.ACFBungeeUtil;
-import lombok.Getter;
-import lombok.ToString;
 import me.glaremasters.deluxequeues.DeluxeQueues;
 import me.glaremasters.deluxequeues.configuration.sections.ConfigOptions;
 import me.glaremasters.deluxequeues.tasks.QueueMoveTask;
@@ -21,8 +19,6 @@ import java.util.concurrent.TimeUnit;
  * Date: 7/13/2019
  * Time: 10:30 PM
  */
-@Getter
-@ToString
 public class DeluxeQueue {
 
     private DeluxeQueues deluxeQueues;
@@ -113,4 +109,39 @@ public class DeluxeQueue {
         return queue.contains(player);
     }
 
+    public DeluxeQueues getDeluxeQueues() {
+        return this.deluxeQueues;
+    }
+
+    public LinkedList<ProxiedPlayer> getQueue() {
+        return this.queue;
+    }
+
+    public ServerInfo getServer() {
+        return this.server;
+    }
+
+    public int getDelayLength() {
+        return this.delayLength;
+    }
+
+    public int getPlayersRequired() {
+        return this.playersRequired;
+    }
+
+    public int getMaxSlots() {
+        return this.maxSlots;
+    }
+
+    public SettingsManager getSettingsManager() {
+        return this.settingsManager;
+    }
+
+    public String getNotifyMethod() {
+        return this.notifyMethod;
+    }
+
+    public String toString() {
+        return "DeluxeQueue(deluxeQueues=" + this.getDeluxeQueues() + ", queue=" + this.getQueue() + ", server=" + this.getServer() + ", delayLength=" + this.getDelayLength() + ", playersRequired=" + this.getPlayersRequired() + ", maxSlots=" + this.getMaxSlots() + ", settingsManager=" + this.getSettingsManager() + ", notifyMethod=" + this.getNotifyMethod() + ")";
+    }
 }

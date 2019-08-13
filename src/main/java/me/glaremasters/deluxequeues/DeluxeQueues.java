@@ -1,7 +1,6 @@
 package me.glaremasters.deluxequeues;
 
 import co.aikar.commands.BungeeCommandManager;
-import lombok.Getter;
 import me.glaremasters.deluxequeues.configuration.SettingsHandler;
 import me.glaremasters.deluxequeues.listeners.ConnectionListener;
 import me.glaremasters.deluxequeues.queues.QueueHandler;
@@ -13,7 +12,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 
-@Getter
 public final class DeluxeQueues extends Plugin {
 
     private BungeeCommandManager commandManager;
@@ -59,5 +57,17 @@ public final class DeluxeQueues extends Plugin {
                 ex.printStackTrace();
             }
         }
+    }
+
+    public BungeeCommandManager getCommandManager() {
+        return this.commandManager;
+    }
+
+    public SettingsHandler getSettingsHandler() {
+        return this.settingsHandler;
+    }
+
+    public QueueHandler getQueueHandler() {
+        return this.queueHandler;
     }
 }
