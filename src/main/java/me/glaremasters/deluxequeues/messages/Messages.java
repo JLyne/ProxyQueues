@@ -5,7 +5,7 @@ import co.aikar.locales.MessageKeyProvider;
 
 public enum Messages implements MessageKeyProvider {
 
-    ;
+    QUEUES__LEFT;
 
 
     /**

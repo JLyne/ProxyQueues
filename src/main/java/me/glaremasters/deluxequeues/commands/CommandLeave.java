@@ -7,6 +7,7 @@ import co.aikar.commands.annotation.CommandPermission;
 import co.aikar.commands.annotation.Dependency;
 import co.aikar.commands.annotation.Description;
 import co.aikar.commands.annotation.Subcommand;
+import me.glaremasters.deluxequeues.messages.Messages;
 import me.glaremasters.deluxequeues.queues.QueueHandler;
 import me.glaremasters.deluxequeues.utils.Constants;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
@@ -21,6 +22,6 @@ public class CommandLeave extends BaseCommand {
     @CommandPermission(Constants.BASE_PERM + "leave")
     public void execute(ProxiedPlayer player) {
         queueHandler.clearPlayer(player);
-        getCurrentCommandIssuer().sendMessage(ACFBungeeUtil.color("&6You've successfully left the queue!"));
+        getCurrentCommandIssuer().sendInfo(Messages.QUEUES__LEFT);
     }
 }

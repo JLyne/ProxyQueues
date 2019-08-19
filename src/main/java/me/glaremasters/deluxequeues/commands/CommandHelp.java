@@ -5,7 +5,6 @@ import co.aikar.commands.annotation.CommandAlias;
 import co.aikar.commands.annotation.CommandPermission;
 import co.aikar.commands.annotation.Description;
 import co.aikar.commands.annotation.HelpCommand;
-import me.glaremasters.deluxequeues.messages.Messages;
 import me.glaremasters.deluxequeues.utils.Constants;
 
 @CommandAlias("%dq")
