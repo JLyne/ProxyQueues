@@ -2,7 +2,6 @@ package me.glaremasters.deluxequeues;
 
 import co.aikar.commands.BungeeCommandManager;
 import me.glaremasters.deluxequeues.acf.ACFHandler;
-import me.glaremasters.deluxequeues.commands.CommandLeave;
 import me.glaremasters.deluxequeues.configuration.SettingsHandler;
 import me.glaremasters.deluxequeues.listeners.ConnectionListener;
 import me.glaremasters.deluxequeues.queues.QueueHandler;
@@ -12,12 +11,7 @@ import net.md_5.bungee.api.plugin.Plugin;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.JarURLConnection;
 import java.nio.file.Files;
-import java.util.Enumeration;
-import java.util.Objects;
-import java.util.jar.JarEntry;
-import java.util.jar.JarFile;
 
 public final class DeluxeQueues extends Plugin {
 
@@ -29,6 +23,7 @@ public final class DeluxeQueues extends Plugin {
     @Override
     public void onEnable() {
         createFile("config.yml");
+        createFile("languages/en-US.yml");
         settingsHandler = new SettingsHandler(this);
         UpdateChecker.runCheck(this, settingsHandler.getSettingsManager());
         queueHandler = new QueueHandler(settingsHandler.getSettingsManager(), this);
@@ -50,6 +45,10 @@ public final class DeluxeQueues extends Plugin {
         if (!getDataFolder().exists()) {
             getDataFolder().mkdir();
         }
+        File languageFolder = new File(getDataFolder(), "languages");
+        if (!languageFolder.exists()) {
+            languageFolder.mkdirs();
+        }
 
         File file = new File(getDataFolder(), name);
 
@@ -60,39 +59,6 @@ public final class DeluxeQueues extends Plugin {
                 ex.printStackTrace();
             }
         }
-    }
-
-    /**
-     * Save and handle new files if needed
-     */
-    private void saveData() {
-        File languageFolder = new File(getDataFolder(), "languages");
-        if (!languageFolder.exists()) //noinspection ResultOfMethodCallIgnored
-            languageFolder.mkdirs();
-        try {
-            final JarURLConnection connection = (JarURLConnection) Objects.requireNonNull(this.getClass().getClassLoader().getResource("languages")).openConnection();
-            final JarFile thisJar = connection.getJarFile();
-            final Enumeration<JarEntry> entries = thisJar.entries();
-            while (entries.hasMoreElements()) {
-                final JarEntry current = entries.nextElement();
-                if (!current.getName().startsWith("languages/") || current.getName().length() == "languages/".length()) {
-                    continue;
-                }
-                final String name = current.getName().substring("languages/".length());
-                File langFile = new File(languageFolder, name);
-                if (!langFile.exists()) {
-                    try (InputStream in = getResourceAsStream(name)) {
-                        Files.copy(in, langFile.toPath());
-                    } catch (IOException ex) {
-                        ex.printStackTrace();
-                    }
-                }
-            }
-
-        } catch (final IOException ex) {
-            ex.printStackTrace();
-        }
-
     }
 
     public BungeeCommandManager getCommandManager() {
