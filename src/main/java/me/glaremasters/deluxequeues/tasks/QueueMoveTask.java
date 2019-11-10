@@ -1,8 +1,10 @@
 package me.glaremasters.deluxequeues.tasks;
 
 import me.glaremasters.deluxequeues.queues.DeluxeQueue;
+import net.md_5.bungee.api.ServerConnectRequest;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
+import net.md_5.bungee.api.event.ServerConnectEvent;
 
 /**
  * Created by Glare
@@ -39,10 +41,12 @@ public class QueueMoveTask implements Runnable {
         ProxiedPlayer player = queue.getQueue().getFirst();
         // Make sure the player exists
         if (player != null) {
-            // Move the player to that server
-            player.connect(server);
+            ServerConnectRequest.Builder request = ServerConnectRequest.builder().retry(false).reason(
+                    ServerConnectEvent.Reason.PLUGIN).target(server).silent(true);
+
+            queue.getDeluxeQueues().getLogger().info(request.toString());
+
+            player.connect(request.build());
         }
-        // Remove the player from the queue
-        queue.getQueue().pollFirst();
     }
 }

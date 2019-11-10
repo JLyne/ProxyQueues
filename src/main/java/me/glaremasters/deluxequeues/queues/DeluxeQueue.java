@@ -2,11 +2,19 @@ package me.glaremasters.deluxequeues.queues;
 
 import ch.jalu.configme.SettingsManager;
 import co.aikar.commands.ACFBungeeUtil;
+import co.aikar.commands.BungeeCommandIssuer;
+import co.aikar.commands.CommandIssuer;
+import co.aikar.commands.MessageType;
 import me.glaremasters.deluxequeues.DeluxeQueues;
 import me.glaremasters.deluxequeues.configuration.sections.ConfigOptions;
+import me.glaremasters.deluxequeues.events.PlayerQueueEvent;
+import me.glaremasters.deluxequeues.messages.Messages;
 import me.glaremasters.deluxequeues.tasks.QueueMoveTask;
+import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.ChatMessageType;
+import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.Title;
+import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
@@ -46,9 +54,17 @@ public class DeluxeQueue {
      * @param player the player to add
      */
     public void addPlayer(ProxiedPlayer player) {
-            if (!queue.contains(player)) {
+        if (!queue.contains(player)) {
+            PlayerQueueEvent queueEvent = deluxeQueues.getProxy().getPluginManager().callEvent(new PlayerQueueEvent(player, server));
+
+            //Don't add to queue if event cancelled, show player the reason
+            if(queueEvent.isCancelled()) {
+                deluxeQueues.getCommandManager().sendMessage(player, MessageType.ERROR, Messages.QUEUES__CANNOT_JOIN);
+                player.sendMessage(new ComponentBuilder(queueEvent.getReason()).color(ChatColor.RED).create());
+            } else {
                 queue.add(player);
                 notifyPlayer(player);
+            }
         }
     }
 
@@ -74,17 +90,21 @@ public class DeluxeQueue {
      * @param player the player to check
      */
     public void notifyPlayer(ProxiedPlayer player) {
+
         String actionbar = settingsManager.getProperty(ConfigOptions.ACTIONBAR_DESIGN);
         String message = settingsManager.getProperty(ConfigOptions.TEXT_DESIGN);
         String title_top = settingsManager.getProperty(ConfigOptions.TITLE_HEADER);
         String title_bottom = settingsManager.getProperty(ConfigOptions.TITLE_FOOTER);
+
         switch (notifyMethod.toLowerCase()) {
             case "actionbar":
+                actionbar = actionbar.replace("{server}", server.getName());
                 actionbar = actionbar.replace("{pos}", String.valueOf(getQueuePos(player) + 1));
                 actionbar = actionbar.replace("{total}", String.valueOf(queue.size()));
                 player.sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(ACFBungeeUtil.color(actionbar)));
                 break;
             case "text":
+                message = message.replace("{server}", server.getName());
                 message = message.replace("{pos}", String.valueOf(getQueuePos(player) + 1));
                 message = message.replace("{total}", String.valueOf(queue.size()));
                 player.sendMessage(new TextComponent(ACFBungeeUtil.color(message)));
@@ -92,6 +112,7 @@ public class DeluxeQueue {
             case "title":
                 Title title = deluxeQueues.getProxy().createTitle();
                 title.title(new TextComponent(ACFBungeeUtil.color(title_top)));
+                title_bottom = title_bottom.replace("{server}", server.getName());
                 title_bottom = title_bottom.replace("{pos}", String.valueOf(getQueuePos(player) + 1));
                 title_bottom = title_bottom.replace("{total}", String.valueOf(queue.size()));
                 title.subTitle(new TextComponent(ACFBungeeUtil.color(title_bottom)));
@@ -105,8 +126,8 @@ public class DeluxeQueue {
      * @param player the player to check for
      * @return in the queue or not
      */
-    public boolean checkForPlayer(ProxiedPlayer player) {
-        return queue.contains(player);
+    public int checkForPlayer(ProxiedPlayer player) {
+        return queue.indexOf(player);
     }
 
     public DeluxeQueues getDeluxeQueues() {

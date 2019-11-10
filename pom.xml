@@ -84,11 +84,13 @@
 
     <dependencies>
         <dependency>
-            <groupId>net.md-5</groupId>
-            <artifactId>bungeecord-api</artifactId>
-            <version>1.13-SNAPSHOT</version>
-            <scope>provided</scope>
+            <groupId>network.ycc.waterdog</groupId>
+            <artifactId>waterdog-api</artifactId>
+            <version>1.14-SNAPSHOT</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/libs/Waterdog.jar</systemPath>
         </dependency>
+
         <!-- ConfigMe API (handles the config) -->
         <dependency>
             <groupId>ch.jalu</groupId>

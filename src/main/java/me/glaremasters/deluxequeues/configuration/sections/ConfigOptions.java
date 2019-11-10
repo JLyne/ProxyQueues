@@ -33,6 +33,10 @@ public class ConfigOptions implements SettingsHolder {
     public static Property<List<String>> QUEUE_SERVERS =
             newListProperty("settings.servers", "");
 
+    @Comment({"Players joining queue servers directly will be redirect to this server, or kicked if it isn't available"})
+    public static Property<String> WAITING_SERVER =
+            newProperty("settings.waiting-server", "");
+
     @Comment({"What would you like the donator permission node to be?",
             "Donators will bypass the queue!"})
     public static Property<String> DONATOR_PERMISSION =
