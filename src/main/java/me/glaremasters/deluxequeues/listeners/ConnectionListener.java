@@ -5,6 +5,7 @@ import me.glaremasters.deluxequeues.DeluxeQueues;
 import me.glaremasters.deluxequeues.configuration.sections.ConfigOptions;
 import me.glaremasters.deluxequeues.queues.DeluxeQueue;
 import me.glaremasters.deluxequeues.queues.QueueHandler;
+import me.glaremasters.deluxequeues.queues.QueuePlayer;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.event.PlayerDisconnectEvent;
@@ -48,17 +49,17 @@ public class ConnectionListener implements Listener {
             if (queueHandler.checkForQueue(server)) {
                 // Get the queue
                 DeluxeQueue queue = queueHandler.getQueue(server);
-                // Make sure it doesn't contain the player
-                if (!queue.checkForPlayer(player)) {
-                    // Make sure the player can actually be added
-                    if (queue.canAddPlayer()) {
-                        // Cancel the event so they don't go right away
-                        event.setCancelled(true);
-                        // Add the player to the queue
-                        queue.addPlayer(player);
+                QueuePlayer p = queue.getFromProxy(player);
+                if (p != null) {
+                    if (p.isReadyToMove()) {
+                        event.setCancelled(false);
+                        queue.removePlayer(p);
+                        return;
                     }
-                } else {
+                }
+                if (queue.canAddPlayer()) {
                     event.setCancelled(true);
+                    queue.addPlayer(player);
                 }
             }
         }

@@ -22,7 +22,7 @@ import java.util.concurrent.TimeUnit;
 public class DeluxeQueue {
 
     private DeluxeQueues deluxeQueues;
-    private LinkedList<ProxiedPlayer> queue = new LinkedList<>();
+    private LinkedList<QueuePlayer> queue = new LinkedList<>();
     private ServerInfo server;
     private int delayLength;
     private int playersRequired;
@@ -46,10 +46,17 @@ public class DeluxeQueue {
      * @param player the player to add
      */
     public void addPlayer(ProxiedPlayer player) {
-            if (!queue.contains(player)) {
-                queue.add(player);
-                notifyPlayer(player);
+        if (getFromProxy(player) == null) {
+            queue.add(new QueuePlayer(player, false));
         }
+    }
+
+    public void removePlayer(QueuePlayer player) {
+        queue.remove(player);
+    }
+
+    public QueuePlayer getFromProxy(ProxiedPlayer player) {
+        return queue.stream().filter(q -> q.getPlayer() == player).findFirst().orElse(null);
     }
 
     /**
@@ -65,7 +72,7 @@ public class DeluxeQueue {
      * @param player the player to check
      * @return their position
      */
-    public int getQueuePos(ProxiedPlayer player) {
+    public int getQueuePos(QueuePlayer player) {
         return queue.indexOf(player);
     }
 
@@ -73,7 +80,7 @@ public class DeluxeQueue {
      * Notify the player that they are in the queue
      * @param player the player to check
      */
-    public void notifyPlayer(ProxiedPlayer player) {
+    public void notifyPlayer(QueuePlayer player) {
         String actionbar = settingsManager.getProperty(ConfigOptions.ACTIONBAR_DESIGN);
         String message = settingsManager.getProperty(ConfigOptions.TEXT_DESIGN);
         String title_top = settingsManager.getProperty(ConfigOptions.TITLE_HEADER);
@@ -82,12 +89,12 @@ public class DeluxeQueue {
             case "actionbar":
                 actionbar = actionbar.replace("{pos}", String.valueOf(getQueuePos(player) + 1));
                 actionbar = actionbar.replace("{total}", String.valueOf(queue.size()));
-                player.sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(ACFBungeeUtil.color(actionbar)));
+                player.getPlayer().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(ACFBungeeUtil.color(actionbar)));
                 break;
             case "text":
                 message = message.replace("{pos}", String.valueOf(getQueuePos(player) + 1));
                 message = message.replace("{total}", String.valueOf(queue.size()));
-                player.sendMessage(new TextComponent(ACFBungeeUtil.color(message)));
+                player.getPlayer().sendMessage(new TextComponent(ACFBungeeUtil.color(message)));
                 break;
             case "title":
                 Title title = deluxeQueues.getProxy().createTitle();
@@ -95,25 +102,16 @@ public class DeluxeQueue {
                 title_bottom = title_bottom.replace("{pos}", String.valueOf(getQueuePos(player) + 1));
                 title_bottom = title_bottom.replace("{total}", String.valueOf(queue.size()));
                 title.subTitle(new TextComponent(ACFBungeeUtil.color(title_bottom)));
-                player.sendTitle(title);
+                player.getPlayer().sendTitle(title);
                 break;
         }
-    }
-
-    /**
-     * Check if the queue is holding a player
-     * @param player the player to check for
-     * @return in the queue or not
-     */
-    public boolean checkForPlayer(ProxiedPlayer player) {
-        return queue.contains(player);
     }
 
     public DeluxeQueues getDeluxeQueues() {
         return this.deluxeQueues;
     }
 
-    public LinkedList<ProxiedPlayer> getQueue() {
+    public LinkedList<QueuePlayer> getQueue() {
         return this.queue;
     }
 
