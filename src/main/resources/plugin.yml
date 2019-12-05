@@ -10,3 +10,7 @@ permissions:
       deluxequeues.leave: true
       deluxequeues.help: true
     default: true
+  deluxequeues.group.admin:
+    children:
+      deluxequeues.admin: true
+    default: op

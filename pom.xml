@@ -6,7 +6,7 @@
 
     <groupId>me.glaremasters</groupId>
     <artifactId>deluxequeues</artifactId>
-    <version>1.2</version>
+    <version>1.4-BETA</version>
     <packaging>jar</packaging>
 
     <name>DeluxeQueues</name>
