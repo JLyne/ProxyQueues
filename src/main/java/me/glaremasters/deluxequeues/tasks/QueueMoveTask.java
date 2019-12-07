@@ -27,10 +27,8 @@ public class QueueMoveTask implements Runnable {
             return;
         }
 
-        // Persist the actionbar
-        if (queue.getNotifyMethod().toLowerCase().equalsIgnoreCase("actionbar")) {
-            queue.getQueue().forEach(p -> queue.notifyPlayer(p));
-        }
+        // Persist the notification to the user
+        queue.getQueue().forEach(p -> queue.notifyPlayer(p));
 
         // Check if the max amount of players on the server are the max slots
         if (queue.getServer().getPlayers().size() >= queue.getMaxSlots()) {
