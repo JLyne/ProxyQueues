@@ -47,7 +47,13 @@ public class DeluxeQueue {
      */
     public void addPlayer(ProxiedPlayer player) {
         if (getFromProxy(player) == null) {
-            queue.add(new QueuePlayer(player, false));
+            QueuePlayer qp = new QueuePlayer(player, false);
+            if (player.hasPermission(settingsManager.getProperty(ConfigOptions.DONATOR_PERMISSION))) {
+                queue.addFirst(qp);
+            }
+            else {
+                queue.add(qp);
+            }
         }
     }
 

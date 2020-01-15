@@ -41,8 +41,8 @@ public class ConnectionListener implements Listener {
         ServerInfo server = event.getTarget();
         // Get the player in the event
         ProxiedPlayer player = event.getPlayer();
-        // Create a boolean for bypass with donator
-        boolean bypass = player.hasPermission(settingsManager.getProperty(ConfigOptions.DONATOR_PERMISSION));
+        // Create a boolean for bypass with staff
+        boolean bypass = player.hasPermission(settingsManager.getProperty(ConfigOptions.STAFF_PERMISSION));
         // Run this if they dont bypass
         if (!bypass) {
             // Check if the server has a queue
