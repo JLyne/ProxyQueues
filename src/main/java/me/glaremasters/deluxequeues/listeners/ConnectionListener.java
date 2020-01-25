@@ -1,30 +1,26 @@
 package me.glaremasters.deluxequeues.listeners;
 
 import ch.jalu.configme.SettingsManager;
-import co.aikar.commands.ACFBungeeUtil;
+import com.velocitypowered.api.event.Subscribe;
+import com.velocitypowered.api.event.connection.DisconnectEvent;
+import com.velocitypowered.api.event.player.ServerConnectedEvent;
+import com.velocitypowered.api.event.player.ServerPreConnectEvent;
+import com.velocitypowered.api.proxy.Player;
+import com.velocitypowered.api.proxy.server.RegisteredServer;
 import me.glaremasters.deluxequeues.DeluxeQueues;
 import me.glaremasters.deluxequeues.configuration.sections.ConfigOptions;
 import me.glaremasters.deluxequeues.events.PlayerQueueEvent;
 import me.glaremasters.deluxequeues.queues.DeluxeQueue;
 import me.glaremasters.deluxequeues.queues.QueueHandler;
-import net.md_5.bungee.api.ChatColor;
-import net.md_5.bungee.api.chat.ComponentBuilder;
-import net.md_5.bungee.api.chat.TextComponent;
-import net.md_5.bungee.api.config.ServerInfo;
-import net.md_5.bungee.api.connection.ProxiedPlayer;
-import net.md_5.bungee.api.event.PlayerDisconnectEvent;
-import net.md_5.bungee.api.event.ServerConnectEvent;
-import net.md_5.bungee.api.event.ServerConnectedEvent;
-import net.md_5.bungee.api.plugin.Listener;
-import net.md_5.bungee.event.EventHandler;
-import net.md_5.bungee.event.EventPriority;
+import net.kyori.text.TextComponent;
+import net.kyori.text.format.TextColor;
 
 /**
  * Created by Glare
  * Date: 7/14/2019
  * Time: 12:13 AM
  */
-public class ConnectionListener implements Listener {
+public class ConnectionListener {
 
     private DeluxeQueues deluxeQueues;
     private QueueHandler queueHandler;
@@ -36,12 +32,11 @@ public class ConnectionListener implements Listener {
         this.settingsManager = deluxeQueues.getSettingsHandler().getSettingsManager();
     }
 
-    @EventHandler(priority = EventPriority.LOW)
-    public void onJoin(ServerConnectEvent event) {
+    public void onJoin(ServerPreConnectEvent event) {
         // Get the server in the event
-        ServerInfo server = event.getTarget();
+        RegisteredServer server = event.getOriginalServer();
         // Get the player in the event
-        ProxiedPlayer player = event.getPlayer();
+        Player player = event.getPlayer();
         // Create a boolean for bypass with donator
         boolean bypass = player.hasPermission(settingsManager.getProperty(ConfigOptions.DONATOR_PERMISSION));
 
@@ -64,20 +59,20 @@ public class ConnectionListener implements Listener {
             case -1 : //Not in queue
                  // Make sure the player can actually be added
                 if (queue.canAddPlayer()) {
-                    if(event.getReason() == ServerConnectEvent.Reason.JOIN_PROXY) {
+                    if(!event.getPlayer().getCurrentServer().isPresent()) {
                         String waitingServerName = deluxeQueues.getSettingsHandler().getSettingsManager().getProperty(ConfigOptions.WAITING_SERVER);
-                        ServerInfo waitingServer = deluxeQueues.getProxy().getServerInfo(waitingServerName);
+                        RegisteredServer waitingServer = deluxeQueues.getProxy().getServerInfo(waitingServerName);
 
                         if(waitingServer != null) {
-                            event.setTarget(waitingServer);
+                            event.setResult(ServerPreConnectEvent.ServerResult.allowed(waitingServer));
                         } else {
-                            player.disconnect(new ComponentBuilder(
-                                    "This server has queueing enabled and can't be connected to directly. Please connect via minecraft.rtgame.co.uk").color(
-                                    ChatColor.RED).create());
+                            player.disconnect(TextComponent.of(
+                                    "This server has queueing enabled and can't be connected to directly. Please connect via minecraft.rtgame.co.uk")
+                                                      .color(TextColor.RED));
                         }
                     } else {
                         // Cancel the event so they don't go right away
-                        event.setCancelled(true);
+                        event.setResult(ServerPreConnectEvent.ServerResult.denied());
                     }
 
                     // Add the player to the queue
@@ -88,18 +83,18 @@ public class ConnectionListener implements Listener {
                 break;
 
             default: //Elsewhere in queue
-                event.setCancelled(true);
+                event.setResult(ServerPreConnectEvent.ServerResult.denied());
 
         }
     }
 
-    @EventHandler(priority = EventPriority.LOW)
+    @Subscribe
     public void onConnected(ServerConnectedEvent event) {
         queueHandler.clearPlayer(event.getPlayer());
     }
 
-    @EventHandler(priority = EventPriority.LOW)
-    public void onLeave(PlayerDisconnectEvent event) {
+    @Subscribe
+    public void onLeave(DisconnectEvent event) {
         // Remove player from all queues
         queueHandler.clearPlayer(event.getPlayer());
     }

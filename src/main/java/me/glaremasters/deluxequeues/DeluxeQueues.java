@@ -1,27 +1,48 @@
 package me.glaremasters.deluxequeues;
 
 import co.aikar.commands.BungeeCommandManager;
+import com.velocitypowered.api.event.Subscribe;
+import com.velocitypowered.api.event.proxy.ProxyInitializeEvent;
+import com.velocitypowered.api.plugin.Plugin;
+import com.velocitypowered.api.plugin.annotation.DataDirectory;
+import com.velocitypowered.api.proxy.ProxyServer;
 import me.glaremasters.deluxequeues.acf.ACFHandler;
 import me.glaremasters.deluxequeues.configuration.SettingsHandler;
 import me.glaremasters.deluxequeues.listeners.ConnectionListener;
 import me.glaremasters.deluxequeues.queues.QueueHandler;
 import me.glaremasters.deluxequeues.updater.UpdateChecker;
-import net.md_5.bungee.api.plugin.Plugin;
+import org.slf4j.Logger;
 
+import javax.inject.Inject;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
+import java.nio.file.Path;
 
-public final class DeluxeQueues extends Plugin {
+@Plugin(id="deluxequeues", name="DeluxeQueues")
+public final class DeluxeQueues {
 
     private BungeeCommandManager commandManager;
     private SettingsHandler settingsHandler;
     private QueueHandler queueHandler;
     private ACFHandler acfHandler;
 
-    @Override
-    public void onEnable() {
+    private final ProxyServer proxyServer;
+    private final Logger logger;
+
+    @Inject
+    @DataDirectory
+    private Path dataFolder;
+
+    @Inject
+    public DeluxeQueues(ProxyServer proxy, Logger logger) {
+        this.proxyServer = proxy;
+        this.logger = logger;
+    }
+
+    @Subscribe
+    public void onProxyInitialize(ProxyInitializeEvent event) {
         createFile("config.yml");
         createFile("languages/en-US.yml");
         settingsHandler = new SettingsHandler(this);
@@ -30,30 +51,28 @@ public final class DeluxeQueues extends Plugin {
         queueHandler.enableQueues();
         commandManager = new BungeeCommandManager(this);
         acfHandler = new ACFHandler(this, commandManager);
-        getProxy().getPluginManager().registerListener(this, new ConnectionListener(this));
+        proxyServer.getEventManager().register(this, new ConnectionListener(this));
     }
 
-    @Override
-    public void onDisable() {
-        // Plugin shutdown logic
-    }
     /**
      * Create a file to be used in the plugin
      * @param name the name of the file
      */
     private void createFile(String name) {
-        if (!getDataFolder().exists()) {
-            getDataFolder().mkdir();
+        File folder = dataFolder.toFile();
+
+        if (!folder.exists()) {
+            folder.mkdir();
         }
-        File languageFolder = new File(getDataFolder(), "languages");
+        File languageFolder = new File(folder, "languages");
         if (!languageFolder.exists()) {
             languageFolder.mkdirs();
         }
 
-        File file = new File(getDataFolder(), name);
+        File file = new File(folder, name);
 
         if (!file.exists()) {
-            try (InputStream in = getResourceAsStream(name)) {
+            try (InputStream in = getClass().getClassLoader().getResourceAsStream(name)) {
                 Files.copy(in, file.toPath());
             } catch (IOException ex) {
                 ex.printStackTrace();

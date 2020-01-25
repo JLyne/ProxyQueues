@@ -2,22 +2,16 @@ package me.glaremasters.deluxequeues.queues;
 
 import ch.jalu.configme.SettingsManager;
 import co.aikar.commands.ACFBungeeUtil;
-import co.aikar.commands.BungeeCommandIssuer;
-import co.aikar.commands.CommandIssuer;
 import co.aikar.commands.MessageType;
+import com.velocitypowered.api.proxy.Player;
+import com.velocitypowered.api.proxy.server.RegisteredServer;
 import me.glaremasters.deluxequeues.DeluxeQueues;
 import me.glaremasters.deluxequeues.configuration.sections.ConfigOptions;
 import me.glaremasters.deluxequeues.events.PlayerQueueEvent;
 import me.glaremasters.deluxequeues.messages.Messages;
 import me.glaremasters.deluxequeues.tasks.QueueMoveTask;
-import net.md_5.bungee.api.ChatColor;
-import net.md_5.bungee.api.ChatMessageType;
-import net.md_5.bungee.api.CommandSender;
-import net.md_5.bungee.api.Title;
-import net.md_5.bungee.api.chat.ComponentBuilder;
-import net.md_5.bungee.api.chat.TextComponent;
-import net.md_5.bungee.api.config.ServerInfo;
-import net.md_5.bungee.api.connection.ProxiedPlayer;
+import net.kyori.text.TextComponent;
+import net.kyori.text.format.TextColor;
 
 import java.util.LinkedList;
 import java.util.concurrent.TimeUnit;
@@ -30,15 +24,15 @@ import java.util.concurrent.TimeUnit;
 public class DeluxeQueue {
 
     private DeluxeQueues deluxeQueues;
-    private LinkedList<ProxiedPlayer> queue = new LinkedList<>();
-    private ServerInfo server;
+    private LinkedList<Player> queue = new LinkedList<>();
+    private RegisteredServer server;
     private int delayLength;
     private int playersRequired;
     private int maxSlots;
     private SettingsManager settingsManager;
     private String notifyMethod;
 
-    public DeluxeQueue(DeluxeQueues deluxeQueues, ServerInfo server, int playersRequired, int maxSlots) {
+    public DeluxeQueue(DeluxeQueues deluxeQueues, RegisteredServer server, int playersRequired, int maxSlots) {
         this.deluxeQueues = deluxeQueues;
         this.server = server;
         this.settingsManager = deluxeQueues.getSettingsHandler().getSettingsManager();
@@ -53,14 +47,14 @@ public class DeluxeQueue {
      * Add a player to a queue
      * @param player the player to add
      */
-    public void addPlayer(ProxiedPlayer player) {
+    public void addPlayer(Player player) {
         if (!queue.contains(player)) {
             PlayerQueueEvent queueEvent = deluxeQueues.getProxy().getPluginManager().callEvent(new PlayerQueueEvent(player, server));
 
             //Don't add to queue if event cancelled, show player the reason
             if(queueEvent.isCancelled()) {
                 deluxeQueues.getCommandManager().sendMessage(player, MessageType.ERROR, Messages.QUEUES__CANNOT_JOIN);
-                player.sendMessage(new ComponentBuilder(queueEvent.getReason()).color(ChatColor.RED).create());
+                player.sendMessage(TextComponent.of(queueEvent.getReason()).color(TextColor.RED).create());
             } else {
                 queue.add(player);
                 notifyPlayer(player);
@@ -81,7 +75,7 @@ public class DeluxeQueue {
      * @param player the player to check
      * @return their position
      */
-    public int getQueuePos(ProxiedPlayer player) {
+    public int getQueuePos(Player player) {
         return queue.indexOf(player);
     }
 
@@ -89,7 +83,7 @@ public class DeluxeQueue {
      * Notify the player that they are in the queue
      * @param player the player to check
      */
-    public void notifyPlayer(ProxiedPlayer player) {
+    public void notifyPlayer(Player player) {
 
         String actionbar = settingsManager.getProperty(ConfigOptions.ACTIONBAR_DESIGN);
         String message = settingsManager.getProperty(ConfigOptions.TEXT_DESIGN);
@@ -98,24 +92,24 @@ public class DeluxeQueue {
 
         switch (notifyMethod.toLowerCase()) {
             case "actionbar":
-                actionbar = actionbar.replace("{server}", server.getName());
+                actionbar = actionbar.replace("{server}", server.getServerInfo().getName());
                 actionbar = actionbar.replace("{pos}", String.valueOf(getQueuePos(player) + 1));
                 actionbar = actionbar.replace("{total}", String.valueOf(queue.size()));
-                player.sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(ACFBungeeUtil.color(actionbar)));
+                player.sendMessage(ChatMessageType.ACTION_BAR, TextComponent.of(ACFBungeeUtil.color(actionbar)));
                 break;
             case "text":
-                message = message.replace("{server}", server.getName());
+                message = message.replace("{server}", server.getServerInfo().getName());
                 message = message.replace("{pos}", String.valueOf(getQueuePos(player) + 1));
                 message = message.replace("{total}", String.valueOf(queue.size()));
-                player.sendMessage(new TextComponent(ACFBungeeUtil.color(message)));
+                player.sendMessage(TextComponent.of(ACFBungeeUtil.color(message)));
                 break;
             case "title":
                 Title title = deluxeQueues.getProxy().createTitle();
-                title.title(new TextComponent(ACFBungeeUtil.color(title_top)));
-                title_bottom = title_bottom.replace("{server}", server.getName());
+                title.title(TextComponent.of(ACFBungeeUtil.color(title_top)));
+                title_bottom = title_bottom.replace("{server}", server.getServerInfo().getName());
                 title_bottom = title_bottom.replace("{pos}", String.valueOf(getQueuePos(player) + 1));
                 title_bottom = title_bottom.replace("{total}", String.valueOf(queue.size()));
-                title.subTitle(new TextComponent(ACFBungeeUtil.color(title_bottom)));
+                title.subTitle(TextComponent.of(ACFBungeeUtil.color(title_bottom)));
                 player.sendTitle(title);
                 break;
         }
@@ -126,7 +120,7 @@ public class DeluxeQueue {
      * @param player the player to check for
      * @return in the queue or not
      */
-    public int checkForPlayer(ProxiedPlayer player) {
+    public int checkForPlayer(Player player) {
         return queue.indexOf(player);
     }
 
@@ -134,11 +128,11 @@ public class DeluxeQueue {
         return this.deluxeQueues;
     }
 
-    public LinkedList<ProxiedPlayer> getQueue() {
+    public LinkedList<Player> getQueue() {
         return this.queue;
     }
 
-    public ServerInfo getServer() {
+    public RegisteredServer getServer() {
         return this.server;
     }
 

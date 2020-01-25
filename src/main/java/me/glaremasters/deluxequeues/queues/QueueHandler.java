@@ -1,10 +1,10 @@
 package me.glaremasters.deluxequeues.queues;
 
 import ch.jalu.configme.SettingsManager;
+import com.velocitypowered.api.proxy.Player;
+import com.velocitypowered.api.proxy.server.RegisteredServer;
 import me.glaremasters.deluxequeues.DeluxeQueues;
 import me.glaremasters.deluxequeues.configuration.sections.ConfigOptions;
-import net.md_5.bungee.api.config.ServerInfo;
-import net.md_5.bungee.api.connection.ProxiedPlayer;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -18,7 +18,7 @@ import java.util.List;
 public class QueueHandler {
 
     private List<DeluxeQueue> queues;
-    private List<ServerInfo> servers;
+    private List<RegisteredServer> servers;
     private SettingsManager settingsManager;
     private DeluxeQueues deluxeQueues;
 
@@ -65,7 +65,7 @@ public class QueueHandler {
      * @param server the server to get the queue from
      * @return the queue
      */
-    public DeluxeQueue getQueue(@NotNull ServerInfo server) {
+    public DeluxeQueue getQueue(@NotNull RegisteredServer server) {
         return queues.stream().filter(q -> q.getServer().equals(server)).findFirst().orElse(null);
     }
 
@@ -73,7 +73,7 @@ public class QueueHandler {
      * Remove a player from all queues
      * @param player the player to remove
      */
-    public void clearPlayer(ProxiedPlayer player) {
+    public void clearPlayer(Player player) {
         queues.forEach(q -> q.getQueue().remove(player));
     }
 
@@ -82,7 +82,7 @@ public class QueueHandler {
      * @param server the server to check
      * @return if the server has a queue or not
      */
-    public boolean checkForQueue(ServerInfo server) {
+    public boolean checkForQueue(RegisteredServer server) {
         return servers.contains(server);
     }
 
@@ -105,7 +105,7 @@ public class QueueHandler {
         return this.queues;
     }
 
-    public List<ServerInfo> getServers() {
+    public List<RegisteredServer> getServers() {
         return this.servers;
     }
 

@@ -1,22 +1,20 @@
 package me.glaremasters.deluxequeues.events;
+;
+import com.velocitypowered.api.proxy.Player;
+import com.velocitypowered.api.proxy.server.ServerInfo;
 
-import net.md_5.bungee.api.config.ServerInfo;
-import net.md_5.bungee.api.connection.ProxiedPlayer;
-import net.md_5.bungee.api.plugin.Cancellable;
-import net.md_5.bungee.api.plugin.Event;
-
-public class PlayerQueueEvent extends Event implements Cancellable {
-	private final ProxiedPlayer player;
+public class PlayerQueueEvent {
+	private final Player player;
 	private final ServerInfo server;
 	private String reason = null;
 	private boolean cancelled = false;
 
-	public PlayerQueueEvent(ProxiedPlayer player, ServerInfo server) {
+	public PlayerQueueEvent(Player player, ServerInfo server) {
 		this.player = player;
 		this.server = server;
 	}
 
-	public ProxiedPlayer getPlayer() {
+	public Player getPlayer() {
 		return player;
 	}
 
@@ -28,12 +26,10 @@ public class PlayerQueueEvent extends Event implements Cancellable {
 		return reason;
 	}
 
-	@Override
 	public boolean isCancelled() {
 		return cancelled;
 	}
 
-	@Override
 	public void setCancelled(boolean cancelled) {
         this.cancelled = cancelled;
     }
