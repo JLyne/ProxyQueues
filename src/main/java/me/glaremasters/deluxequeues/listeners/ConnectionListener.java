@@ -1,6 +1,7 @@
 package me.glaremasters.deluxequeues.listeners;
 
 import ch.jalu.configme.SettingsManager;
+import com.velocitypowered.api.event.PostOrder;
 import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.connection.DisconnectEvent;
 import com.velocitypowered.api.event.player.ServerConnectedEvent;
@@ -14,6 +15,8 @@ import me.glaremasters.deluxequeues.queues.DeluxeQueue;
 import me.glaremasters.deluxequeues.queues.QueueHandler;
 import net.kyori.text.TextComponent;
 import net.kyori.text.format.TextColor;
+
+import java.util.Optional;
 
 /**
  * Created by Glare
@@ -32,6 +35,7 @@ public class ConnectionListener {
         this.settingsManager = deluxeQueues.getSettingsHandler().getSettingsManager();
     }
 
+    @Subscribe(order = PostOrder.EARLY)
     public void onJoin(ServerPreConnectEvent event) {
         // Get the server in the event
         RegisteredServer server = event.getOriginalServer();
@@ -61,10 +65,10 @@ public class ConnectionListener {
                 if (queue.canAddPlayer()) {
                     if(!event.getPlayer().getCurrentServer().isPresent()) {
                         String waitingServerName = deluxeQueues.getSettingsHandler().getSettingsManager().getProperty(ConfigOptions.WAITING_SERVER);
-                        RegisteredServer waitingServer = deluxeQueues.getProxy().getServerInfo(waitingServerName);
+                        Optional<RegisteredServer> waitingServer = deluxeQueues.getProxyServer().getServer(waitingServerName);
 
-                        if(waitingServer != null) {
-                            event.setResult(ServerPreConnectEvent.ServerResult.allowed(waitingServer));
+                        if(waitingServer.isPresent()) {
+                            event.setResult(ServerPreConnectEvent.ServerResult.allowed(waitingServer.get()));
                         } else {
                             player.disconnect(TextComponent.of(
                                     "This server has queueing enabled and can't be connected to directly. Please connect via minecraft.rtgame.co.uk")
@@ -88,12 +92,12 @@ public class ConnectionListener {
         }
     }
 
-    @Subscribe
+    @Subscribe(order = PostOrder.EARLY)
     public void onConnected(ServerConnectedEvent event) {
         queueHandler.clearPlayer(event.getPlayer());
     }
 
-    @Subscribe
+    @Subscribe(order = PostOrder.EARLY)
     public void onLeave(DisconnectEvent event) {
         // Remove player from all queues
         queueHandler.clearPlayer(event.getPlayer());

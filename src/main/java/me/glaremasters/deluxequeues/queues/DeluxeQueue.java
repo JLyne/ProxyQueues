@@ -1,10 +1,12 @@
 package me.glaremasters.deluxequeues.queues;
 
 import ch.jalu.configme.SettingsManager;
-import co.aikar.commands.ACFBungeeUtil;
+import co.aikar.commands.ACFVelocityUtil;
 import co.aikar.commands.MessageType;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
+import com.velocitypowered.api.util.MessagePosition;
+import com.velocitypowered.api.util.title.TextTitle;
 import me.glaremasters.deluxequeues.DeluxeQueues;
 import me.glaremasters.deluxequeues.configuration.sections.ConfigOptions;
 import me.glaremasters.deluxequeues.events.PlayerQueueEvent;
@@ -40,7 +42,8 @@ public class DeluxeQueue {
         this.playersRequired = playersRequired;
         this.maxSlots = maxSlots;
         this.notifyMethod = settingsManager.getProperty(ConfigOptions.INFORM_METHOD);
-        deluxeQueues.getProxy().getScheduler().schedule(deluxeQueues, new QueueMoveTask(this, server), 0, delayLength, TimeUnit.SECONDS);
+        deluxeQueues.getProxyServer().getScheduler().buildTask(deluxeQueues, new QueueMoveTask(this, server))
+                .repeat(delayLength, TimeUnit.SECONDS).schedule();
     }
 
     /**
@@ -49,16 +52,18 @@ public class DeluxeQueue {
      */
     public void addPlayer(Player player) {
         if (!queue.contains(player)) {
-            PlayerQueueEvent queueEvent = deluxeQueues.getProxy().getPluginManager().callEvent(new PlayerQueueEvent(player, server));
-
-            //Don't add to queue if event cancelled, show player the reason
-            if(queueEvent.isCancelled()) {
-                deluxeQueues.getCommandManager().sendMessage(player, MessageType.ERROR, Messages.QUEUES__CANNOT_JOIN);
-                player.sendMessage(TextComponent.of(queueEvent.getReason()).color(TextColor.RED).create());
-            } else {
-                queue.add(player);
-                notifyPlayer(player);
-            }
+            deluxeQueues.getProxyServer().getEventManager().fire(new PlayerQueueEvent(player, server))
+                    .thenAcceptAsync(result -> {
+                        //Don't add to queue if event cancelled, show player the reason
+                        if (result.isCancelled()) {
+                            deluxeQueues.getCommandManager().sendMessage(player, MessageType.ERROR,
+                                                                         Messages.QUEUES__CANNOT_JOIN);
+                            player.sendMessage(TextComponent.of(result.getReason()).color(TextColor.RED));
+                        } else {
+                            queue.add(player);
+                            notifyPlayer(player);
+                        }
+                    });
         }
     }
 
@@ -67,7 +72,7 @@ public class DeluxeQueue {
      * @return added or not
      */
     public boolean canAddPlayer() {
-        return server.getPlayers().size() >= playersRequired;
+        return server.getPlayersConnected().size() >= playersRequired;
     }
 
     /**
@@ -95,22 +100,22 @@ public class DeluxeQueue {
                 actionbar = actionbar.replace("{server}", server.getServerInfo().getName());
                 actionbar = actionbar.replace("{pos}", String.valueOf(getQueuePos(player) + 1));
                 actionbar = actionbar.replace("{total}", String.valueOf(queue.size()));
-                player.sendMessage(ChatMessageType.ACTION_BAR, TextComponent.of(ACFBungeeUtil.color(actionbar)));
+                player.sendMessage(ACFVelocityUtil.color(actionbar), MessagePosition.ACTION_BAR);
                 break;
             case "text":
                 message = message.replace("{server}", server.getServerInfo().getName());
                 message = message.replace("{pos}", String.valueOf(getQueuePos(player) + 1));
                 message = message.replace("{total}", String.valueOf(queue.size()));
-                player.sendMessage(TextComponent.of(ACFBungeeUtil.color(message)));
+                player.sendMessage(ACFVelocityUtil.color(message), MessagePosition.SYSTEM);
                 break;
             case "title":
-                Title title = deluxeQueues.getProxy().createTitle();
-                title.title(TextComponent.of(ACFBungeeUtil.color(title_top)));
+                TextTitle.Builder title = TextTitle.builder();
+                title.title(ACFVelocityUtil.color(title_top));
                 title_bottom = title_bottom.replace("{server}", server.getServerInfo().getName());
                 title_bottom = title_bottom.replace("{pos}", String.valueOf(getQueuePos(player) + 1));
                 title_bottom = title_bottom.replace("{total}", String.valueOf(queue.size()));
-                title.subTitle(TextComponent.of(ACFBungeeUtil.color(title_bottom)));
-                player.sendTitle(title);
+                title.subtitle(ACFVelocityUtil.color(title_bottom));
+                player.sendTitle(title.build());
                 break;
         }
     }

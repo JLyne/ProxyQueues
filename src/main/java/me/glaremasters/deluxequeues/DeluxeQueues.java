@@ -1,6 +1,6 @@
 package me.glaremasters.deluxequeues;
 
-import co.aikar.commands.BungeeCommandManager;
+import co.aikar.commands.VelocityCommandManager;
 import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.proxy.ProxyInitializeEvent;
 import com.velocitypowered.api.plugin.Plugin;
@@ -10,7 +10,6 @@ import me.glaremasters.deluxequeues.acf.ACFHandler;
 import me.glaremasters.deluxequeues.configuration.SettingsHandler;
 import me.glaremasters.deluxequeues.listeners.ConnectionListener;
 import me.glaremasters.deluxequeues.queues.QueueHandler;
-import me.glaremasters.deluxequeues.updater.UpdateChecker;
 import org.slf4j.Logger;
 
 import javax.inject.Inject;
@@ -23,7 +22,7 @@ import java.nio.file.Path;
 @Plugin(id="deluxequeues", name="DeluxeQueues")
 public final class DeluxeQueues {
 
-    private BungeeCommandManager commandManager;
+    private VelocityCommandManager commandManager;
     private SettingsHandler settingsHandler;
     private QueueHandler queueHandler;
     private ACFHandler acfHandler;
@@ -46,10 +45,9 @@ public final class DeluxeQueues {
         createFile("config.yml");
         createFile("languages/en-US.yml");
         settingsHandler = new SettingsHandler(this);
-        UpdateChecker.runCheck(this, settingsHandler.getSettingsManager());
         queueHandler = new QueueHandler(settingsHandler.getSettingsManager(), this);
         queueHandler.enableQueues();
-        commandManager = new BungeeCommandManager(this);
+        commandManager = new VelocityCommandManager(proxyServer, this);
         acfHandler = new ACFHandler(this, commandManager);
         proxyServer.getEventManager().register(this, new ConnectionListener(this));
     }
@@ -80,7 +78,7 @@ public final class DeluxeQueues {
         }
     }
 
-    public BungeeCommandManager getCommandManager() {
+    public VelocityCommandManager getCommandManager() {
         return this.commandManager;
     }
 
@@ -90,5 +88,17 @@ public final class DeluxeQueues {
 
     public QueueHandler getQueueHandler() {
         return this.queueHandler;
+    }
+
+    public ProxyServer getProxyServer() {
+        return proxyServer;
+    }
+
+    public Logger getLogger() {
+        return logger;
+    }
+
+    public File getDataFolder() {
+        return dataFolder.toFile();
     }
 }
