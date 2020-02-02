@@ -2,9 +2,11 @@ package me.glaremasters.deluxequeues.acf;
 
 import co.aikar.commands.VelocityCommandManager;
 import co.aikar.locales.MessageKey;
+import ch.jalu.configme.SettingsManager;
 import me.glaremasters.deluxequeues.DeluxeQueues;
 import me.glaremasters.deluxequeues.commands.CommandHelp;
 import me.glaremasters.deluxequeues.commands.CommandLeave;
+import me.glaremasters.deluxequeues.commands.CommandReload;
 import me.glaremasters.deluxequeues.queues.QueueHandler;
 import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.yaml.YAMLConfigurationLoader;
@@ -31,6 +33,7 @@ public class ACFHandler {
 
     public void registerDependencyInjection(VelocityCommandManager commandManager) {
         commandManager.registerDependency(QueueHandler.class, deluxeQueues.getQueueHandler());
+        commandManager.registerDependency(SettingsManager.class, deluxeQueues.getSettingsHandler().getSettingsManager());
     }
 
     public void registerCommandReplacements(VelocityCommandManager commandManager) {
@@ -40,6 +43,7 @@ public class ACFHandler {
     public void registerCommands(VelocityCommandManager commandManager) {
         commandManager.registerCommand(new CommandHelp());
         commandManager.registerCommand(new CommandLeave());
+        commandManager.registerCommand(new CommandReload());
     }
 
     /**

@@ -4,6 +4,11 @@ import com.velocitypowered.api.proxy.ConnectionRequestBuilder;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
 import me.glaremasters.deluxequeues.queues.DeluxeQueue;
+import net.md_5.bungee.api.ServerConnectRequest;
+import me.glaremasters.deluxequeues.queues.QueuePlayer;
+import net.md_5.bungee.api.config.ServerInfo;
+import net.md_5.bungee.api.connection.ProxiedPlayer;
+import net.md_5.bungee.api.event.ServerConnectEvent;
 
 /**
  * Created by Glare
@@ -27,10 +32,8 @@ public class QueueMoveTask implements Runnable {
             return;
         }
 
-        // Persist the actionbar
-        if (queue.getNotifyMethod().toLowerCase().equalsIgnoreCase("actionbar")) {
-            queue.getQueue().forEach(p -> queue.notifyPlayer(p));
-        }
+        // Persist the notification to the user
+        queue.getQueue().forEach(p -> queue.notifyPlayer(p));
 
         // Check if the max amount of players on the server are the max slots
         if (queue.getServer().getPlayersConnected().size() >= queue.getMaxSlots()) {
@@ -38,7 +41,7 @@ public class QueueMoveTask implements Runnable {
         }
 
         // Get the player next in line
-        Player player = queue.getQueue().getFirst();
+        QueuePlayer player = queue.getQueue().getFirst();
         // Make sure the player exists
         if (player != null) {
             player.createConnectionRequest(server).fireAndForget();

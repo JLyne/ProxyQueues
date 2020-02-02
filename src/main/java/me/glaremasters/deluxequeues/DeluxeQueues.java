@@ -45,8 +45,7 @@ public final class DeluxeQueues {
         createFile("config.yml");
         createFile("languages/en-US.yml");
         settingsHandler = new SettingsHandler(this);
-        queueHandler = new QueueHandler(settingsHandler.getSettingsManager(), this);
-        queueHandler.enableQueues();
+        startQueues();
         commandManager = new VelocityCommandManager(proxyServer, this);
         acfHandler = new ACFHandler(this, commandManager);
         proxyServer.getEventManager().register(this, new ConnectionListener(this));
@@ -88,6 +87,11 @@ public final class DeluxeQueues {
 
     public QueueHandler getQueueHandler() {
         return this.queueHandler;
+    }
+
+    public void startQueues() {
+        queueHandler = new QueueHandler(settingsHandler.getSettingsManager(), this);
+        queueHandler.enableQueues();
     }
 
     public ProxyServer getProxyServer() {

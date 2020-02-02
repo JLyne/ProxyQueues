@@ -26,7 +26,7 @@ import java.util.concurrent.TimeUnit;
 public class DeluxeQueue {
 
     private DeluxeQueues deluxeQueues;
-    private LinkedList<Player> queue = new LinkedList<>();
+    private LinkedList<QueuePlayer> queue = new LinkedList<>();
     private RegisteredServer server;
     private int delayLength;
     private int playersRequired;
@@ -51,20 +51,36 @@ public class DeluxeQueue {
      * @param player the player to add
      */
     public void addPlayer(Player player) {
-        if (!queue.contains(player)) {
-            deluxeQueues.getProxyServer().getEventManager().fire(new PlayerQueueEvent(player, server))
-                    .thenAcceptAsync(result -> {
-                        //Don't add to queue if event cancelled, show player the reason
-                        if (result.isCancelled()) {
-                            deluxeQueues.getCommandManager().sendMessage(player, MessageType.ERROR,
-                                                                         Messages.QUEUES__CANNOT_JOIN);
-                            player.sendMessage(TextComponent.of(result.getReason()).color(TextColor.RED));
-                        } else {
-                            queue.add(player);
-                            notifyPlayer(player);
-                        }
-                    });
+        if (getFromProxy(player) == null) {
+            QueuePlayer qp = new QueuePlayer(player, false);
+
+            if (!queue.contains(qp)) {
+                deluxeQueues.getProxyServer().getEventManager().fire(new PlayerQueueEvent(player, server))
+                        .thenAcceptAsync(result -> {
+                            //Don't add to queue if event cancelled, show player the reason
+                            if (result.isCancelled()) {
+                                deluxeQueues.getCommandManager().sendMessage(player, MessageType.ERROR,
+                                                                             Messages.QUEUES__CANNOT_JOIN);
+                                player.sendMessage(TextComponent.of(result.getReason()).color(TextColor.RED));
+                                return;
+                            }
+
+                            if (player.hasPermission(settingsManager.getProperty(ConfigOptions.DONATOR_PERMISSION))) {
+                                queue.addFirst(qp);
+                            } else {
+                                queue.add(qp);
+                            }
+                        });
+            }
         }
+    }
+
+    public void removePlayer(QueuePlayer player) {
+        queue.remove(player);
+    }
+
+    public QueuePlayer getFromProxy(ProxiedPlayer player) {
+        return queue.stream().filter(q -> q.getPlayer() == player).findFirst().orElse(null);
     }
 
     /**
@@ -80,7 +96,7 @@ public class DeluxeQueue {
      * @param player the player to check
      * @return their position
      */
-    public int getQueuePos(Player player) {
+    public int getQueuePos(QueuePlayer player) {
         return queue.indexOf(player);
     }
 
@@ -88,8 +104,7 @@ public class DeluxeQueue {
      * Notify the player that they are in the queue
      * @param player the player to check
      */
-    public void notifyPlayer(Player player) {
-
+    public void notifyPlayer(QueuePlayer player) {
         String actionbar = settingsManager.getProperty(ConfigOptions.ACTIONBAR_DESIGN);
         String message = settingsManager.getProperty(ConfigOptions.TEXT_DESIGN);
         String title_top = settingsManager.getProperty(ConfigOptions.TITLE_HEADER);
@@ -133,7 +148,7 @@ public class DeluxeQueue {
         return this.deluxeQueues;
     }
 
-    public LinkedList<Player> getQueue() {
+    public LinkedList<QueuePlayer> getQueue() {
         return this.queue;
     }
 

@@ -10,7 +10,6 @@ import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
 import me.glaremasters.deluxequeues.DeluxeQueues;
 import me.glaremasters.deluxequeues.configuration.sections.ConfigOptions;
-import me.glaremasters.deluxequeues.events.PlayerQueueEvent;
 import me.glaremasters.deluxequeues.queues.DeluxeQueue;
 import me.glaremasters.deluxequeues.queues.QueueHandler;
 import net.kyori.text.TextComponent;
@@ -41,8 +40,9 @@ public class ConnectionListener {
         RegisteredServer server = event.getOriginalServer();
         // Get the player in the event
         Player player = event.getPlayer();
-        // Create a boolean for bypass with donator
-        boolean bypass = player.hasPermission(settingsManager.getProperty(ConfigOptions.DONATOR_PERMISSION));
+
+        // Create a boolean for bypass with staff
+        boolean bypass = player.hasPermission(settingsManager.getProperty(ConfigOptions.STAFF_PERMISSION));
 
         // Run this if they dont bypass
         if (bypass) {
@@ -56,6 +56,11 @@ public class ConnectionListener {
 
         // Get the queue
         DeluxeQueue queue = queueHandler.getQueue(server);
+        QueuePlayer p = queue.getFromProxy(player);
+
+        if (p == null) {
+            return;
+        }
 
         int queuePosition = queue.checkForPlayer(player);
 
