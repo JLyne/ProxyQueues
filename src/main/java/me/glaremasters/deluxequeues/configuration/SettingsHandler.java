@@ -14,11 +14,9 @@ import java.io.File;
  */
 public class SettingsHandler {
 
-    private DeluxeQueues deluxeQueues;
-    private SettingsManager settingsManager;
+    private final SettingsManager settingsManager;
 
     public SettingsHandler(DeluxeQueues deluxeQueues) {
-        this.deluxeQueues = deluxeQueues;
 
         settingsManager = SettingsManagerBuilder
                 .withYamlFile(new File(deluxeQueues.getDataFolder(), "config.yml"))

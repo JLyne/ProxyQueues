@@ -1,18 +1,17 @@
 package me.glaremasters.deluxequeues.queues;
-
-import net.md_5.bungee.api.connection.ProxiedPlayer;
+import com.velocitypowered.api.proxy.Player;
 
 public class QueuePlayer {
 
-    private ProxiedPlayer player;
+    private final Player player;
     private boolean readyToMove;
 
-    public QueuePlayer(ProxiedPlayer player, boolean readyToMove) {
+    public QueuePlayer(Player player, boolean readyToMove) {
         this.player = player;
         this.readyToMove = readyToMove;
     }
 
-    public ProxiedPlayer getPlayer() {
+    public Player getPlayer() {
         return player;
     }
 

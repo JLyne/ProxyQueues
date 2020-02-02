@@ -18,10 +18,10 @@ import java.util.Optional;
  */
 public class QueueHandler {
 
-    private List<DeluxeQueue> queues;
-    private List<RegisteredServer> servers;
-    private SettingsManager settingsManager;
-    private DeluxeQueues deluxeQueues;
+    private final List<DeluxeQueue> queues;
+    private final List<RegisteredServer> servers;
+    private final SettingsManager settingsManager;
+    private final DeluxeQueues deluxeQueues;
 
     public QueueHandler(SettingsManager settingsManager, DeluxeQueues deluxeQueues) {
         this.settingsManager = settingsManager;
@@ -75,7 +75,13 @@ public class QueueHandler {
      * @param player the player to remove
      */
     public void clearPlayer(Player player) {
-        queues.forEach(q -> q.getQueue().remove(player));
+        queues.forEach(q -> {
+            QueuePlayer queuePlayer = q.getFromProxy(player);
+
+            if(queuePlayer != null) {
+                q.getQueue().remove(queuePlayer);
+            }
+        });
     }
 
     /**

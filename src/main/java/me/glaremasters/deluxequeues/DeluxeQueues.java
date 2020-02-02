@@ -25,7 +25,6 @@ public final class DeluxeQueues {
     private VelocityCommandManager commandManager;
     private SettingsHandler settingsHandler;
     private QueueHandler queueHandler;
-    private ACFHandler acfHandler;
 
     private final ProxyServer proxyServer;
     private final Logger logger;
@@ -47,7 +46,8 @@ public final class DeluxeQueues {
         settingsHandler = new SettingsHandler(this);
         startQueues();
         commandManager = new VelocityCommandManager(proxyServer, this);
-        acfHandler = new ACFHandler(this, commandManager);
+
+        ACFHandler acfHandler = new ACFHandler(this, commandManager);
         proxyServer.getEventManager().register(this, new ConnectionListener(this));
     }
 

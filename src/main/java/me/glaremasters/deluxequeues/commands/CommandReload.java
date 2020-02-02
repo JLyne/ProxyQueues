@@ -10,9 +10,7 @@ import co.aikar.commands.annotation.Description;
 import co.aikar.commands.annotation.Subcommand;
 import me.glaremasters.deluxequeues.DeluxeQueues;
 import me.glaremasters.deluxequeues.messages.Messages;
-import me.glaremasters.deluxequeues.queues.QueueHandler;
 import me.glaremasters.deluxequeues.utils.Constants;
-import net.md_5.bungee.api.connection.ProxiedPlayer;
 
 @CommandAlias("%dq")
 public class CommandReload extends BaseCommand {

@@ -19,10 +19,11 @@ import java.util.Objects;
 
 public class ACFHandler {
 
-    private DeluxeQueues deluxeQueues;
+    private final DeluxeQueues deluxeQueues;
 
     public ACFHandler(DeluxeQueues deluxeQueues, VelocityCommandManager commandManager) {
         this.deluxeQueues = deluxeQueues;
+        //noinspection deprecation
         commandManager.enableUnstableAPI("help");
         registerLanguages(deluxeQueues, commandManager);
         registerDependencyInjection(commandManager);
@@ -80,7 +81,6 @@ public class ACFHandler {
      * @param locale
      */
     public void loadLanguage(ConfigurationNode config, Locale locale, VelocityCommandManager commandManager) {
-        boolean loaded = false;
         for (ConfigurationNode parent : config.getChildrenList()) {
             List<? extends ConfigurationNode> inner = parent.getChildrenList();
 
@@ -93,7 +93,6 @@ public class ACFHandler {
 
                 if (value != null && !value.isEmpty()) {
                     commandManager.getLocales().addMessage(locale, MessageKey.of(key.getKey().toString() + "." + key), value);
-                    loaded = true;
                 }
             }
         }

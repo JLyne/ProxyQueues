@@ -25,14 +25,14 @@ import java.util.concurrent.TimeUnit;
  */
 public class DeluxeQueue {
 
-    private DeluxeQueues deluxeQueues;
-    private LinkedList<QueuePlayer> queue = new LinkedList<>();
-    private RegisteredServer server;
-    private int delayLength;
-    private int playersRequired;
-    private int maxSlots;
-    private SettingsManager settingsManager;
-    private String notifyMethod;
+    private final DeluxeQueues deluxeQueues;
+    private final LinkedList<QueuePlayer> queue = new LinkedList<>();
+    private final RegisteredServer server;
+    private final int delayLength;
+    private final int playersRequired;
+    private final int maxSlots;
+    private final SettingsManager settingsManager;
+    private final String notifyMethod;
 
     public DeluxeQueue(DeluxeQueues deluxeQueues, RegisteredServer server, int playersRequired, int maxSlots) {
         this.deluxeQueues = deluxeQueues;
@@ -70,6 +70,8 @@ public class DeluxeQueue {
                             } else {
                                 queue.add(qp);
                             }
+
+                            notifyPlayer(qp);
                         });
             }
         }
@@ -79,7 +81,7 @@ public class DeluxeQueue {
         queue.remove(player);
     }
 
-    public QueuePlayer getFromProxy(ProxiedPlayer player) {
+    public QueuePlayer getFromProxy(Player player) {
         return queue.stream().filter(q -> q.getPlayer() == player).findFirst().orElse(null);
     }
 
@@ -115,13 +117,13 @@ public class DeluxeQueue {
                 actionbar = actionbar.replace("{server}", server.getServerInfo().getName());
                 actionbar = actionbar.replace("{pos}", String.valueOf(getQueuePos(player) + 1));
                 actionbar = actionbar.replace("{total}", String.valueOf(queue.size()));
-                player.sendMessage(ACFVelocityUtil.color(actionbar), MessagePosition.ACTION_BAR);
+                player.getPlayer().sendMessage(ACFVelocityUtil.color(actionbar), MessagePosition.ACTION_BAR);
                 break;
             case "text":
                 message = message.replace("{server}", server.getServerInfo().getName());
                 message = message.replace("{pos}", String.valueOf(getQueuePos(player) + 1));
                 message = message.replace("{total}", String.valueOf(queue.size()));
-                player.sendMessage(ACFVelocityUtil.color(message), MessagePosition.SYSTEM);
+                player.getPlayer().sendMessage(ACFVelocityUtil.color(message), MessagePosition.SYSTEM);
                 break;
             case "title":
                 TextTitle.Builder title = TextTitle.builder();
@@ -130,18 +132,9 @@ public class DeluxeQueue {
                 title_bottom = title_bottom.replace("{pos}", String.valueOf(getQueuePos(player) + 1));
                 title_bottom = title_bottom.replace("{total}", String.valueOf(queue.size()));
                 title.subtitle(ACFVelocityUtil.color(title_bottom));
-                player.sendTitle(title.build());
+                player.getPlayer().sendTitle(title.build());
                 break;
         }
-    }
-
-    /**
-     * Check if the queue is holding a player
-     * @param player the player to check for
-     * @return in the queue or not
-     */
-    public int checkForPlayer(Player player) {
-        return queue.indexOf(player);
     }
 
     public DeluxeQueues getDeluxeQueues() {

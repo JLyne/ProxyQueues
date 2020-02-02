@@ -12,6 +12,7 @@ import me.glaremasters.deluxequeues.DeluxeQueues;
 import me.glaremasters.deluxequeues.configuration.sections.ConfigOptions;
 import me.glaremasters.deluxequeues.queues.DeluxeQueue;
 import me.glaremasters.deluxequeues.queues.QueueHandler;
+import me.glaremasters.deluxequeues.queues.QueuePlayer;
 import net.kyori.text.TextComponent;
 import net.kyori.text.format.TextColor;
 
@@ -24,9 +25,9 @@ import java.util.Optional;
  */
 public class ConnectionListener {
 
-    private DeluxeQueues deluxeQueues;
-    private QueueHandler queueHandler;
-    private SettingsManager settingsManager;
+    private final DeluxeQueues deluxeQueues;
+    private final QueueHandler queueHandler;
+    private final SettingsManager settingsManager;
 
     public ConnectionListener(DeluxeQueues deluxeQueues) {
         this.deluxeQueues = deluxeQueues;
@@ -56,44 +57,31 @@ public class ConnectionListener {
 
         // Get the queue
         DeluxeQueue queue = queueHandler.getQueue(server);
-        QueuePlayer p = queue.getFromProxy(player);
+        QueuePlayer queuePlayer = queue.getFromProxy(player);
 
-        if (p == null) {
-            return;
-        }
-
-        int queuePosition = queue.checkForPlayer(player);
-
-        switch (queuePosition) {
-            case -1 : //Not in queue
-                 // Make sure the player can actually be added
-                if (queue.canAddPlayer()) {
-                    if(!event.getPlayer().getCurrentServer().isPresent()) {
-                        String waitingServerName = deluxeQueues.getSettingsHandler().getSettingsManager().getProperty(ConfigOptions.WAITING_SERVER);
-                        Optional<RegisteredServer> waitingServer = deluxeQueues.getProxyServer().getServer(waitingServerName);
-
-                        if(waitingServer.isPresent()) {
-                            event.setResult(ServerPreConnectEvent.ServerResult.allowed(waitingServer.get()));
-                        } else {
-                            player.disconnect(TextComponent.of(
-                                    "This server has queueing enabled and can't be connected to directly. Please connect via minecraft.rtgame.co.uk")
-                                                      .color(TextColor.RED));
-                        }
-                    } else {
-                        // Cancel the event so they don't go right away
-                        event.setResult(ServerPreConnectEvent.ServerResult.denied());
-                    }
-
-                    // Add the player to the queue
-                    queue.addPlayer(player);
-                }
-
-            case 0 : //Front of queue
-                break;
-
-            default: //Elsewhere in queue
+        if(queuePlayer != null) {
+            if(!queuePlayer.isReadyToMove()) {
                 event.setResult(ServerPreConnectEvent.ServerResult.denied());
+            }
+        } else if (queue.canAddPlayer()) {
+            if(!event.getPlayer().getCurrentServer().isPresent()) {
+                String waitingServerName = deluxeQueues.getSettingsHandler().getSettingsManager().getProperty(ConfigOptions.WAITING_SERVER);
+                Optional<RegisteredServer> waitingServer = deluxeQueues.getProxyServer().getServer(waitingServerName);
 
+                if(waitingServer.isPresent()) {
+                    event.setResult(ServerPreConnectEvent.ServerResult.allowed(waitingServer.get()));
+                } else {
+                    player.disconnect(TextComponent.of(
+                            "This server has queueing enabled and can't be connected to directly. Please connect via minecraft.rtgame.co.uk")
+                                              .color(TextColor.RED));
+                }
+            } else {
+                // Cancel the event so they don't go right away
+                event.setResult(ServerPreConnectEvent.ServerResult.denied());
+            }
+
+            // Add the player to the queue
+            queue.addPlayer(player);
         }
     }
 

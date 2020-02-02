@@ -1,14 +1,8 @@
 package me.glaremasters.deluxequeues.tasks;
 
-import com.velocitypowered.api.proxy.ConnectionRequestBuilder;
-import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
 import me.glaremasters.deluxequeues.queues.DeluxeQueue;
-import net.md_5.bungee.api.ServerConnectRequest;
 import me.glaremasters.deluxequeues.queues.QueuePlayer;
-import net.md_5.bungee.api.config.ServerInfo;
-import net.md_5.bungee.api.connection.ProxiedPlayer;
-import net.md_5.bungee.api.event.ServerConnectEvent;
 
 /**
  * Created by Glare
@@ -17,8 +11,8 @@ import net.md_5.bungee.api.event.ServerConnectEvent;
  */
 public class QueueMoveTask implements Runnable {
 
-    private DeluxeQueue queue;
-    private RegisteredServer server;
+    private final DeluxeQueue queue;
+    private final RegisteredServer server;
 
     public QueueMoveTask(DeluxeQueue queue, RegisteredServer server) {
         this.queue = queue;
@@ -33,7 +27,7 @@ public class QueueMoveTask implements Runnable {
         }
 
         // Persist the notification to the user
-        queue.getQueue().forEach(p -> queue.notifyPlayer(p));
+        queue.getQueue().forEach(queue::notifyPlayer);
 
         // Check if the max amount of players on the server are the max slots
         if (queue.getServer().getPlayersConnected().size() >= queue.getMaxSlots()) {
@@ -44,7 +38,8 @@ public class QueueMoveTask implements Runnable {
         QueuePlayer player = queue.getQueue().getFirst();
         // Make sure the player exists
         if (player != null) {
-            player.createConnectionRequest(server).fireAndForget();
+            player.getPlayer().createConnectionRequest(server).fireAndForget();
+            player.setReadyToMove(true);
         }
     }
 }
