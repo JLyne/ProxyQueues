@@ -26,8 +26,7 @@ public final class DeluxeQueues extends Plugin {
         createFile("languages/en-US.yml");
         settingsHandler = new SettingsHandler(this);
         UpdateChecker.runCheck(this, settingsHandler.getSettingsManager());
-        queueHandler = new QueueHandler(settingsHandler.getSettingsManager(), this);
-        queueHandler.enableQueues();
+        startQueues();
         commandManager = new BungeeCommandManager(this);
         acfHandler = new ACFHandler(this, commandManager);
         getProxy().getPluginManager().registerListener(this, new ConnectionListener(this));
@@ -71,5 +70,10 @@ public final class DeluxeQueues extends Plugin {
 
     public QueueHandler getQueueHandler() {
         return this.queueHandler;
+    }
+
+    public void startQueues() {
+        queueHandler = new QueueHandler(settingsHandler.getSettingsManager(), this);
+        queueHandler.enableQueues();
     }
 }

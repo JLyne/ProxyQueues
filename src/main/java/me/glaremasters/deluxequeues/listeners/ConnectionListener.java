@@ -10,6 +10,7 @@ import me.glaremasters.deluxequeues.queues.QueueHandler;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.TextComponent;
+import me.glaremasters.deluxequeues.queues.QueuePlayer;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.event.PlayerDisconnectEvent;
@@ -42,8 +43,9 @@ public class ConnectionListener implements Listener {
         ServerInfo server = event.getTarget();
         // Get the player in the event
         ProxiedPlayer player = event.getPlayer();
-        // Create a boolean for bypass with donator
-        boolean bypass = player.hasPermission(settingsManager.getProperty(ConfigOptions.DONATOR_PERMISSION));
+
+        // Create a boolean for bypass with staff
+        boolean bypass = player.hasPermission(settingsManager.getProperty(ConfigOptions.STAFF_PERMISSION));
 
         // Run this if they dont bypass
         if (bypass) {
@@ -57,6 +59,11 @@ public class ConnectionListener implements Listener {
 
         // Get the queue
         DeluxeQueue queue = queueHandler.getQueue(server);
+        QueuePlayer p = queue.getFromProxy(player);
+
+        if (p == null) {
+            return;
+        }
 
         int queuePosition = queue.checkForPlayer(player);
 

@@ -1,9 +1,11 @@
 package me.glaremasters.deluxequeues.acf;
 
+import ch.jalu.configme.SettingsManager;
 import co.aikar.commands.BungeeCommandManager;
 import me.glaremasters.deluxequeues.DeluxeQueues;
 import me.glaremasters.deluxequeues.commands.CommandHelp;
 import me.glaremasters.deluxequeues.commands.CommandLeave;
+import me.glaremasters.deluxequeues.commands.CommandReload;
 import me.glaremasters.deluxequeues.queues.QueueHandler;
 
 import java.io.File;
@@ -27,6 +29,7 @@ public class ACFHandler {
 
     public void registerDependencyInjection(BungeeCommandManager commandManager) {
         commandManager.registerDependency(QueueHandler.class, deluxeQueues.getQueueHandler());
+        commandManager.registerDependency(SettingsManager.class, deluxeQueues.getSettingsHandler().getSettingsManager());
     }
 
     public void registerCommandReplacements(BungeeCommandManager commandManager) {
@@ -36,6 +39,7 @@ public class ACFHandler {
     public void registerCommands(BungeeCommandManager commandManager) {
         commandManager.registerCommand(new CommandHelp());
         commandManager.registerCommand(new CommandLeave());
+        commandManager.registerCommand(new CommandReload());
     }
 
     /**

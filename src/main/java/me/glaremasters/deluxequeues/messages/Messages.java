@@ -6,7 +6,9 @@ import co.aikar.locales.MessageKeyProvider;
 public enum Messages implements MessageKeyProvider {
 
     QUEUES__LEFT,
-    QUEUES__CANNOT_JOIN;
+    QUEUES__CANNOT_JOIN,
+    RELOAD__SUCCESS;
+
 
 
     /**

@@ -2,6 +2,7 @@ package me.glaremasters.deluxequeues.tasks;
 
 import me.glaremasters.deluxequeues.queues.DeluxeQueue;
 import net.md_5.bungee.api.ServerConnectRequest;
+import me.glaremasters.deluxequeues.queues.QueuePlayer;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.event.ServerConnectEvent;
@@ -28,17 +29,15 @@ public class QueueMoveTask implements Runnable {
             return;
         }
 
-        // Persist the actionbar
-        if (queue.getNotifyMethod().toLowerCase().equalsIgnoreCase("actionbar")) {
-            queue.getQueue().forEach(p -> queue.notifyPlayer(p));
-        }
+        // Persist the notification to the user
+        queue.getQueue().forEach(p -> queue.notifyPlayer(p));
 
         // Check if the max amount of players on the server are the max slots
         if (queue.getServer().getPlayers().size() >= queue.getMaxSlots()) {
             return;
         }
         // Get the player next in line
-        ProxiedPlayer player = queue.getQueue().getFirst();
+        QueuePlayer player = queue.getQueue().getFirst();
         // Make sure the player exists
         if (player != null) {
             ServerConnectRequest.Builder request = ServerConnectRequest.builder().retry(false).reason(
@@ -46,7 +45,10 @@ public class QueueMoveTask implements Runnable {
 
             queue.getDeluxeQueues().getLogger().info(request.toString());
 
-            player.connect(request.build());
+            player.getPlayer().connect(request.build());
+            player.setReadyToMove(true);
         }
+/*        // Remove the player from the queue
+        queue.getQueue().pollFirst();*/
     }
 }
