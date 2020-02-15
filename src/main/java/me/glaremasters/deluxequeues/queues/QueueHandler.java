@@ -79,7 +79,7 @@ public class QueueHandler {
             QueuePlayer queuePlayer = q.getFromProxy(player);
 
             if(queuePlayer != null) {
-                q.getQueue().remove(queuePlayer);
+                q.removePlayer(queuePlayer);
             }
         });
     }

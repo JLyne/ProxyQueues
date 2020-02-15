@@ -50,13 +50,17 @@ public class ConfigOptions implements SettingsHolder {
 
 
     @Comment({"How would you like to inform the player that they are in the queue?",
-            "Currently supports: ACTIONBAR, TEXT, TITLE"})
+            "Currently supports: BOSSBAR, ACTIONBAR, TEXT, TITLE"})
     public static final Property<String> INFORM_METHOD =
             newProperty("notify.method", "ACTIONBAR");
 
     @Comment("How would you like the design for the ActionBar to look?")
     public static final Property<String> ACTIONBAR_DESIGN =
-            newProperty("notify.actionbar.design", "Current Position: {pos} / {total}");
+            newProperty("notify.actionbar.design", "Queued for {server}: {pos} / {total}");
+
+    @Comment("How would you like the design for the BossBar to look?")
+    public static final Property<String> BOSSBAR_DESIGN =
+            newProperty("notify.bossbar.design", "Queued for {server}: {pos} / {total}");
 
     @Comment("How would you like the design for the text to look?")
     public static final Property<String> TEXT_DESIGN =
