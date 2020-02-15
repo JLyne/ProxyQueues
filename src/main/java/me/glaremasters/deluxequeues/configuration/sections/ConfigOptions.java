@@ -16,11 +16,6 @@ import static ch.jalu.configme.properties.PropertyInitializer.newProperty;
  * Time: 10:37 PM
  */
 public class ConfigOptions implements SettingsHolder {
-
-    @Comment("Would you like to check for updates?")
-    public static Property<Boolean> UPDATE_CHECK =
-            newProperty("settings.update-check", true);
-
     @Comment("How many seconds should be in-between each queue movement?")
     public static final Property<Integer> DELAY_LENGTH =
             newProperty("settings.delay-length", 2);
@@ -48,6 +43,11 @@ public class ConfigOptions implements SettingsHolder {
             newProperty("settings.staff-permission", "deluxequeues.staff");
 
 
+    @Comment({"List of kick reasons that should be considered fatal.",
+            "If a player gets kicked from a queued server with one of these reasons, they will be removed from the queue without retrying.",
+            "Accepts partial reasons"})
+    public static final Property<List<String>> FATAL_JOIN_ERRORS =
+            newListProperty("settings.fatal-join-errors", "");
 
     @Comment({"How would you like to inform the player that they are in the queue?",
             "Currently supports: BOSSBAR, ACTIONBAR, TEXT, TITLE"})
