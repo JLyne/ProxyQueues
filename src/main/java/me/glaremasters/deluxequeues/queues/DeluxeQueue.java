@@ -98,6 +98,10 @@ public class DeluxeQueue {
         }
     }
 
+    public void removePlayer(Player player) {
+        removePlayer(getFromProxy(player));
+    }
+
     public QueuePlayer getFromProxy(Player player) {
         return queue.stream().filter(q -> q.getPlayer() == player).findFirst().orElse(null);
     }
