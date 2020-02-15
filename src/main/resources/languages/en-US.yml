@@ -5,6 +5,7 @@ descriptions:
 queues:
   left: "&6You've successfully left the queue!"
   cannot-join: "&6Sorry, you're currently unable to join the queue:\n"
+  removed-error: "&6Sorry, you have been removed from the queue due to a fatal error:\n"
 
 reload:
   success: "&6You've successfully reloaded the configuration!"
