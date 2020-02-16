@@ -46,8 +46,14 @@ public class ConnectionListener {
         // Get the player in the event
         Player player = event.getPlayer();
 
+        RegisteredServer redirected = event.getResult().getServer().orElse(null);
+
         // Create a boolean for bypass with staff
         boolean bypass = player.hasPermission(settingsManager.getProperty(ConfigOptions.STAFF_PERMISSION));
+
+        if(redirected != null && !redirected.equals(server)) {
+            server = redirected;
+        }
 
         // Run this if they dont bypass
         if (bypass) {
