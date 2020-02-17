@@ -36,6 +36,11 @@ public class QueueMoveTask implements Runnable {
 
         // Get the player next in line
         QueuePlayer player = queue.getQueue().getFirst();
+
+        if(player != null && !player.getPlayer().isActive()) {
+            queue.removePlayer(player);
+        }
+
         // Make sure the player exists
         if (player != null) {
             player.getPlayer().createConnectionRequest(server).fireAndForget();
