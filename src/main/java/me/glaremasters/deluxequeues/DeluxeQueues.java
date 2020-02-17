@@ -22,6 +22,7 @@ import java.nio.file.Path;
 @Plugin(id="deluxequeues", name="DeluxeQueues")
 public final class DeluxeQueues {
 
+    private static DeluxeQueues instance;
     private VelocityCommandManager commandManager;
     private SettingsHandler settingsHandler;
     private QueueHandler queueHandler;
@@ -37,6 +38,7 @@ public final class DeluxeQueues {
     public DeluxeQueues(ProxyServer proxy, Logger logger) {
         this.proxyServer = proxy;
         this.logger = logger;
+        instance = this;
     }
 
     @Subscribe
@@ -104,5 +106,9 @@ public final class DeluxeQueues {
 
     public File getDataFolder() {
         return dataFolder.toFile();
+    }
+
+    public static DeluxeQueues getInstance() {
+        return instance;
     }
 }

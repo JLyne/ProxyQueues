@@ -6,9 +6,6 @@ import co.aikar.commands.MessageType;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
 import com.velocitypowered.api.util.MessagePosition;
-import com.velocitypowered.api.util.bossbar.BossBar;
-import com.velocitypowered.api.util.bossbar.BossBarColor;
-import com.velocitypowered.api.util.bossbar.BossBarOverlay;
 import com.velocitypowered.api.util.title.TextTitle;
 import me.glaremasters.deluxequeues.DeluxeQueues;
 import me.glaremasters.deluxequeues.configuration.sections.ConfigOptions;
@@ -17,12 +14,8 @@ import me.glaremasters.deluxequeues.messages.Messages;
 import me.glaremasters.deluxequeues.tasks.QueueMoveTask;
 import net.kyori.text.TextComponent;
 import net.kyori.text.format.TextColor;
-import org.checkerframework.checker.units.qual.A;
 
-import java.util.ArrayList;
 import java.util.LinkedList;
-import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -40,7 +33,6 @@ public class DeluxeQueue {
     private final int maxSlots;
     private final SettingsManager settingsManager;
     private final String notifyMethod;
-    private ConcurrentHashMap<UUID, BossBar> bossBars;
 
     public DeluxeQueue(DeluxeQueues deluxeQueues, RegisteredServer server, int playersRequired, int maxSlots) {
         this.deluxeQueues = deluxeQueues;
@@ -50,7 +42,6 @@ public class DeluxeQueue {
         this.playersRequired = playersRequired;
         this.maxSlots = maxSlots;
         this.notifyMethod = settingsManager.getProperty(ConfigOptions.INFORM_METHOD);
-        this.bossBars = new ConcurrentHashMap<>();
 
         deluxeQueues.getProxyServer().getScheduler().buildTask(deluxeQueues, new QueueMoveTask(this, server))
                 .repeat(delayLength, TimeUnit.SECONDS).schedule();
@@ -88,14 +79,8 @@ public class DeluxeQueue {
     }
 
     public void removePlayer(QueuePlayer player) {
+        player.getBossBar().removeAllPlayers();
         queue.remove(player);
-
-        BossBar bossBar = bossBars.get(player.getPlayer().getUniqueId());
-
-        if(bossBar != null) {
-            bossBar.removeAllPlayers();
-            bossBars.remove(player.getPlayer().getUniqueId());
-        }
     }
 
     public QueuePlayer getFromProxy(Player player) {
@@ -204,15 +189,8 @@ public class DeluxeQueue {
 
         float progress = (position - 1) /  (float)total;
 
-        BossBar bossBar = bossBars.get(player.getPlayer().getUniqueId());
-
-        if(bossBar != null) {
-            bossBar.setTitle(TextComponent.of(message));
-            bossBar.setPercent(progress);
-        } else {
-            bossBar = deluxeQueues.getProxyServer().createBossBar(TextComponent.of(message), BossBarColor.PURPLE, BossBarOverlay.PROGRESS, progress);
-            bossBar.addPlayer(player.getPlayer());
-            bossBars.put(player.getPlayer().getUniqueId(), bossBar);
-        }
+        player.getBossBar().setVisible(true);
+        player.getBossBar().setTitle(TextComponent.of(message));
+        player.getBossBar().setPercent(progress);
     }
 }
