@@ -7,6 +7,7 @@ public enum Messages implements MessageKeyProvider {
 
     QUEUES__LEFT,
     QUEUES__CANNOT_JOIN,
+    QUEUES__REMOVED_ERROR,
     RELOAD__SUCCESS;
 
 

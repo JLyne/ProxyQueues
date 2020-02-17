@@ -71,6 +71,15 @@ public class QueueHandler {
     }
 
     /**
+     * Get a queue from it's server
+     * @param player the server to get the queue from
+     * @return the queue
+     */
+    public DeluxeQueue getCurrentQueue(@NotNull Player player) {
+        return queues.stream().filter(q -> q.getQueuePos(q.getFromProxy(player)) > -1).findFirst().orElse(null);
+    }
+
+    /**
      * Remove a player from all queues
      * @param player the player to remove
      */

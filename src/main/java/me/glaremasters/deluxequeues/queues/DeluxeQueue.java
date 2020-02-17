@@ -43,7 +43,7 @@ public class DeluxeQueue {
         this.maxSlots = maxSlots;
         this.notifyMethod = settingsManager.getProperty(ConfigOptions.INFORM_METHOD);
 
-        deluxeQueues.getProxyServer().getScheduler().buildTask(deluxeQueues, new QueueMoveTask(this, server))
+        deluxeQueues.getProxyServer().getScheduler().buildTask(deluxeQueues, new QueueMoveTask(this, server, deluxeQueues))
                 .repeat(delayLength, TimeUnit.SECONDS).schedule();
     }
 
@@ -81,6 +81,10 @@ public class DeluxeQueue {
     public void removePlayer(QueuePlayer player) {
         player.getBossBar().removeAllPlayers();
         queue.remove(player);
+    }
+
+    public void removePlayer(Player player) {
+        removePlayer(getFromProxy(player));
     }
 
     public QueuePlayer getFromProxy(Player player) {
@@ -187,7 +191,7 @@ public class DeluxeQueue {
         message = message.replace("{pos}", String.valueOf(position));
         message = message.replace("{total}", String.valueOf(total));
 
-        float progress = (position - 1) /  (float)total;
+        float progress = (position - 1) /  (float) Math.max(total - 1, 1);
 
         player.getBossBar().setVisible(true);
         player.getBossBar().setTitle(TextComponent.of(message));

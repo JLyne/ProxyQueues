@@ -6,8 +6,10 @@ import com.velocitypowered.api.event.proxy.ProxyInitializeEvent;
 import com.velocitypowered.api.plugin.Plugin;
 import com.velocitypowered.api.plugin.annotation.DataDirectory;
 import com.velocitypowered.api.proxy.ProxyServer;
+import com.velocitypowered.api.proxy.server.RegisteredServer;
 import me.glaremasters.deluxequeues.acf.ACFHandler;
 import me.glaremasters.deluxequeues.configuration.SettingsHandler;
+import me.glaremasters.deluxequeues.configuration.sections.ConfigOptions;
 import me.glaremasters.deluxequeues.listeners.ConnectionListener;
 import me.glaremasters.deluxequeues.queues.QueueHandler;
 import org.slf4j.Logger;
@@ -106,6 +108,11 @@ public final class DeluxeQueues {
 
     public File getDataFolder() {
         return dataFolder.toFile();
+    }
+
+    public RegisteredServer getWaitingServer() {
+        String waitingServerName = getSettingsHandler().getSettingsManager().getProperty(ConfigOptions.WAITING_SERVER);
+        return getProxyServer().getServer(waitingServerName).orElse(null);
     }
 
     public static DeluxeQueues getInstance() {

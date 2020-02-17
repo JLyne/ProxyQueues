@@ -28,11 +28,15 @@ public class ConnectionListener {
     private final DeluxeQueues deluxeQueues;
     private final QueueHandler queueHandler;
     private final SettingsManager settingsManager;
+    private RegisteredServer waitingServer;
 
     public ConnectionListener(DeluxeQueues deluxeQueues) {
         this.deluxeQueues = deluxeQueues;
         this.queueHandler = deluxeQueues.getQueueHandler();
         this.settingsManager = deluxeQueues.getSettingsHandler().getSettingsManager();
+
+        String waitingServerName = deluxeQueues.getSettingsHandler().getSettingsManager().getProperty(ConfigOptions.WAITING_SERVER);
+        waitingServer = deluxeQueues.getProxyServer().getServer(waitingServerName).orElse(null);
     }
 
     @Subscribe(order = PostOrder.EARLY)
@@ -42,8 +46,14 @@ public class ConnectionListener {
         // Get the player in the event
         Player player = event.getPlayer();
 
+        RegisteredServer redirected = event.getResult().getServer().orElse(null);
+
         // Create a boolean for bypass with staff
         boolean bypass = player.hasPermission(settingsManager.getProperty(ConfigOptions.STAFF_PERMISSION));
+
+        if(redirected != null && !redirected.equals(server)) {
+            server = redirected;
+        }
 
         // Run this if they dont bypass
         if (bypass) {
@@ -65,11 +75,8 @@ public class ConnectionListener {
             }
         } else if (queue.canAddPlayer()) {
             if(!event.getPlayer().getCurrentServer().isPresent()) {
-                String waitingServerName = deluxeQueues.getSettingsHandler().getSettingsManager().getProperty(ConfigOptions.WAITING_SERVER);
-                Optional<RegisteredServer> waitingServer = deluxeQueues.getProxyServer().getServer(waitingServerName);
-
-                if(waitingServer.isPresent()) {
-                    event.setResult(ServerPreConnectEvent.ServerResult.allowed(waitingServer.get()));
+                if(waitingServer != null) {
+                    event.setResult(ServerPreConnectEvent.ServerResult.allowed(waitingServer));
                 } else {
                     player.disconnect(TextComponent.of(
                             "This server has queueing enabled and can't be connected to directly. Please connect via minecraft.rtgame.co.uk")
@@ -85,9 +92,15 @@ public class ConnectionListener {
         }
     }
 
-    @Subscribe(order = PostOrder.EARLY)
+    @Subscribe(order = PostOrder.LATE)
     public void onConnected(ServerConnectedEvent event) {
-        queueHandler.clearPlayer(event.getPlayer());
+        if(!event.getServer().equals(waitingServer)) {
+            DeluxeQueue queue = queueHandler.getQueue(event.getServer());
+
+            if(queue != null) {
+                queue.removePlayer(event.getPlayer());
+            }
+        }
     }
 
     @Subscribe(order = PostOrder.EARLY)
