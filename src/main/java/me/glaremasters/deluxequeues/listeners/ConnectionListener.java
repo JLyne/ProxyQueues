@@ -25,13 +25,11 @@ import java.util.Optional;
  */
 public class ConnectionListener {
 
-    private final DeluxeQueues deluxeQueues;
     private final QueueHandler queueHandler;
     private final SettingsManager settingsManager;
     private RegisteredServer waitingServer;
 
     public ConnectionListener(DeluxeQueues deluxeQueues) {
-        this.deluxeQueues = deluxeQueues;
         this.queueHandler = deluxeQueues.getQueueHandler();
         this.settingsManager = deluxeQueues.getSettingsHandler().getSettingsManager();
 
@@ -39,8 +37,12 @@ public class ConnectionListener {
         waitingServer = deluxeQueues.getProxyServer().getServer(waitingServerName).orElse(null);
     }
 
-    @Subscribe(order = PostOrder.EARLY)
+    @Subscribe(order = PostOrder.LATE)
     public void onJoin(ServerPreConnectEvent event) {
+        if(!event.getResult().isAllowed()) {
+            return;
+        }
+
         // Get the server in the event
         RegisteredServer server = event.getOriginalServer();
         // Get the player in the event
@@ -67,13 +69,13 @@ public class ConnectionListener {
 
         // Get the queue
         DeluxeQueue queue = queueHandler.getQueue(server);
-        QueuePlayer queuePlayer = queue.getFromProxy(player);
+        Optional<QueuePlayer> queuePlayer = queue.getQueuePlayer(player);
 
-        if(queuePlayer != null) {
-            if(!queuePlayer.isReadyToMove()) {
+        if(queuePlayer.isPresent()) {
+            if(!queuePlayer.get().isReadyToMove()) {
                 event.setResult(ServerPreConnectEvent.ServerResult.denied());
             }
-        } else if (queue.canAddPlayer()) {
+        } else if (queue.isActive()) {
             if(!event.getPlayer().getCurrentServer().isPresent()) {
                 if(waitingServer != null) {
                     event.setResult(ServerPreConnectEvent.ServerResult.allowed(waitingServer));
@@ -81,6 +83,8 @@ public class ConnectionListener {
                     player.disconnect(TextComponent.of(
                             "This server has queueing enabled and can't be connected to directly. Please connect via minecraft.rtgame.co.uk")
                                               .color(TextColor.RED));
+
+                    return;
                 }
             } else {
                 // Cancel the event so they don't go right away

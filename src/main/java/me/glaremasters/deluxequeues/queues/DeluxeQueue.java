@@ -16,6 +16,7 @@ import net.kyori.text.TextComponent;
 import net.kyori.text.format.TextColor;
 
 import java.util.LinkedList;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -52,29 +53,27 @@ public class DeluxeQueue {
      * @param player the player to add
      */
     public void addPlayer(Player player) {
-        if (getFromProxy(player) == null) {
-            QueuePlayer qp = new QueuePlayer(player, false);
+        QueuePlayer qp = getQueuePlayer(player).orElse(new QueuePlayer(player, false));
 
-            if (!queue.contains(qp)) {
-                deluxeQueues.getProxyServer().getEventManager().fire(new PlayerQueueEvent(player, server))
-                        .thenAcceptAsync(result -> {
-                            //Don't add to queue if event cancelled, show player the reason
-                            if (result.isCancelled()) {
-                                deluxeQueues.getCommandManager().sendMessage(player, MessageType.ERROR,
-                                                                             Messages.QUEUES__CANNOT_JOIN);
-                                player.sendMessage(TextComponent.of(result.getReason()).color(TextColor.RED));
-                                return;
-                            }
+        if (!queue.contains(qp)) {
+            deluxeQueues.getProxyServer().getEventManager().fire(new PlayerQueueEvent(player, server))
+                    .thenAcceptAsync(result -> {
+                        //Don't add to queue if event cancelled, show player the reason
+                        if (result.isCancelled()) {
+                            deluxeQueues.getCommandManager().sendMessage(player, MessageType.ERROR,
+                                                                         Messages.ERRORS__QUEUE_CANNOT_JOIN);
+                            player.sendMessage(TextComponent.of(result.getReason()).color(TextColor.RED));
+                            return;
+                        }
 
-                            if (player.hasPermission(settingsManager.getProperty(ConfigOptions.DONATOR_PERMISSION))) {
-                                queue.addFirst(qp);
-                            } else {
-                                queue.add(qp);
-                            }
+                        if (player.hasPermission(settingsManager.getProperty(ConfigOptions.DONATOR_PERMISSION))) {
+                            queue.addFirst(qp);
+                        } else {
+                            queue.add(qp);
+                        }
 
-                            notifyPlayer(qp);
-                        });
-            }
+                        notifyPlayer(qp);
+                    });
         }
     }
 
@@ -84,18 +83,18 @@ public class DeluxeQueue {
     }
 
     public void removePlayer(Player player) {
-        removePlayer(getFromProxy(player));
+        getQueuePlayer(player).ifPresent(this::removePlayer);
     }
 
-    public QueuePlayer getFromProxy(Player player) {
-        return queue.stream().filter(q -> q.getPlayer() == player).findFirst().orElse(null);
+    public Optional<QueuePlayer> getQueuePlayer(Player player) {
+        return queue.stream().filter(q -> q.getPlayer() == player).findFirst();
     }
 
     /**
-     * Add in a check to make sure the player can be added to the queue
+     * Whether the queue is active, and that players trying to join should be added to it
      * @return added or not
      */
-    public boolean canAddPlayer() {
+    public boolean isActive() {
         return server.getPlayersConnected().size() >= playersRequired;
     }
 
@@ -104,9 +103,16 @@ public class DeluxeQueue {
      * @param player the player to check
      * @return their position
      */
-    public int getQueuePos(QueuePlayer player) {
+    public int getPosition(Player player) {
+        Optional<QueuePlayer> qp = getQueuePlayer(player);
+
+        return qp.map(queue::indexOf).orElse(-1);
+    }
+
+    public int getPosition(QueuePlayer player) {
         return queue.indexOf(player);
     }
+
 
     /**
      * Notify the player that they are in the queue
@@ -124,13 +130,13 @@ public class DeluxeQueue {
                 break;
             case "actionbar":
                 actionbar = actionbar.replace("{server}", server.getServerInfo().getName());
-                actionbar = actionbar.replace("{pos}", String.valueOf(getQueuePos(player) + 1));
+                actionbar = actionbar.replace("{pos}", String.valueOf(getPosition(player) + 1));
                 actionbar = actionbar.replace("{total}", String.valueOf(queue.size()));
                 player.getPlayer().sendMessage(ACFVelocityUtil.color(actionbar), MessagePosition.ACTION_BAR);
                 break;
             case "text":
                 message = message.replace("{server}", server.getServerInfo().getName());
-                message = message.replace("{pos}", String.valueOf(getQueuePos(player) + 1));
+                message = message.replace("{pos}", String.valueOf(getPosition(player) + 1));
                 message = message.replace("{total}", String.valueOf(queue.size()));
                 player.getPlayer().sendMessage(ACFVelocityUtil.color(message), MessagePosition.SYSTEM);
                 break;
@@ -138,7 +144,7 @@ public class DeluxeQueue {
                 TextTitle.Builder title = TextTitle.builder();
                 title.title(ACFVelocityUtil.color(title_top));
                 title_bottom = title_bottom.replace("{server}", server.getServerInfo().getName());
-                title_bottom = title_bottom.replace("{pos}", String.valueOf(getQueuePos(player) + 1));
+                title_bottom = title_bottom.replace("{pos}", String.valueOf(getPosition(player) + 1));
                 title_bottom = title_bottom.replace("{total}", String.valueOf(queue.size()));
                 title.subtitle(ACFVelocityUtil.color(title_bottom));
                 player.getPlayer().sendTitle(title.build());
@@ -170,6 +176,14 @@ public class DeluxeQueue {
         return this.maxSlots;
     }
 
+    public int getQueueSize() {
+        return this.queue.size();
+    }
+
+    public Optional<QueuePlayer> getPlayerAt(int index) {
+        return Optional.ofNullable(queue.size() > index ? queue.get(index) : null);
+    }
+
     public SettingsManager getSettingsManager() {
         return this.settingsManager;
     }
@@ -183,7 +197,7 @@ public class DeluxeQueue {
     }
 
     private void updateBossBar(QueuePlayer player) {
-        int position = getQueuePos(player) + 1;
+        int position = getPosition(player) + 1;
         int total = queue.size();
 
         String message = settingsManager.getProperty(ConfigOptions.BOSSBAR_DESIGN);
