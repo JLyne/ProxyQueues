@@ -1,11 +1,28 @@
-descriptions:
-  command-leave: "Leave the current queue you are in"
-  reload: "Reload the configuration of the plugin"
-  help: "Help menu"
-queues:
-  left: "&6You've successfully left the queue!"
-  cannot-join: "&6Sorry, you're currently unable to join the queue:\n"
-  removed-error: "&6Sorry, you have been removed from the queue due to a fatal error:\n"
+commands:
+  join-description: "Join the queue for a server"
+  leave-description: "Leave the current queue you are in"
+  info-description: "Shows information for the specified queue"
+  kick-description: "Kick the specified player from any queue they are in"
+  reload-description: "Reload the configuration of the plugin"
+  help-description: "Help menu"
+  kick-success: "<c1>Kicked</c1><c2> %player% </c2><c1>from the </c1><c3?%server%</c3><c1> queue</c1>"
+  join-success: "<c1>You have joined the queue for </c1><c2>%server%</c2>"
+  leave-success: "<c1>You have left the queue for</c1><c2> %server%</c2>"
+  info-response: |-
+    <c3>=======</c3> <c2>%server% Queue</c2> <c3>=======</c3>
+    Players in queue: <c2>%size%</c2>
+    Queue Settings: <c2>%required%</c2> <c1>min</c1>/<c3>%max%</c3><c1> max</c1>
 
-reload:
-  success: "&6You've successfully reloaded the configuration!"
+    <c3>Front 3 players:</c3>
+    1. <c2>%first%</c2>
+    2. <c2>%second%</c2>
+    3. <c2>%third%</c2>
+  reload-success: "<c1>You've successfully reloaded the configuration!</c1>"
+errors:
+  server-no-queue: "<c1>Queueing is disabled for </c1><c2>%server%</c2>"
+  server-unknown: "<c1>Unknown server:</c1> <c2>%server%</c2>"
+  player-no-queue: "<c1>You are not queued for any server</c1>"
+  player-same-server: "<c1>You are already connected to </c1><c2>%server%</c2>"
+  target-no-queue: "<c2>%player%</c2><c1> is not queued for any server</c1>"
+  queue-cannot-join: "<c1>Sorry, you're currently unable to join the queue:\n</c1>"
+  queue-removed-error: "<c1>Sorry, you have been removed from the queue due to a fatal error:\n</c1>"
