@@ -1,21 +1,19 @@
 package me.glaremasters.deluxequeues.acf;
 
+import co.aikar.commands.MessageType;
 import co.aikar.commands.VelocityCommandManager;
 import co.aikar.locales.MessageKey;
 import ch.jalu.configme.SettingsManager;
 import me.glaremasters.deluxequeues.DeluxeQueues;
-import me.glaremasters.deluxequeues.commands.CommandHelp;
-import me.glaremasters.deluxequeues.commands.CommandLeave;
-import me.glaremasters.deluxequeues.commands.CommandReload;
+import me.glaremasters.deluxequeues.commands.*;
 import me.glaremasters.deluxequeues.queues.QueueHandler;
+import net.kyori.text.format.TextColor;
 import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.yaml.YAMLConfigurationLoader;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
-import java.util.Locale;
-import java.util.Objects;
+import java.util.*;
 
 public class ACFHandler {
 
@@ -29,6 +27,9 @@ public class ACFHandler {
         registerDependencyInjection(commandManager);
         registerCommandReplacements(commandManager);
 
+        commandManager.setFormat(MessageType.ERROR, TextColor.GOLD, TextColor.RED, TextColor.YELLOW);
+        commandManager.setFormat(MessageType.INFO, TextColor.BLUE, TextColor.GREEN, TextColor.LIGHT_PURPLE);
+
         registerCommands(commandManager);
     }
 
@@ -38,7 +39,7 @@ public class ACFHandler {
     }
 
     public void registerCommandReplacements(VelocityCommandManager commandManager) {
-        commandManager.getCommandReplacements().addReplacement("dq", "queue|dq|queues");
+        commandManager.getCommandReplacements().addReplacement("dq", "queue|dq");
     }
 
     public void registerCommands(VelocityCommandManager commandManager) {
@@ -53,20 +54,20 @@ public class ACFHandler {
      */
     public void registerLanguages(DeluxeQueues deluxeQueues, VelocityCommandManager commandManager) {
         try {
-            File languageFolder = new File(deluxeQueues.getDataFolder(), "languages");
+            File languageFolder = new File(deluxeQueues.getDataFolder().getAbsolutePath(), "languages");
+
             for (File file : Objects.requireNonNull(languageFolder.listFiles())) {
                 if (file.isFile()) {
                     if (file.getName().endsWith(".yml")) {
                         String updatedName = file.getName().replace(".yml", "");
                         commandManager.addSupportedLanguage(Locale.forLanguageTag(updatedName));
 
-                        ConfigurationNode config = YAMLConfigurationLoader.builder().setFile(
-					new File(languageFolder, file.getName())).build().load();
-
+                        ConfigurationNode config = YAMLConfigurationLoader.builder().setFile(file).build().load();
                         loadLanguage(config, Locale.forLanguageTag(updatedName), commandManager);
                     }
                 }
             }
+
             commandManager.getLocales().setDefaultLocale(Locale.forLanguageTag("en-US"));
         } catch (IOException e) {
             e.printStackTrace();
@@ -81,20 +82,23 @@ public class ACFHandler {
      * @param locale
      */
     public void loadLanguage(ConfigurationNode config, Locale locale, VelocityCommandManager commandManager) {
-        for (ConfigurationNode parent : config.getChildrenList()) {
-            List<? extends ConfigurationNode> inner = parent.getChildrenList();
+        config.getChildrenMap().forEach((key, node) -> {;
+            Map<Object, ? extends ConfigurationNode> inner = node.getChildrenMap();
 
             if (inner.isEmpty()) {
-                continue;
+                return;
             }
 
-            for (ConfigurationNode key : inner) {
-                String value = key.getString();
+            inner.forEach((innerKey, innerNode) -> {
+                String value = innerNode.getString();
+
+                String s = key.toString() + "." + innerKey.toString();
 
                 if (value != null && !value.isEmpty()) {
-                    commandManager.getLocales().addMessage(locale, MessageKey.of(key.getKey().toString() + "." + key), value);
+                    commandManager.getLocales().addMessage(locale, MessageKey.of(
+                            s), value);
                 }
-            }
-        }
+            });
+        });
     }
 }
