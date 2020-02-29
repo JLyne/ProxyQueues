@@ -61,29 +61,39 @@ public class QueueMoveTask implements Runnable {
         }
 
         // Make sure the player exists
-        if (player != null) {
-            player.getPlayer().createConnectionRequest(server).connect().thenAcceptAsync(result -> {
-                if(!result.isSuccessful()) {
-                    Component reason = result.getReason().orElse(TextComponent.empty());
-                    String reasonPlain = PlainComponentSerializer.INSTANCE.serialize(reason);
-                    ServerConnection currentServer = player.getPlayer().getCurrentServer().orElse(null);
-
-                    fatalErrors.forEach(r -> {
-                        if(reasonPlain.contains(r)) {
-                            if(currentServer == null || currentServer.getServer().equals(waitingServer)) {
-                                player.getPlayer().disconnect(result.getReason().orElse(TextComponent.empty()));
-                            } else {
-                                queue.removePlayer(player);
-                                deluxeQueues.getCommandManager().sendMessage(player.getPlayer(), MessageType.ERROR,
-                                                                             Messages.QUEUES__CANNOT_JOIN);
-                                player.getPlayer().sendMessage(reason);
-                            }
-                        }
-                    });
-                }
-            });
-
-            player.setReadyToMove(true);
+        if (player == null) {
+            return;
         }
+
+        player.getPlayer().createConnectionRequest(server).connect().thenAcceptAsync(result -> {
+            if(!result.isSuccessful()) {
+                deluxeQueues.getLogger()
+                        .info("Player " +
+                                      player.getPlayer().getUsername() + " failed to join "
+                                      + queue.getServer().getServerInfo().getName()
+                                      + ". Reason: "
+                                      + PlainComponentSerializer.INSTANCE
+                                .serialize(result.getReason().orElse(TextComponent.of("(None)"))));
+
+                Component reason = result.getReason().orElse(TextComponent.empty());
+                String reasonPlain = PlainComponentSerializer.INSTANCE.serialize(reason);
+                ServerConnection currentServer = player.getPlayer().getCurrentServer().orElse(null);
+
+                fatalErrors.forEach(r -> {
+                    if(reasonPlain.contains(r)) {
+                        if(currentServer == null || currentServer.getServer().equals(waitingServer)) {
+                            player.getPlayer().disconnect(result.getReason().orElse(TextComponent.empty()));
+                        } else {
+                            queue.removePlayer(player);
+                            deluxeQueues.getCommandManager().sendMessage(player.getPlayer(), MessageType.ERROR,
+                                                                         Messages.ERRORS__QUEUE_CANNOT_JOIN);
+                            player.getPlayer().sendMessage(reason);
+                        }
+                    }
+                });
+            }
+        });
+
+        player.setReadyToMove(true);
     }
 }
