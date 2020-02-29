@@ -44,6 +44,7 @@ public class ACFHandler {
 
     public void registerCommands(VelocityCommandManager commandManager) {
         commandManager.registerCommand(new CommandHelp());
+        commandManager.registerCommand(new CommandJoin());
         commandManager.registerCommand(new CommandLeave());
         commandManager.registerCommand(new CommandReload());
     }
