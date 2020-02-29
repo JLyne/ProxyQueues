@@ -13,7 +13,7 @@ public class CommandHelp extends BaseCommand {
 
     @HelpCommand
     @CommandPermission(Constants.BASE_PERM + "help")
-    @Description("{@@descriptions.help}")
+    @Description("{@@commands.help-description}")
     public void execute(co.aikar.commands.CommandHelp help) {
         help.showHelp();
     }

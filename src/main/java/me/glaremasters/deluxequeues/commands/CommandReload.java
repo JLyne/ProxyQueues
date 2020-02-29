@@ -19,11 +19,11 @@ public class CommandReload extends BaseCommand {
     @Dependency private DeluxeQueues deluxeQueues;
 
     @Subcommand("reload")
-    @Description("{@@descriptions.reload}")
+    @Description("{@@commands.reload-description}")
     @CommandPermission(Constants.ADMIN_PERM)
     public void execute(CommandIssuer issuer) {
         settingsManager.reload();
         deluxeQueues.startQueues();
-        issuer.sendInfo(Messages.RELOAD__SUCCESS);
+        issuer.sendInfo(Messages.COMMANDS__RELOAD_SUCCESS);
     }
 }
