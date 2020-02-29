@@ -47,6 +47,8 @@ public class ACFHandler {
         commandManager.registerCommand(new CommandJoin());
         commandManager.registerCommand(new CommandLeave());
         commandManager.registerCommand(new CommandReload());
+        commandManager.registerCommand(new CommandInfo());
+        commandManager.registerCommand(new CommandKick());
     }
 
     /**
