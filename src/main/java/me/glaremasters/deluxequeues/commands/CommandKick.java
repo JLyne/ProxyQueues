@@ -31,7 +31,7 @@ public class CommandKick extends BaseCommand {
             return;
         }
 
-        queueHandler.clearPlayer(player.getPlayer());
+        queueHandler.kickPlayer(player.getPlayer());
         sender.sendInfo(Messages.COMMANDS__KICK_SUCCESS,
                         "%player%", player.getPlayer().getUsername(),
                         "%server%", currentQueue.get().getServer().getServerInfo().getName());

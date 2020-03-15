@@ -4,10 +4,12 @@ import ch.jalu.configme.SettingsManager;
 import co.aikar.commands.ACFVelocityUtil;
 import co.aikar.commands.MessageType;
 import com.velocitypowered.api.proxy.Player;
+import com.velocitypowered.api.proxy.ServerConnection;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
 import com.velocitypowered.api.util.MessagePosition;
 import com.velocitypowered.api.util.title.TextTitle;
 import me.glaremasters.deluxequeues.DeluxeQueues;
+import me.glaremasters.deluxequeues.QueueType;
 import me.glaremasters.deluxequeues.configuration.sections.ConfigOptions;
 import me.glaremasters.deluxequeues.events.PlayerQueueEvent;
 import me.glaremasters.deluxequeues.messages.Messages;
@@ -15,8 +17,10 @@ import me.glaremasters.deluxequeues.tasks.QueueMoveTask;
 import net.kyori.text.TextComponent;
 import net.kyori.text.format.TextColor;
 
-import java.util.LinkedList;
 import java.util.Optional;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -27,67 +31,164 @@ import java.util.concurrent.TimeUnit;
 public class DeluxeQueue {
 
     private final DeluxeQueues deluxeQueues;
-    private final LinkedList<QueuePlayer> queue = new LinkedList<>();
+
+    private final ConcurrentLinkedQueue<QueuePlayer> queue = new ConcurrentLinkedQueue<>();
+    private final ConcurrentLinkedQueue<QueuePlayer> priorityQueue = new ConcurrentLinkedQueue<>();
+    private final ConcurrentLinkedQueue<QueuePlayer> staffQueue = new ConcurrentLinkedQueue<>();
+
+    private final ConcurrentHashMap<Player, QueuePlayer> queuePlayers = new ConcurrentHashMap<>();
+
+    //Cache of connected priority/staff players, to ease calculation of queue player thresholds
+    private final Set<Player> connectedPriority = ConcurrentHashMap.newKeySet();
+    private final Set<Player> connectedStaff = ConcurrentHashMap.newKeySet();
+
     private final RegisteredServer server;
     private final int delayLength;
     private final int playersRequired;
+
     private final int maxSlots;
+    private final int priorityMaxSlots;
+    private final int staffMaxSlots;
+
     private final SettingsManager settingsManager;
     private final String notifyMethod;
 
-    public DeluxeQueue(DeluxeQueues deluxeQueues, RegisteredServer server, int playersRequired, int maxSlots) {
+    public DeluxeQueue(DeluxeQueues deluxeQueues, RegisteredServer server, int playersRequired, int maxSlots, int priorityMaxSlots, int staffMaxSlots) {
         this.deluxeQueues = deluxeQueues;
         this.server = server;
         this.settingsManager = deluxeQueues.getSettingsHandler().getSettingsManager();
         this.delayLength = settingsManager.getProperty(ConfigOptions.DELAY_LENGTH);
-        this.playersRequired = playersRequired;
-        this.maxSlots = maxSlots;
+        this.playersRequired = Math.max(playersRequired, 0);
+
+        this.maxSlots = Math.max(maxSlots, playersRequired);
+        this.priorityMaxSlots = Math.max(priorityMaxSlots, maxSlots);
+        this.staffMaxSlots = Math.max(staffMaxSlots, priorityMaxSlots);
+
         this.notifyMethod = settingsManager.getProperty(ConfigOptions.INFORM_METHOD);
 
         deluxeQueues.getProxyServer().getScheduler().buildTask(deluxeQueues, new QueueMoveTask(this, server, deluxeQueues))
                 .repeat(delayLength, TimeUnit.SECONDS).schedule();
     }
 
+    public void addPlayer(Player player) {
+        addPlayer(player, null);
+    }
+
     /**
      * Add a player to a queue
      * @param player the player to add
      */
-    public void addPlayer(Player player) {
-        QueuePlayer qp = getQueuePlayer(player).orElse(new QueuePlayer(player, false));
+    public void addPlayer(Player player, QueueType queueType) {
+        Optional<QueuePlayer> qp = getQueuePlayer(player);
 
-        if (!queue.contains(qp)) {
-            deluxeQueues.getProxyServer().getEventManager().fire(new PlayerQueueEvent(player, server))
-                    .thenAcceptAsync(result -> {
-                        //Don't add to queue if event cancelled, show player the reason
-                        if (result.isCancelled()) {
-                            deluxeQueues.getCommandManager().sendMessage(player, MessageType.ERROR,
-                                                                         Messages.ERRORS__QUEUE_CANNOT_JOIN);
-                            player.sendMessage(TextComponent.of(result.getReason()).color(TextColor.RED));
-                            return;
-                        }
+        if(qp.isPresent()) {
+            return;
+        }
 
-                        if (player.hasPermission(settingsManager.getProperty(ConfigOptions.DONATOR_PERMISSION))) {
-                            queue.addFirst(qp);
-                        } else {
-                            queue.add(qp);
-                        }
+        if(queueType == null) {
+            queueType = QueueType.NORMAL;
 
-                        notifyPlayer(qp);
-                    });
+            if(player.hasPermission(settingsManager.getProperty(ConfigOptions.PRIORITY_PERMISSION))) {
+                queueType = QueueType.PRIORITY;
+            } else if(player.hasPermission(settingsManager.getProperty(ConfigOptions.STAFF_PERMISSION))) {
+                queueType = QueueType.STAFF;
+            }
+        }
+
+        QueuePlayer queuePlayer = new QueuePlayer(player, queueType);
+        queuePlayers.put(player, queuePlayer);
+
+        deluxeQueues.getProxyServer().getEventManager().fire(new PlayerQueueEvent(player, server))
+                .thenAcceptAsync(result -> {
+                    //Don't add to queue if event cancelled, show player the reason
+                    if (result.isCancelled()) {
+                        deluxeQueues.getCommandManager().sendMessage(player, MessageType.ERROR,
+                                                                     Messages.ERRORS__QUEUE_CANNOT_JOIN);
+                        player.sendMessage(TextComponent.of(result.getReason()).color(TextColor.RED));
+                        queuePlayers.remove(player, queuePlayer);
+                        return;
+                    }
+
+                    switch(queuePlayer.getQueueType()) {
+                        case STAFF:
+                            staffQueue.add(queuePlayer);
+                            break;
+
+                        case PRIORITY:
+                            priorityQueue.add(queuePlayer);
+                            break;
+
+                        case NORMAL:
+                        default:
+                            queue.add(queuePlayer);
+                            break;
+                    }
+                });
+    }
+
+    public void removePlayer(QueuePlayer player, boolean connected) {
+        player.getBossBar().removeAllPlayers();
+        player.setConnecting(false);
+
+        switch(player.getQueueType()) {
+            case STAFF:
+                staffQueue.remove(player);
+
+                //Update connected players cache
+                if(connected) {
+                    deluxeQueues.getLogger().info("Connected to queued server, adding cache entry");
+                    connectedStaff.add(player.getPlayer()); //Is connected to queued server, add to connected
+                } else {
+                    deluxeQueues.getLogger().info("Not connected to queued server, removing cache entry");
+                    connectedStaff.remove(player.getPlayer()); //Is not connected to queued server, remove from connected
+                }
+
+                break;
+
+            case PRIORITY:
+                priorityQueue.remove(player);
+
+                //Update connected players cache
+                if(connected) {
+                    deluxeQueues.getLogger().info("Connected to queued server, adding cache entry");
+                    connectedPriority.add(player.getPlayer()); //Is connected to queued server, add to connected
+                } else {
+                    deluxeQueues.getLogger().info("Not connected to queued server, removing cache entry");
+                    connectedPriority.remove(player.getPlayer()); //Is not connected to queued server, remove from connected
+                }
+
+                break;
+
+            case NORMAL:
+            default:
+                queue.remove(player);
+                break;
+        }
+
+        queuePlayers.remove(player.getPlayer());
+    }
+
+    public void removePlayer(Player player, boolean connected) {
+        Optional<QueuePlayer> queuePlayer = getQueuePlayer(player);
+
+        if(queuePlayer.isPresent()) {
+            removePlayer(queuePlayer.get(), connected);
+        } else {
+            deluxeQueues.getLogger().info("Not in queue, removing cached entries");
+
+            connectedStaff.remove(player);
+            connectedPriority.remove(player);
         }
     }
 
-    public void removePlayer(QueuePlayer player) {
-        player.getBossBar().removeAllPlayers();
-        queue.remove(player);
-    }
-
-    public void removePlayer(Player player) {
-        getQueuePlayer(player).ifPresent(this::removePlayer);
-    }
-
     public Optional<QueuePlayer> getQueuePlayer(Player player) {
-        return queue.stream().filter(q -> q.getPlayer() == player).findFirst();
+        QueuePlayer queuePlayer = queuePlayers.get(player);
+
+        if(queuePlayer == null) {
+            return Optional.ofNullable(queuePlayers.computeIfAbsent(player, key -> null));
+        } else {
+            return Optional.of(queuePlayer);
+        }
     }
 
     /**
@@ -98,31 +199,80 @@ public class DeluxeQueue {
         return server.getPlayersConnected().size() >= playersRequired;
     }
 
-    /**
-     * Get the position of a player in a queue
-     * @param player the player to check
-     * @return their position
-     */
-    public int getPosition(Player player) {
-        Optional<QueuePlayer> qp = getQueuePlayer(player);
-
-        return qp.map(queue::indexOf).orElse(-1);
+    public boolean isPlayerQueued(Player player) {
+        return getQueuePlayer(player).isPresent();
     }
 
-    public int getPosition(QueuePlayer player) {
-        return queue.indexOf(player);
-    }
+    public boolean isServerFull(QueueType queueType) {
+        int modSlots;
+        int usedModSlots;
 
+        switch(queueType) {
+            //Staff, check total count is below staff limit
+            case STAFF:
+                deluxeQueues.getLogger().info("STAFF: " + server.getPlayersConnected().size() + " >= " + getMaxSlots(QueueType.STAFF) + "?");
+
+                return server.getPlayersConnected().size() >= getMaxSlots(QueueType.STAFF);
+
+            //Priority, check total count ignoring filled mod slots is below priority limit
+            case PRIORITY:
+                modSlots = getMaxSlots(QueueType.STAFF) - getMaxSlots(QueueType.PRIORITY);
+                usedModSlots = Math.min(connectedStaff.size(), modSlots); //Ignore staff beyond assigned slots, prevents mods "stealing" normal slots if normal players leave
+
+                deluxeQueues.getLogger().info("PRIORITY: " + server.getPlayersConnected().size() + " - " + usedModSlots + " >= " + getMaxSlots(QueueType.PRIORITY) + "?");
+
+                return (server.getPlayersConnected().size() - usedModSlots) >= getMaxSlots(QueueType.PRIORITY);
+
+            //Normal, check total count ignoring filled mod and priority slots is below normal limit
+            case NORMAL:
+            default:
+                modSlots = getMaxSlots(QueueType.STAFF) - getMaxSlots(QueueType.PRIORITY);
+                usedModSlots = Math.min(connectedStaff.size(), modSlots); //Ignore staff beyond assigned slots, prevents mods "stealing" normal slots if normal players leave
+
+                int prioritySlots = getMaxSlots(QueueType.PRIORITY) - getMaxSlots(QueueType.NORMAL);
+                //Count mods not counted above as filled priority slots, prevents mods "stealing" normal slots if normal players leave
+                int usedPrioritySlots = Math.min(connectedPriority.size() + (connectedStaff.size() - usedModSlots), prioritySlots);
+
+                deluxeQueues.getLogger().info("NORMAL: " + server.getPlayersConnected().size() + " - " + usedModSlots + " - " + usedPrioritySlots + " >= " + getMaxSlots(QueueType.NORMAL) + "?");
+
+                return (server.getPlayersConnected().size() - usedModSlots - usedPrioritySlots) >= getMaxSlots(QueueType.NORMAL);
+
+        }
+    }
 
     /**
      * Notify the player that they are in the queue
      * @param player the player to check
      */
     public void notifyPlayer(QueuePlayer player) {
-        String actionbar = settingsManager.getProperty(ConfigOptions.ACTIONBAR_DESIGN);
-        String message = settingsManager.getProperty(ConfigOptions.TEXT_DESIGN);
-        String title_top = settingsManager.getProperty(ConfigOptions.TITLE_HEADER);
-        String title_bottom = settingsManager.getProperty(ConfigOptions.TITLE_FOOTER);
+        String actionbar;
+        String message;
+        String title_top;
+        String title_bottom;
+
+        switch(player.getQueueType()) {
+            case STAFF:
+                actionbar = settingsManager.getProperty(ConfigOptions.STAFF_ACTIONBAR_DESIGN);
+                message = settingsManager.getProperty(ConfigOptions.STAFF_TEXT_DESIGN);
+                title_top = settingsManager.getProperty(ConfigOptions.STAFF_TITLE_HEADER);
+                title_bottom = settingsManager.getProperty(ConfigOptions.STAFF_TITLE_FOOTER);
+                break;
+
+            case PRIORITY:
+                actionbar = settingsManager.getProperty(ConfigOptions.PRIORITY_ACTIONBAR_DESIGN);
+                message = settingsManager.getProperty(ConfigOptions.PRIORITY_TEXT_DESIGN);
+                title_top = settingsManager.getProperty(ConfigOptions.PRIORITY_TITLE_HEADER);
+                title_bottom = settingsManager.getProperty(ConfigOptions.PRIORITY_TITLE_FOOTER);
+                break;
+
+            case NORMAL:
+            default:
+                actionbar = settingsManager.getProperty(ConfigOptions.NORMAL_ACTIONBAR_DESIGN);
+                message = settingsManager.getProperty(ConfigOptions.NORMAL_TEXT_DESIGN);
+                title_top = settingsManager.getProperty(ConfigOptions.NORMAL_TITLE_HEADER);
+                title_bottom = settingsManager.getProperty(ConfigOptions.NORMAL_TITLE_FOOTER);
+                break;
+        }
 
         switch (notifyMethod.toLowerCase()) {
             case "bossbar":
@@ -130,34 +280,35 @@ public class DeluxeQueue {
                 break;
             case "actionbar":
                 actionbar = actionbar.replace("{server}", server.getServerInfo().getName());
-                actionbar = actionbar.replace("{pos}", String.valueOf(getPosition(player) + 1));
-                actionbar = actionbar.replace("{total}", String.valueOf(queue.size()));
+                actionbar = actionbar.replace("{pos}", String.valueOf(player.getPosition()));
                 player.getPlayer().sendMessage(ACFVelocityUtil.color(actionbar), MessagePosition.ACTION_BAR);
                 break;
             case "text":
                 message = message.replace("{server}", server.getServerInfo().getName());
-                message = message.replace("{pos}", String.valueOf(getPosition(player) + 1));
-                message = message.replace("{total}", String.valueOf(queue.size()));
+                message = message.replace("{pos}", String.valueOf(player.getPosition()));
                 player.getPlayer().sendMessage(ACFVelocityUtil.color(message), MessagePosition.SYSTEM);
                 break;
             case "title":
                 TextTitle.Builder title = TextTitle.builder();
                 title.title(ACFVelocityUtil.color(title_top));
                 title_bottom = title_bottom.replace("{server}", server.getServerInfo().getName());
-                title_bottom = title_bottom.replace("{pos}", String.valueOf(getPosition(player) + 1));
-                title_bottom = title_bottom.replace("{total}", String.valueOf(queue.size()));
+                title_bottom = title_bottom.replace("{pos}", String.valueOf(player.getPosition()));
                 title.subtitle(ACFVelocityUtil.color(title_bottom));
                 player.getPlayer().sendTitle(title.build());
                 break;
         }
     }
 
-    public DeluxeQueues getDeluxeQueues() {
-        return this.deluxeQueues;
+    public ConcurrentLinkedQueue<QueuePlayer> getQueue() {
+        return queue;
     }
 
-    public LinkedList<QueuePlayer> getQueue() {
-        return this.queue;
+    public ConcurrentLinkedQueue<QueuePlayer> getPriorityQueue() {
+        return priorityQueue;
+    }
+
+    public ConcurrentLinkedQueue<QueuePlayer> getStaffQueue() {
+        return staffQueue;
     }
 
     public RegisteredServer getServer() {
@@ -172,20 +323,58 @@ public class DeluxeQueue {
         return this.playersRequired;
     }
 
-    public int getMaxSlots() {
-        return this.maxSlots;
+    public int getMaxSlots(QueueType queueType) {
+        switch (queueType) {
+            case STAFF:
+                return staffMaxSlots;
+            case PRIORITY:
+                return priorityMaxSlots;
+            case NORMAL:
+            default:
+                return maxSlots;
+        }
     }
 
-    public int getQueueSize() {
-        return this.queue.size();
+    public int getQueueSize(QueueType queueType) {
+        switch (queueType) {
+            case STAFF:
+                return staffQueue.size();
+            case PRIORITY:
+                return priorityQueue.size();
+            case NORMAL:
+            default:
+                return queue.size();
+        }
     }
 
-    public Optional<QueuePlayer> getPlayerAt(int index) {
-        return Optional.ofNullable(queue.size() > index ? queue.get(index) : null);
-    }
+    public QueuePlayer[] getTopPlayers(QueueType queueType, int count) {
+        QueuePlayer[] players = new QueuePlayer[count];
+        ConcurrentLinkedQueue<QueuePlayer> queue;
 
-    public SettingsManager getSettingsManager() {
-        return this.settingsManager;
+        switch (queueType) {
+            case STAFF:
+                queue = staffQueue;
+                break;
+            case PRIORITY:
+                queue = priorityQueue;
+                break;
+            case NORMAL:
+            default:
+                queue = this.queue;
+                break;
+        }
+
+        int index = 0;
+
+        for(QueuePlayer player : queue) {
+            players[index] = player;
+
+            if(++index > 2) {
+                break;
+            }
+        }
+
+        return players;
     }
 
     public String getNotifyMethod() {
@@ -193,22 +382,30 @@ public class DeluxeQueue {
     }
 
     public String toString() {
-        return "DeluxeQueue(deluxeQueues=" + this.getDeluxeQueues() + ", queue=" + this.getQueue() + ", server=" + this.getServer() + ", delayLength=" + this.getDelayLength() + ", playersRequired=" + this.getPlayersRequired() + ", maxSlots=" + this.getMaxSlots() + ", settingsManager=" + this.getSettingsManager() + ", notifyMethod=" + this.getNotifyMethod() + ")";
+        return "DeluxeQueue(queue=" + this.getQueue() + ", server=" + this.getServer() + ", delayLength=" + this.getDelayLength() + ", playersRequired=" + this.getPlayersRequired() + ", maxSlots=" + this.getMaxSlots(QueueType.STAFF) + ", notifyMethod=" + this.getNotifyMethod() + ")";
     }
 
     private void updateBossBar(QueuePlayer player) {
-        int position = getPosition(player) + 1;
-        int total = queue.size();
+        int position = player.getPosition();
+        String message;
 
-        String message = settingsManager.getProperty(ConfigOptions.BOSSBAR_DESIGN);
+        switch (player.getQueueType()) {
+            case STAFF:
+                message = settingsManager.getProperty(ConfigOptions.STAFF_BOSSBAR_DESIGN);
+                break;
+            case PRIORITY:
+                message = settingsManager.getProperty(ConfigOptions.PRIORITY_BOSSBAR_DESIGN);
+                break;
+            case NORMAL:
+            default:
+                message = settingsManager.getProperty(ConfigOptions.NORMAL_BOSSBAR_DESIGN);
+                break;
+        }
+
         message = message.replace("{server}", server.getServerInfo().getName());
         message = message.replace("{pos}", String.valueOf(position));
-        message = message.replace("{total}", String.valueOf(total));
-
-        float progress = (position - 1) /  (float) Math.max(total - 1, 1);
 
         player.getBossBar().setVisible(true);
         player.getBossBar().setTitle(TextComponent.of(message));
-        player.getBossBar().setPercent(progress);
     }
 }

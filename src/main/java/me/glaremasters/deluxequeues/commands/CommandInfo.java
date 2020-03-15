@@ -5,6 +5,7 @@ import co.aikar.commands.CommandIssuer;
 import co.aikar.commands.annotation.*;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
 import me.glaremasters.deluxequeues.DeluxeQueues;
+import me.glaremasters.deluxequeues.QueueType;
 import me.glaremasters.deluxequeues.messages.Messages;
 import me.glaremasters.deluxequeues.queues.DeluxeQueue;
 import me.glaremasters.deluxequeues.queues.QueueHandler;
@@ -38,20 +39,37 @@ public class CommandInfo extends BaseCommand {
         }
 
         int playersRequired = queue.getPlayersRequired(),
-            maxSlots = queue.getMaxSlots(),
-            playerCount = queue.getQueueSize();
+            normalMax = queue.getMaxSlots(QueueType.NORMAL),
+            priorityMax = queue.getMaxSlots(QueueType.PRIORITY),
+            staffMax = queue.getMaxSlots(QueueType.STAFF),
+            normalSize = queue.getQueueSize(QueueType.NORMAL),
+            prioritySize = queue.getQueueSize(QueueType.PRIORITY),
+            staffSize = queue.getQueueSize(QueueType.STAFF);
 
-        Optional<QueuePlayer> first = queue.getPlayerAt(0);
-        Optional<QueuePlayer> second = queue.getPlayerAt(1);
-        Optional<QueuePlayer> third = queue.getPlayerAt(2);
+        normalSize += prioritySize;
+        normalSize += staffSize;
+
+        QueuePlayer[] normalPlayers = queue.getTopPlayers(QueueType.NORMAL, 3);
+        QueuePlayer[] priorityPlayers = queue.getTopPlayers(QueueType.PRIORITY, 3);
+        QueuePlayer[] staffPlayers = queue.getTopPlayers(QueueType.STAFF, 3);
 
         sender.sendInfo(Messages.COMMANDS__INFO_RESPONSE,
                         "%server%", server.get().getServerInfo().getName(),
-                        "%size%", String.valueOf(playerCount),
+                        "%size%", String.valueOf(normalSize),
+                        "%prioritySize%", String.valueOf(prioritySize),
+                        "%staffSize%", String.valueOf(staffSize),
                         "%required%", String.valueOf(playersRequired),
-                        "%max%", String.valueOf(maxSlots),
-                        "%first%", first.isPresent() ? first.get().getPlayer().getUsername() : "n/a",
-                        "%second%", second.isPresent() ? second.get().getPlayer().getUsername() : "n/a",
-                        "%third%", third.isPresent() ? third.get().getPlayer().getUsername() : "n/a");
+                        "%max%", String.valueOf(normalMax),
+                        "%priorityMax%", String.valueOf(priorityMax),
+                        "%globalMax%", String.valueOf(staffMax),
+                        "%staffFirst%", staffPlayers[0] != null ? staffPlayers[0].getPlayer().getUsername() : "n/a",
+                        "%staffSecond%", staffPlayers[1] != null ? staffPlayers[1].getPlayer().getUsername() : "n/a",
+                        "%staffThird%", staffPlayers[2] != null ? staffPlayers[2].getPlayer().getUsername() : "n/a",
+                        "%priorityFirst%", priorityPlayers[0] != null ? priorityPlayers[0].getPlayer().getUsername() : "n/a",
+                        "%prioritySecond%", priorityPlayers[1] != null ? priorityPlayers[1].getPlayer().getUsername() : "n/a",
+                        "%priorityThird%", priorityPlayers[2] != null ? priorityPlayers[2].getPlayer().getUsername() : "n/a",
+                        "%first%", normalPlayers[0] != null ? normalPlayers[0].getPlayer().getUsername() : "n/a",
+                        "%second%", normalPlayers[1] != null ? normalPlayers[1].getPlayer().getUsername() : "n/a",
+                        "%third%", normalPlayers[2] != null ? normalPlayers[2].getPlayer().getUsername() : "n/a");
     }
 }

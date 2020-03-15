@@ -4,18 +4,24 @@ import ch.jalu.configme.SettingsManager;
 import com.velocitypowered.api.event.PostOrder;
 import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.connection.DisconnectEvent;
+import com.velocitypowered.api.event.player.KickedFromServerEvent;
 import com.velocitypowered.api.event.player.ServerConnectedEvent;
 import com.velocitypowered.api.event.player.ServerPreConnectEvent;
 import com.velocitypowered.api.proxy.Player;
+import com.velocitypowered.api.proxy.ServerConnection;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
 import me.glaremasters.deluxequeues.DeluxeQueues;
+import me.glaremasters.deluxequeues.QueueType;
 import me.glaremasters.deluxequeues.configuration.sections.ConfigOptions;
 import me.glaremasters.deluxequeues.queues.DeluxeQueue;
 import me.glaremasters.deluxequeues.queues.QueueHandler;
 import me.glaremasters.deluxequeues.queues.QueuePlayer;
+import net.kyori.text.Component;
 import net.kyori.text.TextComponent;
 import net.kyori.text.format.TextColor;
+import net.kyori.text.serializer.plain.PlainComponentSerializer;
 
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -26,14 +32,19 @@ import java.util.Optional;
 public class ConnectionListener {
 
     private final QueueHandler queueHandler;
-    private final SettingsManager settingsManager;
+    private final List<String> fatalErrors;
+    private DeluxeQueues deluxeQueues;
     private RegisteredServer waitingServer;
 
     public ConnectionListener(DeluxeQueues deluxeQueues) {
-        this.queueHandler = deluxeQueues.getQueueHandler();
-        this.settingsManager = deluxeQueues.getSettingsHandler().getSettingsManager();
+        SettingsManager settingsManager = deluxeQueues.getSettingsHandler().getSettingsManager();
 
-        String waitingServerName = deluxeQueues.getSettingsHandler().getSettingsManager().getProperty(ConfigOptions.WAITING_SERVER);
+        this.queueHandler = deluxeQueues.getQueueHandler();
+        this.deluxeQueues = deluxeQueues;
+        this.fatalErrors = deluxeQueues.getSettingsHandler().getSettingsManager().getProperty(
+                            ConfigOptions.FATAL_ERRORS);
+
+        String waitingServerName = settingsManager.getProperty(ConfigOptions.WAITING_SERVER);
         waitingServer = deluxeQueues.getProxyServer().getServer(waitingServerName).orElse(null);
     }
 
@@ -50,16 +61,8 @@ public class ConnectionListener {
 
         RegisteredServer redirected = event.getResult().getServer().orElse(null);
 
-        // Create a boolean for bypass with staff
-        boolean bypass = player.hasPermission(settingsManager.getProperty(ConfigOptions.STAFF_PERMISSION));
-
         if(redirected != null && !redirected.equals(server)) {
             server = redirected;
-        }
-
-        // Run this if they dont bypass
-        if (bypass) {
-            return;
         }
 
         // Check if the server has a queue
@@ -72,7 +75,7 @@ public class ConnectionListener {
         Optional<QueuePlayer> queuePlayer = queue.getQueuePlayer(player);
 
         if(queuePlayer.isPresent()) {
-            if(!queuePlayer.get().isReadyToMove()) {
+            if(!queuePlayer.get().isConnecting()) {
                 event.setResult(ServerPreConnectEvent.ServerResult.denied());
             }
         } else if (queue.isActive()) {
@@ -102,7 +105,7 @@ public class ConnectionListener {
             DeluxeQueue queue = queueHandler.getQueue(event.getServer());
 
             if(queue != null) {
-                queue.removePlayer(event.getPlayer());
+                queue.removePlayer(event.getPlayer(), true);
             }
         }
     }
@@ -111,6 +114,41 @@ public class ConnectionListener {
     public void onLeave(DisconnectEvent event) {
         // Remove player from all queues
         queueHandler.clearPlayer(event.getPlayer());
+    }
+
+    @Subscribe(order = PostOrder.LAST)
+    public void onKick(KickedFromServerEvent event) {
+        deluxeQueues.getLogger()
+                .info("Player " + event.getPlayer().getUsername() + " kicked from " +
+                              event.getServer().getServerInfo().getName() + ". Reason: " + event.getOriginalReason());
+
+        if(event.kickedDuringServerConnect()) {
+            deluxeQueues.getLogger().info("Kicked during connect");
+            return;
+        }
+
+        if(!event.getServer().equals(waitingServer)) {
+            DeluxeQueue queue = queueHandler.getQueue(event.getServer());
+
+            if(queue == null || !queue.isActive()) {
+                deluxeQueues.getLogger().info("No queue active");
+                return;
+            }
+
+            Component reason = event.getOriginalReason().orElse(TextComponent.empty());
+            String reasonPlain = PlainComponentSerializer.INSTANCE.serialize(reason);
+
+            boolean fatal = fatalErrors.stream().anyMatch(reasonPlain::contains);
+
+            if(!fatal) {
+                deluxeQueues.getLogger()
+                .info("Reason not fatal, requeueing " + event.getPlayer().getUsername());
+
+                queue.addPlayer(event.getPlayer(), QueueType.PRIORITY);
+            } else {
+                deluxeQueues.getLogger().info("Reason fatal");
+            }
+        }
     }
 
 }

@@ -12,7 +12,9 @@ import net.kyori.text.Component;
 import net.kyori.text.TextComponent;
 import net.kyori.text.serializer.plain.PlainComponentSerializer;
 
+import java.time.Instant;
 import java.util.List;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
  * Created by Glare
@@ -20,19 +22,20 @@ import java.util.List;
  * Time: 10:47 PM
  */
 public class QueueMoveTask implements Runnable {
-
     private final DeluxeQueue queue;
     private final RegisteredServer server;
     private final DeluxeQueues deluxeQueues;
     private final List<String> fatalErrors;
     private final RegisteredServer waitingServer;
 
+    private QueuePlayer targetPlayer = null;
+
     public QueueMoveTask(DeluxeQueue queue, RegisteredServer server, DeluxeQueues deluxeQueues) {
         this.queue = queue;
         this.server = server;
         this.deluxeQueues = deluxeQueues;
         this.fatalErrors = deluxeQueues.getSettingsHandler().getSettingsManager().getProperty(
-                            ConfigOptions.FATAL_JOIN_ERRORS);
+                            ConfigOptions.FATAL_ERRORS);
 
         String waitingServerName = deluxeQueues.getSettingsHandler().getSettingsManager().getProperty(ConfigOptions.WAITING_SERVER);
         waitingServer = deluxeQueues.getProxyServer().getServer(waitingServerName).orElse(null);
@@ -40,60 +43,93 @@ public class QueueMoveTask implements Runnable {
 
     @Override
     public void run() {
-        // Make sure the queue isn't empty
-        if (queue.getQueue().isEmpty()) {
-            return;
+        ConcurrentLinkedQueue<QueuePlayer> normalQueue = queue.getQueue();
+        ConcurrentLinkedQueue<QueuePlayer> priorityQueue = queue.getPriorityQueue();
+        ConcurrentLinkedQueue<QueuePlayer> staffQueue = queue.getStaffQueue();
+
+        if(targetPlayer != null && (!targetPlayer.isConnecting() || !targetPlayer.getPlayer().isActive())) {
+            deluxeQueues.getLogger().info("Target player no longer valid");
+            targetPlayer.setConnecting(false);
+            targetPlayer = null;
         }
 
-        // Persist the notification to the user
-        queue.getQueue().forEach(queue::notifyPlayer);
+        if(targetPlayer != null && targetPlayer.getLastConnectionAttempt().isBefore(Instant.now().minusSeconds(10))) {
+            deluxeQueues.getLogger().info("Target player timed out");
+            targetPlayer.setConnecting(false);
+            targetPlayer = null;
+        }
+
+        handleQueue(staffQueue);
+        handleQueue(priorityQueue);
+        handleQueue(normalQueue);
+
+        // Nothing to do if no player to queue, or connection attempt already underway
+        if(targetPlayer == null || targetPlayer.isConnecting()) {
+            deluxeQueues.getLogger().info("No player to connect or already connecting");
+            return;
+        }
 
         // Check if the max amount of players on the server are the max slots
-        if (queue.getServer().getPlayersConnected().size() >= queue.getMaxSlots()) {
+        if (queue.isServerFull(targetPlayer.getQueueType())) {
+            deluxeQueues.getLogger().info("Too many players in server");
             return;
         }
 
-        // Get the player next in line
-        QueuePlayer player = queue.getQueue().getFirst();
+        deluxeQueues.getLogger().info("Attempting to connect player " + targetPlayer.toString());
 
-        if(player != null && !player.getPlayer().isActive()) {
-            queue.removePlayer(player);
-        }
+        targetPlayer.getPlayer().createConnectionRequest(server).connect().thenAcceptAsync(result -> {
+            targetPlayer.setConnecting(false);
 
-        // Make sure the player exists
-        if (player == null) {
-            return;
-        }
+            if(result.isSuccessful()) {
+                deluxeQueues.getLogger().info("Player " +
+                                                      targetPlayer.getPlayer().getUsername() + " connected to "
+                                                      + queue.getServer().getServerInfo().getName());
 
-        player.getPlayer().createConnectionRequest(server).connect().thenAcceptAsync(result -> {
-            if(!result.isSuccessful()) {
-                deluxeQueues.getLogger()
-                        .info("Player " +
-                                      player.getPlayer().getUsername() + " failed to join "
-                                      + queue.getServer().getServerInfo().getName()
-                                      + ". Reason: "
-                                      + PlainComponentSerializer.INSTANCE
-                                .serialize(result.getReason().orElse(TextComponent.of("(None)"))));
-
-                Component reason = result.getReason().orElse(TextComponent.empty());
-                String reasonPlain = PlainComponentSerializer.INSTANCE.serialize(reason);
-                ServerConnection currentServer = player.getPlayer().getCurrentServer().orElse(null);
-
-                fatalErrors.forEach(r -> {
-                    if(reasonPlain.contains(r)) {
-                        if(currentServer == null || currentServer.getServer().equals(waitingServer)) {
-                            player.getPlayer().disconnect(result.getReason().orElse(TextComponent.empty()));
-                        } else {
-                            queue.removePlayer(player);
-                            deluxeQueues.getCommandManager().sendMessage(player.getPlayer(), MessageType.ERROR,
-                                                                         Messages.ERRORS__QUEUE_CANNOT_JOIN);
-                            player.getPlayer().sendMessage(reason);
-                        }
-                    }
-                });
+                return;
             }
+
+            deluxeQueues.getLogger()
+                    .info("Player " +
+                                  targetPlayer.getPlayer().getUsername() + " failed to join "
+                                  + queue.getServer().getServerInfo().getName()
+                                  + ". Reason: "
+                                  + PlainComponentSerializer.INSTANCE
+                            .serialize(result.getReason().orElse(TextComponent.of("(None)"))));
+
+            Component reason = result.getReason().orElse(TextComponent.empty());
+            String reasonPlain = PlainComponentSerializer.INSTANCE.serialize(reason);
+            ServerConnection currentServer = targetPlayer.getPlayer().getCurrentServer().orElse(null);
+
+            fatalErrors.forEach(r -> {
+                if(reasonPlain.contains(r)) {
+                    if(currentServer == null || currentServer.getServer().equals(waitingServer)) {
+                        targetPlayer.getPlayer().disconnect(result.getReason().orElse(TextComponent.empty()));
+                    } else {
+                        queue.removePlayer(targetPlayer, false);
+                        deluxeQueues
+                                .getCommandManager().sendMessage(targetPlayer.getPlayer(), MessageType.ERROR,
+                                             Messages.ERRORS__QUEUE_CANNOT_JOIN);
+                        targetPlayer.getPlayer().sendMessage(reason);
+                    }
+                }
+            });
         });
 
-        player.setReadyToMove(true);
+        targetPlayer.setConnecting(true);
+    }
+
+    private void handleQueue(ConcurrentLinkedQueue<QueuePlayer> q) {
+        int position = 1;
+
+        for(QueuePlayer player : q) {
+            player.setPosition(position);
+            queue.notifyPlayer(player);
+
+            if(targetPlayer == null && player.getPlayer().isActive()) {
+                targetPlayer = player;
+            }
+
+            position++;
+        }
     }
 }

@@ -1,10 +1,14 @@
 package me.glaremasters.deluxequeues.queues;
 
 import ch.jalu.configme.SettingsManager;
+import co.aikar.commands.MessageType;
 import com.velocitypowered.api.proxy.Player;
+import com.velocitypowered.api.proxy.ServerConnection;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
 import me.glaremasters.deluxequeues.DeluxeQueues;
 import me.glaremasters.deluxequeues.configuration.sections.ConfigOptions;
+import me.glaremasters.deluxequeues.messages.Messages;
+import net.kyori.text.TextComponent;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -76,7 +80,7 @@ public class QueueHandler {
      * @return the queue
      */
     public Optional<DeluxeQueue> getCurrentQueue(@NotNull Player player) {
-        return queues.stream().filter(q -> q.getPosition(player) > -1).findFirst();
+        return queues.stream().filter(q -> q.isPlayerQueued(player)).findFirst();
     }
 
     /**
@@ -84,8 +88,55 @@ public class QueueHandler {
      * @param player the player to remove
      */
     public void clearPlayer(Player player) {
-        queues.forEach(q -> q.removePlayer(player));
+        clearPlayer(player, true);
     }
+
+    /**
+     * Remove a player from all queues
+     * @param player the player to remove
+     */
+    public void clearPlayer(Player player, boolean silent) {
+        queues.forEach(q -> q.removePlayer(player, false));
+
+        if(silent) {
+            return;
+        }
+
+        if(!player.isActive()) {
+            return;
+        }
+
+        String waitingServerName = deluxeQueues.getSettingsHandler().getSettingsManager().getProperty(ConfigOptions.WAITING_SERVER);
+        RegisteredServer waitingServer = deluxeQueues.getProxyServer().getServer(waitingServerName).orElse(null);
+
+        Optional<ServerConnection> currentServer = player.getCurrentServer();
+
+        if(currentServer.isPresent() && currentServer.get().getServer().equals(waitingServer)) {
+            player.disconnect(TextComponent.of(deluxeQueues.getCommandManager()
+                                      .formatMessage(deluxeQueues.getCommandManager().getCommandIssuer(player), MessageType.ERROR,
+                                                     Messages.COMMANDS__LEAVE_SUCCESS)));
+        } else {
+            deluxeQueues.getCommandManager().getCommandIssuer(player).sendError(Messages.COMMANDS__LEAVE_SUCCESS);
+        }
+    }
+
+    public void kickPlayer(Player player) {
+        String waitingServerName = deluxeQueues.getSettingsHandler().getSettingsManager().getProperty(ConfigOptions.WAITING_SERVER);
+        RegisteredServer waitingServer = deluxeQueues.getProxyServer().getServer(waitingServerName).orElse(null);
+
+        clearPlayer(player);
+
+        Optional<ServerConnection> currentServer = player.getCurrentServer();
+
+        if(currentServer.isPresent() && currentServer.get().getServer().equals(waitingServer)) {
+            player.disconnect(TextComponent.of(deluxeQueues.getCommandManager()
+                                      .formatMessage(deluxeQueues.getCommandManager().getCommandIssuer(player), MessageType.ERROR,
+                                                     Messages.ERRORS__QUEUE_REMOVED)));
+        } else {
+            deluxeQueues.getCommandManager().getCommandIssuer(player).sendError(Messages.ERRORS__QUEUE_REMOVED);
+        }
+    }
+
 
     /**
      * Check if a server has a queue
@@ -104,10 +155,13 @@ public class QueueHandler {
             try {
                 String[] split = s.split(";");
                 Optional<RegisteredServer> server = deluxeQueues.getProxyServer().getServer(split[0]);
-                DeluxeQueue queue = new DeluxeQueue(deluxeQueues, server.get(), Integer.parseInt(split[1]), Integer.parseInt(split[2]));
+                DeluxeQueue queue = new DeluxeQueue(deluxeQueues, server.get(), Integer.parseInt(split[1]),
+                                                    Integer.parseInt(split[2]), Integer.parseInt(split[3]),
+                                                    Integer.parseInt(split[4]));
                 createQueue(queue);
             } catch (Exception ex) {
                 deluxeQueues.getLogger().warn("It seems like one of your servers was configured invalidly in the config.");
+                ex.printStackTrace();
             }
         });
     }
