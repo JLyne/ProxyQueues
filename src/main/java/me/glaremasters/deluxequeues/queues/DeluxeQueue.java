@@ -181,6 +181,15 @@ public class DeluxeQueue {
         }
     }
 
+    public void cleanupConnectedState(Player player) {
+        Optional<QueuePlayer> queuePlayer = getQueuePlayer(player);
+
+        if(!queuePlayer.isPresent()) {
+            connectedStaff.remove(player);
+            connectedPriority.remove(player);
+        }
+    }
+
     public Optional<QueuePlayer> getQueuePlayer(Player player) {
         QueuePlayer queuePlayer = queuePlayers.get(player);
 

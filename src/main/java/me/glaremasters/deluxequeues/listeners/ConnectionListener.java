@@ -103,10 +103,15 @@ public class ConnectionListener {
     @Subscribe(order = PostOrder.LATE)
     public void onConnected(ServerConnectedEvent event) {
         if(!event.getServer().equals(waitingServer)) {
-            DeluxeQueue queue = queueHandler.getQueue(event.getServer());
+            DeluxeQueue targetQueue = queueHandler.getQueue(event.getServer());
+            DeluxeQueue previousQueue = queueHandler.getQueue(event.getServer());
 
-            if(queue != null) {
-                queue.removePlayer(event.getPlayer(), true);
+            if(targetQueue != null) {
+                targetQueue.removePlayer(event.getPlayer(), true);
+            }
+
+            if(previousQueue != null) {
+                previousQueue.cleanupConnectedState(event.getPlayer());
             }
         }
     }
