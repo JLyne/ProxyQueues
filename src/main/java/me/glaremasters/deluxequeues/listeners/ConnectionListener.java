@@ -33,11 +33,12 @@ public class ConnectionListener {
 
     private final QueueHandler queueHandler;
     private final List<String> fatalErrors;
+    private final SettingsManager settingsManager;
     private DeluxeQueues deluxeQueues;
     private RegisteredServer waitingServer;
 
     public ConnectionListener(DeluxeQueues deluxeQueues) {
-        SettingsManager settingsManager = deluxeQueues.getSettingsHandler().getSettingsManager();
+        settingsManager = deluxeQueues.getSettingsHandler().getSettingsManager();
 
         this.queueHandler = deluxeQueues.getQueueHandler();
         this.deluxeQueues = deluxeQueues;
@@ -144,7 +145,10 @@ public class ConnectionListener {
                 deluxeQueues.getLogger()
                 .info("Reason not fatal, requeueing " + event.getPlayer().getUsername());
 
-                queue.addPlayer(event.getPlayer(), QueueType.PRIORITY);
+                boolean staff = event.getPlayer()
+                        .hasPermission(settingsManager.getProperty(ConfigOptions.STAFF_PERMISSION));
+
+                queue.addPlayer(event.getPlayer(), staff ? QueueType.STAFF : QueueType.PRIORITY);
             } else {
                 deluxeQueues.getLogger().info("Reason fatal");
             }
