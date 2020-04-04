@@ -44,7 +44,10 @@ public class CommandInfo extends BaseCommand {
             staffMax = queue.getMaxSlots(QueueType.STAFF),
             normalSize = queue.getQueueSize(QueueType.NORMAL),
             prioritySize = queue.getQueueSize(QueueType.PRIORITY),
-            staffSize = queue.getQueueSize(QueueType.STAFF);
+            staffSize = queue.getQueueSize(QueueType.STAFF),
+            connectedSize = queue.getConnectedCount(),
+            priorityConnectedSize = queue.getConnectedCount(QueueType.PRIORITY),
+            staffConnectedSize = queue.getConnectedCount(QueueType.STAFF);
 
         normalSize += prioritySize;
         normalSize += staffSize;
@@ -58,6 +61,9 @@ public class CommandInfo extends BaseCommand {
                         "%size%", String.valueOf(normalSize),
                         "%prioritySize%", String.valueOf(prioritySize),
                         "%staffSize%", String.valueOf(staffSize),
+                        "%connectedSize%", String.valueOf(connectedSize),
+                        "%priorityConnectedSize%", String.valueOf(priorityConnectedSize),
+                        "%staffConnectedSize%", String.valueOf(staffConnectedSize),
                         "%required%", String.valueOf(playersRequired),
                         "%max%", String.valueOf(normalMax),
                         "%priorityMax%", String.valueOf(priorityMax),

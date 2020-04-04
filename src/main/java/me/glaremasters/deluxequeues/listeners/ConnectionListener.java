@@ -108,13 +108,16 @@ public class ConnectionListener {
             if(targetQueue != null) {
                 targetQueue.removePlayer(event.getPlayer(), true);
             }
-
         }
 
-        DeluxeQueue previousQueue = queueHandler.getQueue(event.getServer());
+        Optional<RegisteredServer> previousServer = event.getPreviousServer();
 
-        if(previousQueue != null) {
-            previousQueue.cleanupConnectedState(event.getPlayer());
+        if(previousServer.isPresent()) {
+            DeluxeQueue previousQueue = queueHandler.getQueue(previousServer.get());
+
+            if(previousQueue != null) {
+                previousQueue.cleanupConnectedState(event.getPlayer());
+            }
         }
     }
 

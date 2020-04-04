@@ -11,6 +11,8 @@ commands:
   info-response: |-
     <c3>=======</c3> <c2>%server% Queue</c2> <c3>=======</c3>
     Players in queue: <c2>%size%</c2> <c3>(</c3><c2>%prioritySize%</c2><c3> priority, </c3><c2>%staffSize%</c2><c3> staff)</c3>
+    Players on Server: <c2>%connectedSize%</c2> <c3>(</c3><c2>%priorityConnectedSize%</c2><c3> priority, </c3><c2>%staffConnectedSize%</c2><c3> staff)</c3>
+
     Queue Settings: <c2>%required%</c2> <c1>min</c1>/<c3>%max%</c3><c1> normal max</c1>/<c3>%priorityMax%</c3><c1> priority max</c1>/<c3>%globalMax%</c3><c1> global max</c1>
 
     <c3>Front 3 staff:</c3>

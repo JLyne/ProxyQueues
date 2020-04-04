@@ -356,6 +356,22 @@ public class DeluxeQueue {
         }
     }
 
+    public int getConnectedCount() {
+        return server.getPlayersConnected().size();
+    }
+
+    public int getConnectedCount(QueueType queueType) {
+        switch (queueType) {
+            case STAFF:
+                return connectedStaff.size();
+            case PRIORITY:
+                return connectedPriority.size();
+            case NORMAL:
+            default:
+                return server.getPlayersConnected().size() - connectedStaff.size() - connectedPriority.size();
+        }
+    }
+
     public QueuePlayer[] getTopPlayers(QueueType queueType, int count) {
         QueuePlayer[] players = new QueuePlayer[count];
         ConcurrentLinkedQueue<QueuePlayer> queue;
