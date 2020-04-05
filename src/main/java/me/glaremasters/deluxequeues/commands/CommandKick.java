@@ -4,12 +4,9 @@ import co.aikar.commands.BaseCommand;
 import co.aikar.commands.CommandIssuer;
 import co.aikar.commands.annotation.*;
 import co.aikar.commands.velocity.contexts.OnlinePlayer;
-import com.velocitypowered.api.proxy.server.RegisteredServer;
-import me.glaremasters.deluxequeues.DeluxeQueues;
 import me.glaremasters.deluxequeues.messages.Messages;
 import me.glaremasters.deluxequeues.queues.DeluxeQueue;
 import me.glaremasters.deluxequeues.queues.QueueHandler;
-import me.glaremasters.deluxequeues.queues.QueuePlayer;
 import me.glaremasters.deluxequeues.utils.Constants;
 
 import java.util.Optional;

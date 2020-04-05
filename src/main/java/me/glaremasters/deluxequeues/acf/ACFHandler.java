@@ -85,7 +85,7 @@ public class ACFHandler {
      * @param locale
      */
     public void loadLanguage(ConfigurationNode config, Locale locale, VelocityCommandManager commandManager) {
-        config.getChildrenMap().forEach((key, node) -> {;
+        config.getChildrenMap().forEach((key, node) -> {
             Map<Object, ? extends ConfigurationNode> inner = node.getChildrenMap();
 
             if (inner.isEmpty()) {
