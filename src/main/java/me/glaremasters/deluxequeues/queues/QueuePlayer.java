@@ -11,27 +11,35 @@ import java.time.Instant;
 
 public class QueuePlayer {
 
-    private final Player player;
     private final BossBar bossBar;
     private boolean connecting;
-    private int position;
-    private QueueType queueType;
+    private Player player;
+    private int position = -1;
+    private final QueueType queueType;
     private Instant lastConnectionAttempt;
+    private Instant lastSeen;
 
     public QueuePlayer(Player player, QueueType queueType) {
         this.player = player;
         this.connecting = false;
         this.queueType = queueType;
         this.lastConnectionAttempt = Instant.EPOCH;
+        this.lastSeen = null;
 
         this.bossBar = DeluxeQueues.getInstance().getProxyServer()
                 .createBossBar(TextComponent.of("Joining queue..."), BossBarColor.PURPLE, BossBarOverlay.PROGRESS, 0);
-        this.bossBar.setVisible(false);
+        this.bossBar.setVisible(true);
         this.bossBar.addPlayer(player);
     }
 
     public Player getPlayer() {
         return player;
+    }
+
+    public void setPlayer(Player player) {
+        bossBar.removeAllPlayers();
+        this.player = player;
+        bossBar.addPlayer(player);
     }
 
     public BossBar getBossBar() {
@@ -66,6 +74,14 @@ public class QueuePlayer {
         return queueType;
     }
 
+    public Instant getLastSeen() {
+        return lastSeen;
+    }
+
+    public void setLastSeen(Instant lastSeen) {
+        this.lastSeen = lastSeen;
+    }
+
     @Override
     public String toString() {
         return "QueuePlayer{" +
@@ -73,6 +89,7 @@ public class QueuePlayer {
                 ", queueType=" + queueType +
                 ", position=" + position +
                 ", connecting=" + connecting +
+                ", lastSeen=" + lastSeen +
                 '}';
     }
 }

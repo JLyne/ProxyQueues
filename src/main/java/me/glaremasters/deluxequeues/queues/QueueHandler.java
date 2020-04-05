@@ -57,15 +57,6 @@ public class QueueHandler {
     }
 
     /**
-     * Check if a queue exists
-     * @param queue the queue to check
-     * @return queue object
-     */
-    public DeluxeQueue getQueue(@NotNull DeluxeQueue queue) {
-        return queues.stream().filter(q -> q.equals(queue)).findFirst().orElse(null);
-    }
-
-    /**
      * Get a queue from it's server
      * @param server the server to get the queue from
      * @return the queue
@@ -106,9 +97,7 @@ public class QueueHandler {
             return;
         }
 
-        String waitingServerName = deluxeQueues.getSettingsHandler().getSettingsManager().getProperty(ConfigOptions.WAITING_SERVER);
-        RegisteredServer waitingServer = deluxeQueues.getProxyServer().getServer(waitingServerName).orElse(null);
-
+        RegisteredServer waitingServer = deluxeQueues.getWaitingServer().orElse(null);
         Optional<ServerConnection> currentServer = player.getCurrentServer();
 
         if(currentServer.isPresent() && currentServer.get().getServer().equals(waitingServer)) {
@@ -121,11 +110,9 @@ public class QueueHandler {
     }
 
     public void kickPlayer(Player player) {
-        String waitingServerName = deluxeQueues.getSettingsHandler().getSettingsManager().getProperty(ConfigOptions.WAITING_SERVER);
-        RegisteredServer waitingServer = deluxeQueues.getProxyServer().getServer(waitingServerName).orElse(null);
-
         clearPlayer(player);
 
+        RegisteredServer waitingServer = deluxeQueues.getWaitingServer().orElse(null);
         Optional<ServerConnection> currentServer = player.getCurrentServer();
 
         if(currentServer.isPresent() && currentServer.get().getServer().equals(waitingServer)) {
@@ -168,17 +155,5 @@ public class QueueHandler {
 
     public List<DeluxeQueue> getQueues() {
         return this.queues;
-    }
-
-    public List<RegisteredServer> getServers() {
-        return this.servers;
-    }
-
-    public SettingsManager getSettingsManager() {
-        return this.settingsManager;
-    }
-
-    public DeluxeQueues getDeluxeQueues() {
-        return this.deluxeQueues;
     }
 }

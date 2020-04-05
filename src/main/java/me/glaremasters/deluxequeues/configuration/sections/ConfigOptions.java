@@ -20,6 +20,10 @@ public class ConfigOptions implements SettingsHolder {
     public static final Property<Integer> DELAY_LENGTH =
             newProperty("settings.delay-length", 2);
 
+    @Comment("How many seconds after a player disconnects should they be removed from the queue?")
+    public static final Property<Integer> DISCONNECT_TIMEOUT =
+            newProperty("settings.disconnect-timeout", 180);
+
     @Comment({"List all the servers here that you would like to have a queue for.",
             "For each server, you need to specify:",
             "- The number of players to enabled queueing at",

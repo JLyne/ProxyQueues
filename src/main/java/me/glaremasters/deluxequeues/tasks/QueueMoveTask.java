@@ -13,7 +13,9 @@ import net.kyori.text.TextComponent;
 import net.kyori.text.serializer.plain.PlainComponentSerializer;
 
 import java.time.Instant;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
@@ -37,8 +39,7 @@ public class QueueMoveTask implements Runnable {
         this.fatalErrors = deluxeQueues.getSettingsHandler().getSettingsManager().getProperty(
                             ConfigOptions.FATAL_ERRORS);
 
-        String waitingServerName = deluxeQueues.getSettingsHandler().getSettingsManager().getProperty(ConfigOptions.WAITING_SERVER);
-        waitingServer = deluxeQueues.getProxyServer().getServer(waitingServerName).orElse(null);
+        waitingServer = deluxeQueues.getWaitingServer().orElse(null);
     }
 
     @Override
@@ -48,7 +49,6 @@ public class QueueMoveTask implements Runnable {
         ConcurrentLinkedQueue<QueuePlayer> staffQueue = queue.getStaffQueue();
 
         if(targetPlayer != null && (!targetPlayer.isConnecting() || !targetPlayer.getPlayer().isActive())) {
-            deluxeQueues.getLogger().info("Target player no longer valid");
             targetPlayer.setConnecting(false);
             targetPlayer = null;
         }
@@ -65,26 +65,24 @@ public class QueueMoveTask implements Runnable {
 
         // Nothing to do if no player to queue, or connection attempt already underway
         if(targetPlayer == null || targetPlayer.isConnecting()) {
-            deluxeQueues.getLogger().info("No player to connect or already connecting");
             return;
         }
 
         // Check if the max amount of players on the server are the max slots
         if (queue.isServerFull(targetPlayer.getQueueType())) {
-            deluxeQueues.getLogger().info("Too many players in server");
             return;
         }
 
+        connectPlayer();
+    }
+
+    private void connectPlayer() {
         deluxeQueues.getLogger().info("Attempting to connect player " + targetPlayer.toString());
 
         targetPlayer.getPlayer().createConnectionRequest(server).connect().thenAcceptAsync(result -> {
             targetPlayer.setConnecting(false);
 
             if(result.isSuccessful()) {
-                deluxeQueues.getLogger().info("Player " +
-                                                      targetPlayer.getPlayer().getUsername() + " connected to "
-                                                      + queue.getServer().getServerInfo().getName());
-
                 return;
             }
 
@@ -100,19 +98,19 @@ public class QueueMoveTask implements Runnable {
             String reasonPlain = PlainComponentSerializer.INSTANCE.serialize(reason);
             ServerConnection currentServer = targetPlayer.getPlayer().getCurrentServer().orElse(null);
 
-            fatalErrors.forEach(r -> {
-                if(reasonPlain.contains(r)) {
-                    if(currentServer == null || currentServer.getServer().equals(waitingServer)) {
-                        targetPlayer.getPlayer().disconnect(result.getReason().orElse(TextComponent.empty()));
-                    } else {
-                        queue.removePlayer(targetPlayer, false);
-                        deluxeQueues
-                                .getCommandManager().sendMessage(targetPlayer.getPlayer(), MessageType.ERROR,
-                                             Messages.ERRORS__QUEUE_CANNOT_JOIN);
-                        targetPlayer.getPlayer().sendMessage(reason);
-                    }
+            boolean fatal = fatalErrors.stream().anyMatch(reasonPlain::contains);
+
+		    if(fatal) {
+                if(currentServer == null || currentServer.getServer().equals(waitingServer)) {
+                    targetPlayer.getPlayer().disconnect(result.getReason().orElse(TextComponent.empty()));
+                } else {
+                    queue.removePlayer(targetPlayer, false);
+                    deluxeQueues
+                            .getCommandManager().sendMessage(targetPlayer.getPlayer(), MessageType.ERROR,
+                                                             Messages.ERRORS__QUEUE_CANNOT_JOIN);
+                    targetPlayer.getPlayer().sendMessage(reason);
                 }
-            });
+            }
         });
 
         targetPlayer.setConnecting(true);
@@ -120,15 +118,45 @@ public class QueueMoveTask implements Runnable {
 
     private void handleQueue(ConcurrentLinkedQueue<QueuePlayer> q) {
         int position = 1;
+        int disconnectTimeout = deluxeQueues.getSettingsHandler()
+                .getSettingsManager().getProperty(ConfigOptions.DISCONNECT_TIMEOUT);
 
-        for(QueuePlayer player : q) {
-            player.setPosition(position);
-            queue.notifyPlayer(player);
+        for(Iterator i = q.iterator(); i.hasNext();) {
+            QueuePlayer player = (QueuePlayer) i.next();
+            Optional<ServerConnection> currentServer = player.getPlayer().getCurrentServer();
+            boolean online = player.getPlayer().isActive();
 
-            if(targetPlayer == null && player.getPlayer().isActive()) {
-                targetPlayer = player;
+            if(online || player.getLastSeen() == null) {
+                player.setLastSeen(Instant.now());
             }
 
+            if(online && currentServer.isPresent() && currentServer.get().getServer().equals(server)) {
+                deluxeQueues.getLogger()
+                    .info("Removing already connected player " + player.getPlayer().getUsername() + " from queue position #" + position + " in " + player.getQueueType());
+
+                queue.removePlayer(player, true);
+                continue;
+            }
+
+            if(!online && player.getLastSeen().isBefore(Instant.now().minusSeconds(disconnectTimeout))) {
+                deluxeQueues.getLogger()
+                    .info("Removing timed out player " + player.getPlayer().getUsername() + " from queue position #" + position + " in " + player.getQueueType());
+
+                queue.removePlayer(player, false);
+                continue;
+            }
+
+            deluxeQueues.getLogger()
+                    .info("Player " + player.getPlayer().getUsername() + " is in queue position #" + position + " in " + player.getQueueType());
+
+            if(targetPlayer == null && online) {
+                targetPlayer = player;
+                deluxeQueues.getLogger()
+                    .info("Selecting player " + player.getPlayer().getUsername() + " is in queue position #" + position + " in " + player.getQueueType() + " as target.");
+            }
+
+            player.setPosition(position);
+            queue.getNotifier().notifyPlayer(player);
             position++;
         }
     }

@@ -1,17 +1,21 @@
 package me.glaremasters.deluxequeues;
 
+import co.aikar.commands.MessageType;
 import co.aikar.commands.VelocityCommandManager;
+import co.aikar.commands.VelocityMessageFormatter;
 import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.proxy.ProxyInitializeEvent;
 import com.velocitypowered.api.plugin.Plugin;
 import com.velocitypowered.api.plugin.annotation.DataDirectory;
 import com.velocitypowered.api.proxy.ProxyServer;
+import com.velocitypowered.api.proxy.messages.LegacyChannelIdentifier;
+import com.velocitypowered.api.proxy.messages.MinecraftChannelIdentifier;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
 import me.glaremasters.deluxequeues.acf.ACFHandler;
 import me.glaremasters.deluxequeues.configuration.SettingsHandler;
 import me.glaremasters.deluxequeues.configuration.sections.ConfigOptions;
-import me.glaremasters.deluxequeues.listeners.ConnectionListener;
 import me.glaremasters.deluxequeues.queues.QueueHandler;
+import net.kyori.text.format.TextColor;
 import org.slf4j.Logger;
 
 import javax.inject.Inject;
@@ -20,6 +24,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Optional;
 
 @Plugin(id="deluxequeues", name="DeluxeQueues")
 public final class DeluxeQueues {
@@ -50,9 +55,12 @@ public final class DeluxeQueues {
         settingsHandler = new SettingsHandler(this);
         startQueues();
         commandManager = new VelocityCommandManager(proxyServer, this);
-
         ACFHandler acfHandler = new ACFHandler(this, commandManager);
-        proxyServer.getEventManager().register(this, new ConnectionListener(this));
+
+
+        commandManager.setFormat(MessageType.INFO, new VelocityMessageFormatter(
+                TextColor.YELLOW, TextColor.GREEN, TextColor.LIGHT_PURPLE));
+
     }
 
     /**
@@ -110,9 +118,9 @@ public final class DeluxeQueues {
         return dataFolder.toFile();
     }
 
-    public RegisteredServer getWaitingServer() {
+    public Optional<RegisteredServer> getWaitingServer() {
         String waitingServerName = getSettingsHandler().getSettingsManager().getProperty(ConfigOptions.WAITING_SERVER);
-        return getProxyServer().getServer(waitingServerName).orElse(null);
+        return getProxyServer().getServer(waitingServerName);
     }
 
     public static DeluxeQueues getInstance() {
