@@ -8,8 +8,6 @@ import com.velocitypowered.api.event.proxy.ProxyInitializeEvent;
 import com.velocitypowered.api.plugin.Plugin;
 import com.velocitypowered.api.plugin.annotation.DataDirectory;
 import com.velocitypowered.api.proxy.ProxyServer;
-import com.velocitypowered.api.proxy.messages.LegacyChannelIdentifier;
-import com.velocitypowered.api.proxy.messages.MinecraftChannelIdentifier;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
 import me.glaremasters.deluxequeues.acf.ACFHandler;
 import me.glaremasters.deluxequeues.configuration.SettingsHandler;
@@ -55,8 +53,7 @@ public final class DeluxeQueues {
         settingsHandler = new SettingsHandler(this);
         startQueues();
         commandManager = new VelocityCommandManager(proxyServer, this);
-        ACFHandler acfHandler = new ACFHandler(this, commandManager);
-
+        new ACFHandler(this, commandManager);
 
         commandManager.setFormat(MessageType.INFO, new VelocityMessageFormatter(
                 TextColor.YELLOW, TextColor.GREEN, TextColor.LIGHT_PURPLE));
@@ -103,7 +100,6 @@ public final class DeluxeQueues {
 
     public void startQueues() {
         queueHandler = new QueueHandler(settingsHandler.getSettingsManager(), this);
-        queueHandler.enableQueues();
     }
 
     public ProxyServer getProxyServer() {

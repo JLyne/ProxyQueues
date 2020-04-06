@@ -23,7 +23,7 @@ public class CommandReload extends BaseCommand {
     @CommandPermission(Constants.ADMIN_PERM)
     public void execute(CommandIssuer issuer) {
         settingsManager.reload();
-        deluxeQueues.startQueues();
+        deluxeQueues.getQueueHandler().updateQueues();
         issuer.sendInfo(Messages.COMMANDS__RELOAD_SUCCESS);
     }
 }

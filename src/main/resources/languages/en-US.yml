@@ -33,6 +33,7 @@ errors:
   queue-cannot-join: "<c1>Sorry, you're currently unable to join the queue:\n</c1>"
   queue-removed-error: "<c1>Sorry, you have been removed from the queue due to a fatal error:\n</c1>"
   queue-removed: "<c1>You have been removed from the queue by an admin</c1>"
+  queue-destroyed: "<c1>Queueing for </c1><c2>%server%</c2><c1> is no longer available</c1>"
 reconnect:
   restore-success: |-
     <c3>Seems you lost connection to the server</c3>

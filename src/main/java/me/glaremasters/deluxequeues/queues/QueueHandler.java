@@ -11,9 +11,8 @@ import me.glaremasters.deluxequeues.messages.Messages;
 import net.kyori.text.TextComponent;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Created by Glare
@@ -22,47 +21,58 @@ import java.util.Optional;
  */
 public class QueueHandler {
 
-    private final List<DeluxeQueue> queues;
-    private final List<RegisteredServer> servers;
+    private final ConcurrentHashMap<RegisteredServer, DeluxeQueue> queues;
     private final SettingsManager settingsManager;
     private final DeluxeQueues deluxeQueues;
 
     public QueueHandler(SettingsManager settingsManager, DeluxeQueues deluxeQueues) {
         this.settingsManager = settingsManager;
         this.deluxeQueues = deluxeQueues;
-        this.queues = new ArrayList<>();
-        this.servers = new ArrayList<>();
+        this.queues = new ConcurrentHashMap<>();
+
+        updateQueues();
     }
 
     /**
      * Create a new queue for a server
-     * @param queue the new queue
+     * @param server The server the new queue is for
+     * @return DeluxeQueue - The queue
      */
-    public void createQueue(@NotNull DeluxeQueue queue) {
-        if (!queues.contains(queue)) {
-            servers.add(queue.getServer());
-            queues.add(queue);
-        }
+    public DeluxeQueue createQueue(@NotNull RegisteredServer server, int requiredPlayers, int maxNormal, int maxPriority, int maxStaff) {
+        return queues.compute(server, (s, queue) -> {
+            if(queue == null) {
+                deluxeQueues.getLogger().info("Creating queue for " + server.getServerInfo().getName());
+                return new DeluxeQueue(deluxeQueues, s, requiredPlayers, maxNormal, maxPriority, maxStaff);
+            } else {
+                deluxeQueues.getLogger().info("Updating queue for " + server.getServerInfo().getName());
+                queue.setPlayersRequired(requiredPlayers);
+                queue.setMaxSlots(maxNormal);
+                queue.setPriorityMaxSlots(maxPriority);
+                queue.setStaffMaxSlots(maxStaff);
+
+                return queue;
+            }
+        });
     }
 
     /**
      * Delete a queue if it exists
-     * @param queue the queue to check
+     * @param server The server to remove the queue for
      */
-    public void deleteQueue(@NotNull DeluxeQueue queue) {
-        if (queues.contains(queue)) {
-            servers.remove(queue.getServer());
-            queues.remove(queue);
-        }
+    public void deleteQueue(@NotNull RegisteredServer server) {
+        queues.computeIfPresent(server, (s, queue) -> {
+            queue.destroy();
+            return null;
+        });
     }
 
     /**
      * Get a queue from it's server
-     * @param server the server to get the queue from
+     * @param server the server to get the queue for
      * @return the queue
      */
     public DeluxeQueue getQueue(@NotNull RegisteredServer server) {
-        return queues.stream().filter(q -> q.getServer().equals(server)).findFirst().orElse(null);
+        return queues.get(server);
     }
 
     /**
@@ -71,7 +81,8 @@ public class QueueHandler {
      * @return the queue
      */
     public Optional<DeluxeQueue> getCurrentQueue(@NotNull Player player) {
-        return queues.stream().filter(q -> q.isPlayerQueued(player)).findFirst();
+        return queues.values().stream()
+                .filter(q -> q.isPlayerQueued(player)).findFirst();
     }
 
     /**
@@ -87,7 +98,7 @@ public class QueueHandler {
      * @param player the player to remove
      */
     public void clearPlayer(Player player, boolean silent) {
-        queues.forEach(q -> q.removePlayer(player, false));
+        queues.forEach((server, queue) -> queue.removePlayer(player, false));
 
         if(silent) {
             return;
@@ -124,36 +135,49 @@ public class QueueHandler {
         }
     }
 
-
     /**
-     * Check if a server has a queue
-     * @param server the server to check
-     * @return if the server has a queue or not
+     * Updates all queues from the config, creating/updating/deleting as required
      */
-    public boolean checkForQueue(RegisteredServer server) {
-        return servers.contains(server);
-    }
+    public void updateQueues() {
+        ArrayList<RegisteredServer> queuedServers = new ArrayList<>();
 
-    /**
-     * Enable all the queues on the server
-     */
-    public void enableQueues() {
         settingsManager.getProperty(ConfigOptions.QUEUE_SERVERS).forEach(s -> {
             try {
                 String[] split = s.split(";");
-                Optional<RegisteredServer> server = deluxeQueues.getProxyServer().getServer(split[0]);
-                DeluxeQueue queue = new DeluxeQueue(deluxeQueues, server.get(), Integer.parseInt(split[1]),
-                                                    Integer.parseInt(split[2]), Integer.parseInt(split[3]),
-                                                    Integer.parseInt(split[4]));
-                createQueue(queue);
+                String serverName = split[0];
+
+                int requiredPlayers = Integer.parseInt(split[1]),
+                    maxNormal = Integer.parseInt(split[2]),
+                    maxPriority = Integer.parseInt(split[3]),
+                    maxStaff = Integer.parseInt(split[4]);
+
+                RegisteredServer server = deluxeQueues.getProxyServer().getServer(serverName).get();
+
+                DeluxeQueue queue = createQueue(server, requiredPlayers, maxNormal, maxPriority, maxStaff);
+                queue.setDelayLength(settingsManager.getProperty(ConfigOptions.DELAY_LENGTH));
+
+                queuedServers.add(server);
             } catch (Exception ex) {
                 deluxeQueues.getLogger().warn("It seems like one of your servers was configured invalidly in the config.");
                 ex.printStackTrace();
             }
         });
+
+        Iterator<Map.Entry<RegisteredServer, DeluxeQueue>> it = queues.entrySet().iterator();
+
+        //Delete queues removed from config
+        while(it.hasNext()) {
+            Map.Entry<RegisteredServer, DeluxeQueue> pair = it.next();
+
+            if(!queuedServers.contains(pair.getKey())) {
+                deluxeQueues.getLogger().info("Deleting queue for " + pair.getKey().getServerInfo().getName());
+                pair.getValue().destroy();
+                it.remove();
+            }
+        }
     }
 
-    public List<DeluxeQueue> getQueues() {
-        return this.queues;
+    public Collection<DeluxeQueue> getQueues() {
+        return this.queues.values();
     }
 }

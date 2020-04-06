@@ -3,7 +3,9 @@ package me.glaremasters.deluxequeues.queues;
 import ch.jalu.configme.SettingsManager;
 import co.aikar.commands.MessageType;
 import com.velocitypowered.api.proxy.Player;
+import com.velocitypowered.api.proxy.ServerConnection;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
+import com.velocitypowered.api.scheduler.ScheduledTask;
 import me.glaremasters.deluxequeues.DeluxeQueues;
 import me.glaremasters.deluxequeues.QueueType;
 import me.glaremasters.deluxequeues.configuration.sections.ConfigOptions;
@@ -41,12 +43,13 @@ public class DeluxeQueue {
     private final Set<UUID> connectedStaff = ConcurrentHashMap.newKeySet();
 
     private final RegisteredServer server;
-    private final int delayLength;
-    private final int playersRequired;
+    private ScheduledTask scheduledTask;
+    private int delayLength;
+    private int playersRequired;
 
-    private final int maxSlots;
-    private final int priorityMaxSlots;
-    private final int staffMaxSlots;
+    private int maxSlots;
+    private int priorityMaxSlots;
+    private int staffMaxSlots;
 
     private final SettingsManager settingsManager;
 
@@ -67,10 +70,10 @@ public class DeluxeQueue {
 
         this.notifier = new DeluxeQueueNotifier(deluxeQueues, this);
         this.eventHandler = new DeluxeQueueEventHandler(deluxeQueues, this);
-        this.moveTask = new QueueMoveTask(this, server, deluxeQueues);
-
         deluxeQueues.getProxyServer().getEventManager().register(deluxeQueues, eventHandler);
-        deluxeQueues.getProxyServer().getScheduler().buildTask(deluxeQueues, moveTask)
+
+        this.moveTask = new QueueMoveTask(this, server, deluxeQueues);
+        this.scheduledTask = deluxeQueues.getProxyServer().getScheduler().buildTask(deluxeQueues, moveTask)
                 .repeat(delayLength, TimeUnit.SECONDS).schedule();
     }
 
@@ -128,9 +131,7 @@ public class DeluxeQueue {
                 return;
             }
 
-            deluxeQueues.getLogger().info("Position: " + queuePlayer.getPosition());
-
-            //Only add to queue if they arem't already tehre
+            //Only add to queue if they aren't already there
             if(!restored) {
                 switch(queuePlayer.getQueueType()) {
                     case STAFF:
@@ -214,6 +215,37 @@ public class DeluxeQueue {
         } else {
             deluxeQueues.getLogger().info("Not in queue, removing cached entries");
             clearConnectedState(player);
+        }
+    }
+
+    public void destroy() {
+        deluxeQueues.getProxyServer().getEventManager().unregisterListener(deluxeQueues, eventHandler);
+        scheduledTask.cancel();
+
+        clearQueue(staffQueue);
+        clearQueue(priorityQueue);
+        clearQueue(queue);
+
+        queuePlayers.clear();
+    }
+
+    private void clearQueue(ConcurrentLinkedQueue<QueuePlayer> q) {
+        Optional<RegisteredServer> waitingServer = deluxeQueues.getWaitingServer();
+
+        for (QueuePlayer player : q) {
+            removePlayer(player, false);
+
+            Optional<ServerConnection> currentServer = player.getPlayer().getCurrentServer();
+
+            if(!waitingServer.isPresent() || !currentServer.isPresent() || waitingServer.get().equals(currentServer.get().getServer())) {
+                player.getPlayer().disconnect(TextComponent.of(deluxeQueues.getCommandManager()
+                                      .formatMessage(deluxeQueues.getCommandManager().getCommandIssuer(player.getPlayer()),
+                                                     MessageType.ERROR,
+                                                     Messages.ERRORS__QUEUE_DESTROYED, "%server%", server.getServerInfo().getName())));
+            } else {
+                deluxeQueues.getCommandManager().getCommandIssuer(player.getPlayer())
+                        .sendError(Messages.ERRORS__QUEUE_DESTROYED, "%server%", server.getServerInfo().getName());
+            }
         }
     }
 
@@ -373,6 +405,32 @@ public class DeluxeQueue {
 
     public DeluxeQueueNotifier getNotifier() {
         return notifier;
+    }
+
+    public void setDelayLength(int delayLength) {
+        if(delayLength != this.delayLength) {
+            scheduledTask.cancel();
+            scheduledTask = deluxeQueues.getProxyServer().getScheduler().buildTask(deluxeQueues, moveTask)
+                .repeat(delayLength, TimeUnit.SECONDS).schedule();
+        }
+
+        this.delayLength = delayLength;
+    }
+
+    public void setPlayersRequired(int playersRequired) {
+        this.playersRequired = playersRequired;
+    }
+
+    public void setMaxSlots(int maxSlots) {
+        this.maxSlots = maxSlots;
+    }
+
+    public void setPriorityMaxSlots(int priorityMaxSlots) {
+        this.priorityMaxSlots = priorityMaxSlots;
+    }
+
+    public void setStaffMaxSlots(int staffMaxSlots) {
+        this.staffMaxSlots = staffMaxSlots;
     }
 
     public String toString() {

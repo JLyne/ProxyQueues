@@ -2,6 +2,7 @@ package me.glaremasters.deluxequeues.events;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
 
+@SuppressWarnings("unused")
 public class PlayerQueueEvent {
 	private final Player player;
 	private final RegisteredServer server;

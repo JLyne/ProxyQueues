@@ -3,6 +3,7 @@ package me.glaremasters.deluxequeues.messages;
 import co.aikar.locales.MessageKey;
 import co.aikar.locales.MessageKeyProvider;
 
+@SuppressWarnings("unused")
 public enum Messages implements MessageKeyProvider {
     COMMANDS__JOIN_DESCRIPTION,
     COMMANDS__LEAVE_DESCRIPTION,
@@ -22,7 +23,8 @@ public enum Messages implements MessageKeyProvider {
     ERRORS__PLAYER_SAME_SERVER,
     ERRORS__TARGET_NO_QUEUE,
     ERRORS__QUEUE_CANNOT_JOIN,
-    ERRORS__QUEUE_REMOVED;
+    ERRORS__QUEUE_REMOVED,
+    ERRORS__QUEUE_DESTROYED;
 
 
     /**
