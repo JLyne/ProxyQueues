@@ -13,9 +13,7 @@ import net.kyori.text.TextComponent;
 import net.kyori.text.serializer.plain.PlainComponentSerializer;
 
 import java.time.Instant;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
@@ -121,38 +119,24 @@ public class QueueMoveTask implements Runnable {
         int disconnectTimeout = deluxeQueues.getSettingsHandler()
                 .getSettingsManager().getProperty(ConfigOptions.DISCONNECT_TIMEOUT);
 
-        for(Iterator i = q.iterator(); i.hasNext();) {
-            QueuePlayer player = (QueuePlayer) i.next();
-            Optional<ServerConnection> currentServer = player.getPlayer().getCurrentServer();
+        for (QueuePlayer player : q) {
             boolean online = player.getPlayer().isActive();
 
-            if(online || player.getLastSeen() == null) {
+            if (online || player.getLastSeen() == null) {
                 player.setLastSeen(Instant.now());
             }
 
-            if(online && currentServer.isPresent() && currentServer.get().getServer().equals(server)) {
+            if (!online && player.getLastSeen().isBefore(Instant.now().minusSeconds(disconnectTimeout))) {
                 deluxeQueues.getLogger()
-                    .info("Removing already connected player " + player.getPlayer().getUsername() + " from queue position #" + position + " in " + player.getQueueType());
-
-                queue.removePlayer(player, true);
-                continue;
-            }
-
-            if(!online && player.getLastSeen().isBefore(Instant.now().minusSeconds(disconnectTimeout))) {
-                deluxeQueues.getLogger()
-                    .info("Removing timed out player " + player.getPlayer().getUsername() + " from queue position #" + position + " in " + player.getQueueType());
+                        .info("Removing timed out player " + player.getPlayer().getUsername()
+                                      + " from " + player.getQueueType() + "/" + position);
 
                 queue.removePlayer(player, false);
                 continue;
             }
 
-            deluxeQueues.getLogger()
-                    .info("Player " + player.getPlayer().getUsername() + " is in queue position #" + position + " in " + player.getQueueType());
-
-            if(targetPlayer == null && online) {
+            if (targetPlayer == null && online) {
                 targetPlayer = player;
-                deluxeQueues.getLogger()
-                    .info("Selecting player " + player.getPlayer().getUsername() + " is in queue position #" + position + " in " + player.getQueueType() + " as target.");
             }
 
             player.setPosition(position);
