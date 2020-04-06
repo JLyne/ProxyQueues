@@ -22,6 +22,7 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Created by Glare
@@ -96,62 +97,68 @@ public class DeluxeQueue {
      * @param player the player to add
      */
     public void addPlayer(Player player, QueueType queueType) {
-        Optional<QueuePlayer> qp = getQueuePlayer(player, false);
-        QueuePlayer queuePlayer;
-        boolean restored;
+        AtomicBoolean added = new AtomicBoolean(false);
+        AtomicBoolean restored = new AtomicBoolean(false);
 
-        if(qp.isPresent() && qp.get().getPlayer().equals(player)) { //Player is already in queue
-            return;
-        } else if(qp.isPresent()) { //Player was previous in queue before disconnecting, update and reuse object
-            deluxeQueues.getLogger().info(player.getUsername() + " is already in queue. Restoring position");
+        QueuePlayer result = queuePlayers.compute(player.getUniqueId(), (uuid, queuePlayer) -> {
+            added.set(false);
 
-            queuePlayer = qp.get();
-            queuePlayer.setPlayer(player);
-            queuePlayer.setLastSeen(Instant.now());
-            restored = true;
-        } else { //New player
-             queuePlayer = new QueuePlayer(player, queueType);
-             restored = false;
-        }
+            if(queuePlayer != null) {
+                if(queuePlayer.getPlayer().equals(player)) { //Player is already in queue
+                    return queuePlayer;
+                } else { //Player was previous in queue before disconnecting, update and reuse object
+                    queuePlayer.setPlayer(player);
+                    queuePlayer.setLastSeen(Instant.now());
 
-        queuePlayers.putIfAbsent(player.getUniqueId(), queuePlayer);
+                    return shouldAddPlayer(queuePlayer) ? queuePlayer : null;
+                }
+            } else { //New player
+                queuePlayer = new QueuePlayer(player, queueType);
+                added.set(shouldAddPlayer(queuePlayer));
 
-        PlayerQueueEvent event = new PlayerQueueEvent(player, server);
-
-        deluxeQueues.getProxyServer().getEventManager().fire(event).thenAcceptAsync(result -> {
-            //Don't add to queue if event cancelled, show player the reason
-            if (result.isCancelled()) {
-                deluxeQueues.getLogger().info(player.getUsername() + "'s PlayerQueueEvent cancelled. Removing from queue.");
-                deluxeQueues.getCommandManager().sendMessage(player, MessageType.ERROR,
-                                                             Messages.ERRORS__QUEUE_CANNOT_JOIN);
-                player.sendMessage(TextComponent.of(result.getReason()).color(TextColor.RED));
-
-                removePlayer(queuePlayer, false);
-
-                return;
+                return added.get() ? queuePlayer : null;
             }
+        });
 
+        if(result != null) {
             //Only add to queue if they aren't already there
-            if(!restored) {
-                switch(queuePlayer.getQueueType()) {
+            if(added.get()) {
+                deluxeQueues.getLogger().info("Added " + player.getUsername() + " added already in queue. Restoring position");
+                switch (result.getQueueType()) {
                     case STAFF:
-                        staffQueue.add(queuePlayer);
+                        staffQueue.add(result);
                         break;
 
                     case PRIORITY:
-                        priorityQueue.add(queuePlayer);
+                        priorityQueue.add(result);
                         break;
 
                     case NORMAL:
                     default:
-                        queue.add(queuePlayer);
+                        queue.add(result);
                         break;
                 }
             } else {
-                deluxeQueues.getCommandManager().getCommandIssuer(queuePlayer.getPlayer())
-                        .sendInfo(Messages.RECONNECT__RESTORE_SUCCESS);
+                deluxeQueues.getLogger().info("Restoring queue position of " + player.getUsername());
+                deluxeQueues.getCommandManager().getCommandIssuer(result.getPlayer())
+                            .sendInfo(Messages.RECONNECT__RESTORE_SUCCESS);
             }
-        });
+        }
+    }
+
+    private boolean shouldAddPlayer(QueuePlayer queuePlayer) {
+        PlayerQueueEvent event = new PlayerQueueEvent(queuePlayer.getPlayer(), server);
+        deluxeQueues.getProxyServer().getEventManager().fire(event).join();
+
+        //Don't add to queue if event cancelled, show player the reason
+        if (event.isCancelled()) {
+            deluxeQueues.getLogger().info(queuePlayer.getPlayer().getUsername() + "'s PlayerQueueEvent cancelled");
+            deluxeQueues.getCommandManager().sendMessage(queuePlayer.getPlayer(), MessageType.ERROR,
+                                                         Messages.ERRORS__QUEUE_CANNOT_JOIN);
+            queuePlayer.getPlayer().sendMessage(TextComponent.of(event.getReason()).color(TextColor.RED));
+        }
+
+        return !event.isCancelled();
     }
 
     /**
