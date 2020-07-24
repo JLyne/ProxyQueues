@@ -12,6 +12,7 @@ import me.glaremasters.deluxequeues.configuration.sections.ConfigOptions;
 import me.glaremasters.deluxequeues.events.PlayerQueueEvent;
 import me.glaremasters.deluxequeues.messages.Messages;
 import me.glaremasters.deluxequeues.tasks.QueueMoveTask;
+import net.kyori.text.Component;
 import net.kyori.text.TextComponent;
 import net.kyori.text.format.TextColor;
 
@@ -98,7 +99,6 @@ public class DeluxeQueue {
      */
     public void addPlayer(Player player, QueueType queueType) {
         AtomicBoolean added = new AtomicBoolean(false);
-        AtomicBoolean restored = new AtomicBoolean(false);
 
         QueuePlayer result = queuePlayers.compute(player.getUniqueId(), (uuid, queuePlayer) -> {
             added.set(false);
@@ -107,16 +107,18 @@ public class DeluxeQueue {
                 if(queuePlayer.getPlayer().equals(player)) { //Player is already in queue
                     return queuePlayer;
                 } else { //Player was previous in queue before disconnecting, update and reuse object
-                    queuePlayer.setPlayer(player);
-                    queuePlayer.setLastSeen(Instant.now());
-
-                    return shouldAddPlayer(queuePlayer) ? queuePlayer : null;
+                    if(shouldAddPlayer(player)) {
+                        queuePlayer.setPlayer(player);
+                        queuePlayer.setLastSeen(Instant.now());
+                        return queuePlayer;
+                    } else {
+                        return null;
+                    }
                 }
             } else { //New player
-                queuePlayer = new QueuePlayer(player, queueType);
-                added.set(shouldAddPlayer(queuePlayer));
+                added.set(shouldAddPlayer(player));
 
-                return added.get() ? queuePlayer : null;
+                return added.get() ? new QueuePlayer(player, queueType) : null;
             }
         });
 
@@ -146,16 +148,25 @@ public class DeluxeQueue {
         }
     }
 
-    private boolean shouldAddPlayer(QueuePlayer queuePlayer) {
-        PlayerQueueEvent event = new PlayerQueueEvent(queuePlayer.getPlayer(), server);
+    private boolean shouldAddPlayer(Player player) {
+        PlayerQueueEvent event = new PlayerQueueEvent(player, server);
         deluxeQueues.getProxyServer().getEventManager().fire(event).join();
 
         //Don't add to queue if event cancelled, show player the reason
         if (event.isCancelled()) {
-            deluxeQueues.getLogger().info(queuePlayer.getPlayer().getUsername() + "'s PlayerQueueEvent cancelled");
-            deluxeQueues.getCommandManager().sendMessage(queuePlayer.getPlayer(), MessageType.ERROR,
-                                                         Messages.ERRORS__QUEUE_CANNOT_JOIN);
-            queuePlayer.getPlayer().sendMessage(TextComponent.of(event.getReason()).color(TextColor.RED));
+            String reason = event.getReason() != null ? event.getReason() : "An unexpected error occurred. Please try again later";
+            ServerConnection currentServer = player.getCurrentServer().orElse(null);
+            RegisteredServer waitingServer = deluxeQueues.getWaitingServer().orElse(null);
+
+            deluxeQueues.getLogger().info(player.getUsername() + "'s PlayerQueueEvent cancelled");
+
+            if(currentServer == null || currentServer.getServer().equals(waitingServer)) {
+                player.disconnect(TextComponent.of(deluxeQueues.getCommandManager()
+                                      .formatMessage(deluxeQueues.getCommandManager().getCommandIssuer(player), MessageType.ERROR,
+                                                     Messages.ERRORS__QUEUE_CANNOT_JOIN, "%reason%", reason)));
+            } else {
+                deluxeQueues.getCommandManager().getCommandIssuer(player).sendError(Messages.ERRORS__QUEUE_CANNOT_JOIN, "%reason%", reason);
+            }
         }
 
         return !event.isCancelled();

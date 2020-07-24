@@ -10,6 +10,7 @@ import me.glaremasters.deluxequeues.queues.DeluxeQueue;
 import me.glaremasters.deluxequeues.queues.QueuePlayer;
 import net.kyori.text.Component;
 import net.kyori.text.TextComponent;
+import net.kyori.text.format.TextColor;
 import net.kyori.text.serializer.plain.PlainComponentSerializer;
 
 import java.time.Instant;
@@ -88,9 +89,9 @@ public class QueueMoveTask implements Runnable {
                     .info("Player " +
                                   targetPlayer.getPlayer().getUsername() + " failed to join "
                                   + queue.getServer().getServerInfo().getName()
-                                  + ". Reason: "
+                                  + ". Reason: \""
                                   + PlainComponentSerializer.INSTANCE
-                            .serialize(result.getReason().orElse(TextComponent.of("(None)"))));
+                            .serialize(result.getReason().orElse(TextComponent.of("(None)"))) + "\"");
 
             Component reason = result.getReason().orElse(TextComponent.empty());
             String reasonPlain = PlainComponentSerializer.INSTANCE.serialize(reason);
@@ -103,9 +104,8 @@ public class QueueMoveTask implements Runnable {
                     targetPlayer.getPlayer().disconnect(result.getReason().orElse(TextComponent.empty()));
                 } else {
                     queue.removePlayer(targetPlayer, false);
-                    deluxeQueues
-                            .getCommandManager().sendMessage(targetPlayer.getPlayer(), MessageType.ERROR,
-                                                             Messages.ERRORS__QUEUE_CANNOT_JOIN);
+
+                    deluxeQueues.getCommandManager().getCommandIssuer(targetPlayer.getPlayer()).sendError(Messages.ERRORS__QUEUE_CANNOT_JOIN);
                     targetPlayer.getPlayer().sendMessage(reason);
                 }
             }
