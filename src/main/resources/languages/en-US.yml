@@ -8,7 +8,7 @@ commands:
   kick-success: "<c1>Kicked</c1><c2> %player% </c2><c1>from the </c1><c3>%server%</c3><c1> queue</c1>"
   join-success: "<c1>You have joined the queue for </c1><c2>%server%</c2>"
   leave-success: "<c1>You have left the queue</c1>"
-  info-response: |-
+  info-server-response: |-
     <c3>=======</c3> <c2>%server% Queue</c2> <c3>=======</c3>
     Players in queue: <c2>%size%</c2> <c3>(</c3><c2>%prioritySize%</c2><c3> priority, </c3><c2>%staffSize%</c2><c3> staff)</c3>
     Players on Server: <c2>%connectedSize%</c2> <c3>(</c3><c2>%priorityConnectedSize%</c2><c3> priority, </c3><c2>%staffConnectedSize%</c2><c3> staff)</c3>
@@ -23,6 +23,14 @@ commands:
 
     <c3>Front 3 normal:</c3>
     <c2>%first%, %second%, %third%</c2>
+  info-player-response: |-
+    <c3>=======</c3> <c2>%player%</c2> <c3>=======</c3>
+    Queued For: <c2>%server%</c2>
+    Queue Type: <c2>%type%</c2>
+    Position: <c2>%position%</c2>
+    Status: %status%
+  info-status-online: '<c3>Online</c3>'
+  info-status-offline: '<c3>Offline</c3><c2>. Last seen </c2><c3>%lastseen%</c3><c2> ago (</c2><c3>%remaining%</c3><c2> remaining).</c2>'
   reload-success: "<c1>You've successfully reloaded the configuration!</c1>"
 errors:
   server-no-queue: "<c1>Queueing is disabled for </c1><c2>%server%</c2>"
