@@ -1,12 +1,12 @@
 package uk.co.notnull.proxyqueues.queues;
 
 import ch.jalu.configme.SettingsManager;
-import co.aikar.commands.ACFVelocityUtil;
-import com.velocitypowered.api.util.MessagePosition;
-import com.velocitypowered.api.util.title.TextTitle;
+import net.kyori.adventure.audience.MessageType;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
+import net.kyori.adventure.title.Title;
 import uk.co.notnull.proxyqueues.ProxyQueues;
 import uk.co.notnull.proxyqueues.configuration.sections.ConfigOptions;
-import net.kyori.text.TextComponent;
 
 public class ProxyQueueNotifier {
 
@@ -30,6 +30,7 @@ public class ProxyQueueNotifier {
         String message;
         String title_top;
         String title_bottom;
+        LegacyComponentSerializer serializer = LegacyComponentSerializer.legacyAmpersand();
 
         switch(player.getQueueType()) {
             case STAFF:
@@ -62,20 +63,19 @@ public class ProxyQueueNotifier {
             case "actionbar":
                 actionbar = actionbar.replace("{server}", queue.getServer().getServerInfo().getName());
                 actionbar = actionbar.replace("{pos}", String.valueOf(player.getPosition()));
-                player.getPlayer().sendMessage(ACFVelocityUtil.color(actionbar), MessagePosition.ACTION_BAR);
+                player.getPlayer().sendActionBar(serializer.deserialize(actionbar));
                 break;
             case "text":
                 message = message.replace("{server}", queue.getServer().getServerInfo().getName());
                 message = message.replace("{pos}", String.valueOf(player.getPosition()));
-                player.getPlayer().sendMessage(ACFVelocityUtil.color(message), MessagePosition.SYSTEM);
+                player.getPlayer().sendMessage(serializer.deserialize(message), MessageType.SYSTEM);
                 break;
             case "title":
-                TextTitle.Builder title = TextTitle.builder();
-                title.title(ACFVelocityUtil.color(title_top));
                 title_bottom = title_bottom.replace("{server}", queue.getServer().getServerInfo().getName());
                 title_bottom = title_bottom.replace("{pos}", String.valueOf(player.getPosition()));
-                title.subtitle(ACFVelocityUtil.color(title_bottom));
-                player.getPlayer().sendTitle(title.build());
+                Title title = Title.of(serializer.deserialize(title_top),
+                                       serializer.deserialize(title_bottom));
+                player.getPlayer().showTitle(title);
                 break;
         }
     }
@@ -100,8 +100,8 @@ public class ProxyQueueNotifier {
         message = message.replace("{server}", queue.getServer().getServerInfo().getName());
         message = message.replace("{pos}", String.valueOf(position));
 
-        player.getBossBar().setVisible(true);
-        player.getBossBar().setTitle(TextComponent.of(message));
+        player.showBossBar();
+        player.getBossBar().name(TextComponent.of(message));
     }
 
 	public String getNotifyMethod() {

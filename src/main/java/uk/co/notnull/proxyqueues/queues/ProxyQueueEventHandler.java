@@ -9,13 +9,13 @@ import com.velocitypowered.api.event.player.ServerConnectedEvent;
 import com.velocitypowered.api.event.player.ServerPreConnectEvent;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.serializer.plain.PlainComponentSerializer;
 import uk.co.notnull.proxyqueues.ProxyQueues;
 import uk.co.notnull.proxyqueues.QueueType;
 import uk.co.notnull.proxyqueues.configuration.sections.ConfigOptions;
-import net.kyori.text.Component;
-import net.kyori.text.TextComponent;
-import net.kyori.text.format.TextColor;
-import net.kyori.text.serializer.plain.PlainComponentSerializer;
 
 import java.time.Instant;
 import java.util.*;
@@ -65,7 +65,7 @@ public class ProxyQueueEventHandler {
                 } else {
                     player.disconnect(TextComponent.of(
                             "This server has queueing enabled and can't be connected to directly. Please connect via minecraft.rtgame.co.uk")
-                                              .color(TextColor.RED));
+                                              .color(NamedTextColor.RED));
 
                     return;
                 }
@@ -145,10 +145,10 @@ public class ProxyQueueEventHandler {
 
         proxyQueues.getLogger()
                 .info("Player " + event.getPlayer().getUsername() + " kicked from " +
-                              event.getServer().getServerInfo().getName() + ". Reason: " + event.getOriginalReason());
+                              event.getServer().getServerInfo().getName() + ". Reason: " + event.getServerKickReason());
 
-		Component reason = event.getOriginalReason().orElse(TextComponent.empty());
-		String reasonPlain = PlainComponentSerializer.INSTANCE.serialize(reason);
+		Component reason = event.getServerKickReason().orElse(TextComponent.empty());
+		String reasonPlain = PlainComponentSerializer.plain().serialize(reason);
 		List<String> fatalErrors = proxyQueues.getSettingsHandler().getSettingsManager().getProperty(
 				ConfigOptions.FATAL_ERRORS);
 

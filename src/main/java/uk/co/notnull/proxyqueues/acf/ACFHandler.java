@@ -4,10 +4,10 @@ import co.aikar.commands.MessageType;
 import co.aikar.commands.VelocityCommandManager;
 import co.aikar.locales.MessageKey;
 import ch.jalu.configme.SettingsManager;
+import net.kyori.text.format.TextColor;
 import uk.co.notnull.proxyqueues.ProxyQueues;
 import uk.co.notnull.proxyqueues.commands.*;
 import uk.co.notnull.proxyqueues.queues.QueueHandler;
-import net.kyori.text.format.TextColor;
 import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.yaml.YAMLConfigurationLoader;
 

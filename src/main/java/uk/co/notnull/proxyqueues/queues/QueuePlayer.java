@@ -1,11 +1,8 @@
 package uk.co.notnull.proxyqueues.queues;
 import com.velocitypowered.api.proxy.Player;
-import com.velocitypowered.api.util.bossbar.BossBar;
-import com.velocitypowered.api.util.bossbar.BossBarColor;
-import com.velocitypowered.api.util.bossbar.BossBarOverlay;
-import uk.co.notnull.proxyqueues.ProxyQueues;
+import net.kyori.adventure.bossbar.BossBar;
+import net.kyori.adventure.text.TextComponent;
 import uk.co.notnull.proxyqueues.QueueType;
-import net.kyori.text.TextComponent;
 
 import java.time.Instant;
 
@@ -26,10 +23,17 @@ public class QueuePlayer {
         this.lastConnectionAttempt = Instant.EPOCH;
         this.lastSeen = null;
 
-        this.bossBar = ProxyQueues.getInstance().getProxyServer()
-                .createBossBar(TextComponent.of("Joining queue..."), BossBarColor.PURPLE, BossBarOverlay.PROGRESS, 0);
-        this.bossBar.setVisible(true);
-        this.bossBar.addPlayer(player);
+        this.bossBar = BossBar.of(TextComponent.of("Joining queue..."), 0, getBossBarColor(),
+                                  BossBar.Overlay.PROGRESS);
+        this.player.showBossBar(bossBar);
+    }
+
+    public void showBossBar() {
+        getPlayer().showBossBar(getBossBar());
+    }
+
+    public void hideBossBar() {
+        getPlayer().hideBossBar(getBossBar());
     }
 
     public Player getPlayer() {
@@ -37,9 +41,9 @@ public class QueuePlayer {
     }
 
     public void setPlayer(Player player) {
-        bossBar.removeAllPlayers();
+        this.player.hideBossBar(bossBar);
         this.player = player;
-        bossBar.addPlayer(player);
+        this.player.showBossBar(bossBar);
     }
 
     public BossBar getBossBar() {
@@ -80,6 +84,17 @@ public class QueuePlayer {
 
     public void setLastSeen(Instant lastSeen) {
         this.lastSeen = lastSeen;
+    }
+
+    public BossBar.Color getBossBarColor() {
+        switch(queueType) {
+            case PRIORITY:
+                return BossBar.Color.GREEN;
+            case STAFF:
+                return BossBar.Color.BLUE;
+            default:
+                return BossBar.Color.PURPLE;
+        }
     }
 
     @Override

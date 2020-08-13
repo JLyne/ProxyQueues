@@ -7,9 +7,9 @@ import uk.co.notnull.proxyqueues.configuration.sections.ConfigOptions;
 import uk.co.notnull.proxyqueues.messages.Messages;
 import uk.co.notnull.proxyqueues.queues.ProxyQueue;
 import uk.co.notnull.proxyqueues.queues.QueuePlayer;
-import net.kyori.text.Component;
-import net.kyori.text.TextComponent;
-import net.kyori.text.serializer.plain.PlainComponentSerializer;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.serializer.plain.PlainComponentSerializer;
 
 import java.time.Instant;
 import java.util.List;
@@ -88,18 +88,18 @@ public class QueueMoveTask implements Runnable {
                                   targetPlayer.getPlayer().getUsername() + " failed to join "
                                   + queue.getServer().getServerInfo().getName()
                                   + ". Reason: \""
-                                  + PlainComponentSerializer.INSTANCE
-                            .serialize(result.getReason().orElse(TextComponent.of("(None)"))) + "\"");
+                                  + PlainComponentSerializer.plain()
+                            .serialize(result.getReasonComponent().orElse(TextComponent.of("(None)"))) + "\"");
 
-            Component reason = result.getReason().orElse(TextComponent.empty());
-            String reasonPlain = PlainComponentSerializer.INSTANCE.serialize(reason);
+            Component reason = result.getReasonComponent().orElse(TextComponent.empty());
+            String reasonPlain = PlainComponentSerializer.plain().serialize(reason);
             ServerConnection currentServer = targetPlayer.getPlayer().getCurrentServer().orElse(null);
 
             boolean fatal = fatalErrors.stream().anyMatch(reasonPlain::contains);
 
 		    if(fatal) {
                 if(currentServer == null || currentServer.getServer().equals(waitingServer)) {
-                    targetPlayer.getPlayer().disconnect(result.getReason().orElse(TextComponent.empty()));
+                    targetPlayer.getPlayer().disconnect(result.getReasonComponent().orElse(TextComponent.empty()));
                 } else {
                     queue.removePlayer(targetPlayer, false);
 

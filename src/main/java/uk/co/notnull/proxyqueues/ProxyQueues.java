@@ -9,11 +9,11 @@ import com.velocitypowered.api.plugin.Plugin;
 import com.velocitypowered.api.plugin.annotation.DataDirectory;
 import com.velocitypowered.api.proxy.ProxyServer;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
+import net.kyori.text.format.TextColor;
 import uk.co.notnull.proxyqueues.acf.ACFHandler;
 import uk.co.notnull.proxyqueues.configuration.SettingsHandler;
 import uk.co.notnull.proxyqueues.configuration.sections.ConfigOptions;
 import uk.co.notnull.proxyqueues.queues.QueueHandler;
-import net.kyori.text.format.TextColor;
 import org.slf4j.Logger;
 
 import javax.inject.Inject;

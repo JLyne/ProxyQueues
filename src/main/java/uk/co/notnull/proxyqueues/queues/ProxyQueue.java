@@ -6,13 +6,13 @@ import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ServerConnection;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
 import com.velocitypowered.api.scheduler.ScheduledTask;
+import net.kyori.adventure.text.TextComponent;
 import uk.co.notnull.proxyqueues.ProxyQueues;
 import uk.co.notnull.proxyqueues.QueueType;
 import uk.co.notnull.proxyqueues.configuration.sections.ConfigOptions;
 import uk.co.notnull.proxyqueues.events.PlayerQueueEvent;
 import uk.co.notnull.proxyqueues.messages.Messages;
 import uk.co.notnull.proxyqueues.tasks.QueueMoveTask;
-import net.kyori.text.TextComponent;
 
 import java.time.Instant;
 import java.util.Optional;
@@ -176,7 +176,7 @@ public class ProxyQueue {
      * @param connected - Whether player has now connected to the queued server, for cache updates
      */
     public void removePlayer(QueuePlayer player, boolean connected) {
-        player.getBossBar().removeAllPlayers();
+        player.hideBossBar();
         player.setConnecting(false);
         boolean removed;
 

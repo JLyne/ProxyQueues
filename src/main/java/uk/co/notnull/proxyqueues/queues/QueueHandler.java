@@ -5,10 +5,10 @@ import co.aikar.commands.MessageType;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ServerConnection;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
+import net.kyori.adventure.text.TextComponent;
 import uk.co.notnull.proxyqueues.ProxyQueues;
 import uk.co.notnull.proxyqueues.configuration.sections.ConfigOptions;
 import uk.co.notnull.proxyqueues.messages.Messages;
-import net.kyori.text.TextComponent;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
