@@ -44,7 +44,7 @@ public class CommandJoin extends BaseCommand {
             return;
         }
 
-        queueHandler.clearPlayer(sender.getIssuer());
+        queueHandler.clearPlayer((Player) sender.getIssuer());
         queue.addPlayer(sender.getIssuer());
     }
 }

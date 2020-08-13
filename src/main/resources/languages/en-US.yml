@@ -30,6 +30,7 @@ errors:
   player-no-queue: "<c1>You are not queued for any server</c1>"
   player-same-server: "<c1>You are already connected to </c1><c2>%server%</c2>"
   target-no-queue: "<c2>%player%</c2><c1> is not queued for any server</c1>"
+  target-unknown: "<c1>Unknown player: </c1><c2>%player%</c2>"
   queue-cannot-join: "<c1>Sorry, you're currently unable to join the queue:\n%reason%</c1>"
   queue-removed-error: "<c1>Sorry, you have been removed from the queue due to a fatal error:\n</c1>"
   queue-removed: "<c1>You have been removed from the queue by an admin</c1>"

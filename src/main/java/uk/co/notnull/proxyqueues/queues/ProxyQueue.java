@@ -234,6 +234,22 @@ public class ProxyQueue {
         }
     }
 
+    /**
+     * Removes the player from the queue, and updates connected caches
+     * @param uuid - The uuid of the player
+     * @param connected - Whether player has now connected to the queued server, for cache updates
+     */
+    public void removePlayer(UUID uuid, boolean connected) {
+        Optional<QueuePlayer> queuePlayer = getQueuePlayer(uuid);
+
+        if(queuePlayer.isPresent()) {
+            removePlayer(queuePlayer.get(), connected);
+        } else {
+            proxyQueues.getLogger().info("Not in queue, removing cached entries");
+            clearConnectedState(uuid);
+        }
+    }
+
     public void destroy() {
         proxyQueues.getProxyServer().getEventManager().unregisterListener(proxyQueues, eventHandler);
         scheduledTask.cancel();
@@ -274,6 +290,10 @@ public class ProxyQueue {
         return getQueuePlayer(player, false).isPresent();
     }
 
+    public boolean isPlayerQueued(UUID uuid) {
+        return getQueuePlayer(uuid).isPresent();
+    }
+
     public Optional<QueuePlayer> getQueuePlayer(Player player, boolean strict) {
         QueuePlayer queuePlayer = queuePlayers.get(player.getUniqueId());
 
@@ -283,6 +303,16 @@ public class ProxyQueue {
 
         if(strict && queuePlayer != null && !queuePlayer.getPlayer().equals(player)) {
             queuePlayer = null;
+        }
+
+        return Optional.ofNullable(queuePlayer);
+    }
+
+    public Optional<QueuePlayer> getQueuePlayer(UUID uuid) {
+        QueuePlayer queuePlayer = queuePlayers.get(uuid);
+
+        if(queuePlayer == null) {
+            queuePlayer = queuePlayers.computeIfAbsent(uuid, key -> null);
         }
 
         return Optional.ofNullable(queuePlayer);
@@ -456,5 +486,10 @@ public class ProxyQueue {
     void clearConnectedState(Player player) {
         connectedStaff.remove(player.getUniqueId());
         connectedPriority.remove(player.getUniqueId());
+    }
+
+    void clearConnectedState(UUID uuid) {
+        connectedStaff.remove(uuid);
+        connectedPriority.remove(uuid);
     }
 }

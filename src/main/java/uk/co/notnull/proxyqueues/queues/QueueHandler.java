@@ -85,6 +85,11 @@ public class QueueHandler {
                 .filter(q -> q.isPlayerQueued(player)).findFirst();
     }
 
+    public Optional<ProxyQueue> getCurrentQueue(@NotNull UUID uuid) {
+        return queues.values().stream()
+                .filter(q -> q.isPlayerQueued(uuid)).findFirst();
+    }
+
     /**
      * Remove a player from all queues
      * @param player the player to remove
@@ -95,7 +100,15 @@ public class QueueHandler {
 
     /**
      * Remove a player from all queues
-     * @param player the player to remove
+     * @param uuid the UUID of the player to remove
+     */
+    public void clearPlayer(UUID uuid) {
+        clearPlayer(uuid, true);
+    }
+
+    /**
+     * Remove a player from all queues
+     * @param player The player to remove
      */
     public void clearPlayer(Player player, boolean silent) {
         queues.forEach((server, queue) -> queue.removePlayer(player, false));
@@ -104,6 +117,37 @@ public class QueueHandler {
             return;
         }
 
+        notifyQueueRemoval(player, Messages.COMMANDS__LEAVE_SUCCESS);
+    }
+
+    /**
+     * Remove a player from all queues
+     * @param uuid The UUID of the player to remove
+     */
+    public void clearPlayer(UUID uuid, boolean silent) {
+        queues.forEach((server, queue) -> queue.removePlayer(uuid, false));
+
+        if(silent) {
+            return;
+        }
+
+        ProxyQueues.getInstance().getProxyServer().getPlayer(uuid).ifPresent(
+                onlinePlayer -> notifyQueueRemoval(onlinePlayer, Messages.COMMANDS__LEAVE_SUCCESS));
+    }
+
+    public void kickPlayer(Player player) {
+        clearPlayer(player, true);
+        notifyQueueRemoval(player, Messages.ERRORS__QUEUE_REMOVED);
+    }
+
+    public void kickPlayer(UUID uuid) {
+        clearPlayer(uuid, true);
+
+        ProxyQueues.getInstance().getProxyServer().getPlayer(uuid).ifPresent(
+                onlinePlayer -> notifyQueueRemoval(onlinePlayer, Messages.ERRORS__QUEUE_REMOVED));
+    }
+
+    private void notifyQueueRemoval(Player player, Messages message) {
         if(!player.isActive()) {
             return;
         }
@@ -114,24 +158,9 @@ public class QueueHandler {
         if(currentServer.isPresent() && currentServer.get().getServer().equals(waitingServer)) {
             player.disconnect(TextComponent.of(proxyQueues.getCommandManager()
                                       .formatMessage(proxyQueues.getCommandManager().getCommandIssuer(player), MessageType.ERROR,
-                                                     Messages.COMMANDS__LEAVE_SUCCESS)));
+                                                     message)));
         } else {
-            proxyQueues.getCommandManager().getCommandIssuer(player).sendError(Messages.COMMANDS__LEAVE_SUCCESS);
-        }
-    }
-
-    public void kickPlayer(Player player) {
-        clearPlayer(player);
-
-        RegisteredServer waitingServer = proxyQueues.getWaitingServer().orElse(null);
-        Optional<ServerConnection> currentServer = player.getCurrentServer();
-
-        if(currentServer.isPresent() && currentServer.get().getServer().equals(waitingServer)) {
-            player.disconnect(TextComponent.of(proxyQueues.getCommandManager()
-                                      .formatMessage(proxyQueues.getCommandManager().getCommandIssuer(player), MessageType.ERROR,
-                                                     Messages.ERRORS__QUEUE_REMOVED)));
-        } else {
-            proxyQueues.getCommandManager().getCommandIssuer(player).sendError(Messages.ERRORS__QUEUE_REMOVED);
+            proxyQueues.getCommandManager().getCommandIssuer(player).sendError(message);
         }
     }
 
