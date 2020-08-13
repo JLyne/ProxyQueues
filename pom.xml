@@ -4,14 +4,14 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>me.glaremasters</groupId>
-    <artifactId>deluxequeues</artifactId>
-    <version>1.4</version>
+    <groupId>uk.co.notnull</groupId>
+    <artifactId>proxyqueues</artifactId>
+    <version>1.0</version>
     <packaging>jar</packaging>
 
-    <name>DeluxeQueues</name>
+    <name>ProxyQueues</name>
 
-    <description>DeluxeQueues</description>
+    <description>ProxyQueues</description>
     <properties>
         <java.version>1.8</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -55,7 +55,7 @@
                             <relocations>
                                 <relocation>
                                     <pattern>co.aikar.commands</pattern>
-                                    <shadedPattern>me.glaremasters.deluxequeues.libs.acf</shadedPattern>
+                                    <shadedPattern>uk.co.notnull.proxyqueues.libs.acf</shadedPattern>
                                 </relocation>
                             </relocations>
                             <artifactSet>
