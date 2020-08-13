@@ -3,7 +3,7 @@
 Velocity queue system used on the RTGame Minecraft Server.
 Based off an older version of [DeluxeQueues](https://github.com/darbyjack/DeluxeQueues)
 
-##Features
+## Features
 * Queues for multiple servers
 * Normal, Priority and Staff queue levels with separately configurable slot counts
 * Priority re-queuing when unexpectedly disconnected after joining the queued for server
