@@ -95,6 +95,11 @@
             <id>velocity</id>
             <url>https://repo.velocitypowered.com/snapshots/</url>
         </repository>
+        <repository>
+            <id>data-local</id>
+            <name>data</name>
+            <url>file://${project.basedir}/libs</url>
+        </repository>
     </repositories>
 
     <dependencies>
@@ -139,6 +144,12 @@
             <groupId>commons-lang</groupId>
             <artifactId>commons-lang</artifactId>
             <version>2.6</version>
+        </dependency>
+        <dependency>
+            <groupId>de.sldk.mc</groupId>
+            <artifactId>velocity-prometheus-exporter</artifactId>
+            <version>2.0.1</version>
+            <scope>provided</scope>
         </dependency>
 
     </dependencies>

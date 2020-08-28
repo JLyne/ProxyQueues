@@ -7,13 +7,16 @@ import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.proxy.ProxyInitializeEvent;
 import com.velocitypowered.api.plugin.Dependency;
 import com.velocitypowered.api.plugin.Plugin;
+import com.velocitypowered.api.plugin.PluginContainer;
 import com.velocitypowered.api.plugin.annotation.DataDirectory;
 import com.velocitypowered.api.proxy.ProxyServer;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
+import de.sldk.mc.core.MetricRegistry;
 import net.kyori.text.format.TextColor;
 import uk.co.notnull.proxyqueues.acf.ACFHandler;
 import uk.co.notnull.proxyqueues.configuration.SettingsHandler;
 import uk.co.notnull.proxyqueues.configuration.sections.ConfigOptions;
+import uk.co.notnull.proxyqueues.metrics.PlayersQueued;
 import uk.co.notnull.proxyqueues.queues.QueueHandler;
 import org.slf4j.Logger;
 
@@ -26,7 +29,8 @@ import java.nio.file.Path;
 import java.util.Optional;
 
 @Plugin(id="proxyqueues", name="ProxyQueues", dependencies = {
-        @Dependency(id="luckperms")
+        @Dependency(id="luckperms"),
+        @Dependency(id="velocity-prometheus-exporter", optional = true)
 })
 public final class ProxyQueues {
 
@@ -60,6 +64,14 @@ public final class ProxyQueues {
 
         commandManager.setFormat(MessageType.INFO, new VelocityMessageFormatter(
                 TextColor.YELLOW, TextColor.GREEN, TextColor.LIGHT_PURPLE));
+
+        Optional<PluginContainer> prometheusExporter = proxyServer.getPluginManager().getPlugin("velocity-prometheus-exporter");
+        prometheusExporter.flatMap(PluginContainer::getInstance).ifPresent(instance -> {
+			PlayersQueued playersQueued = new PlayersQueued(this);
+		    MetricRegistry.getInstance().register(playersQueued);
+
+		    playersQueued.enable();
+		});
 
     }
 
