@@ -110,6 +110,7 @@ public class CommandInfo extends BaseCommand {
 
             QueuePlayer player = queue.getQueuePlayer(uuid).get();
             String status;
+            long queuedTime = player.getQueuedTime();
 
             if(player.getPlayer().isActive()) {
                 status = ProxyQueues.getInstance().getCommandManager()
@@ -134,7 +135,8 @@ public class CommandInfo extends BaseCommand {
                             "%server%", queue.getServer().getServerInfo().getName(),
                             "%type%", player.getQueueType().toString(),
                             "%position%", Integer.toString(player.getPosition()),
-                            "%status%", status);
+                            "%status%", status,
+                            "%queuedTime%", queuedTime + "s");
         });
     }
 }

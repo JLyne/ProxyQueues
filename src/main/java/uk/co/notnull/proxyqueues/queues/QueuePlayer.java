@@ -5,6 +5,7 @@ import net.kyori.adventure.text.TextComponent;
 import uk.co.notnull.proxyqueues.QueueType;
 
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 
 public class QueuePlayer {
 
@@ -13,8 +14,10 @@ public class QueuePlayer {
     private Player player;
     private int position = -1;
     private final QueueType queueType;
+
     private Instant lastConnectionAttempt;
     private Instant lastSeen;
+    private Instant queued;
 
     public QueuePlayer(Player player, QueueType queueType) {
         this.player = player;
@@ -22,6 +25,7 @@ public class QueuePlayer {
         this.queueType = queueType;
         this.lastConnectionAttempt = Instant.EPOCH;
         this.lastSeen = null;
+        this.queued = Instant.now();
 
         this.bossBar = BossBar.of(TextComponent.of("Joining queue..."), 0, getBossBarColor(),
                                   BossBar.Overlay.PROGRESS);
@@ -84,6 +88,10 @@ public class QueuePlayer {
 
     public void setLastSeen(Instant lastSeen) {
         this.lastSeen = lastSeen;
+    }
+
+    public long getQueuedTime() {
+        return queued.until(Instant.now(), ChronoUnit.SECONDS);
     }
 
     public BossBar.Color getBossBarColor() {

@@ -29,8 +29,9 @@ commands:
     Queue Type: <c2>%type%</c2>
     Position: <c2>%position%</c2>
     Status: %status%
-  info-status-online: '<c3>Online</c3>'
-  info-status-offline: '<c3>Offline</c3><c2>. Last seen </c2><c3>%lastseen%</c3><c2> ago (</c2><c3>%remaining%</c3><c2> remaining).</c2>'
+    Queueing for: <c2>%queuedTime%</c2>
+  info-status-online: "<c3>Online</c3>"
+  info-status-offline: "<c3>Offline</c3><c2>. Last seen </c2><c3>%lastseen%</c3><c2> ago (</c2><c3>%remaining%</c3><c2> remaining).</c2>"
   reload-success: "<c1>You've successfully reloaded the configuration!</c1>"
 errors:
   server-no-queue: "<c1>Queueing is disabled for </c1><c2>%server%</c2>"
