@@ -22,10 +22,7 @@ public class PlayersQueued extends ServerMetric {
     public void collect(RegisteredServer server) {
         ProxyQueue queue = ((ProxyQueues) plugin).getQueueHandler().getQueue(server);
 
-        ((ProxyQueues) plugin).getLogger().info("Queue status for " + server.getServerInfo().getName());
-
         if(queue != null) {
-            ((ProxyQueues) plugin).getLogger().info("Queue exists " + server.getServerInfo().getName());
             playersQueued.labels("normal", server.getServerInfo().getName()).set(queue.getQueueSize(QueueType.NORMAL));
             playersQueued.labels("priority", server.getServerInfo().getName()).set(queue.getQueueSize(QueueType.PRIORITY));
             playersQueued.labels("staff", server.getServerInfo().getName()).set(queue.getQueueSize(QueueType.STAFF));
