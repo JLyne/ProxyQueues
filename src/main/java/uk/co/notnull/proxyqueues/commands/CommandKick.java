@@ -33,7 +33,7 @@ public class CommandKick extends BaseCommand {
 
             Optional<ProxyQueue> currentQueue = queueHandler.getCurrentQueue(uuid);
 
-            if(!currentQueue.isPresent()) {
+            if(currentQueue.isEmpty()) {
                 sender.sendError(Messages.ERRORS__TARGET_NO_QUEUE, "%player%", target);
                 return;
             }

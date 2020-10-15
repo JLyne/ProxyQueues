@@ -55,8 +55,8 @@ public class ProxyQueueEventHandler {
         // Get the queue
         Optional<QueuePlayer> queuePlayer = queue.getQueuePlayer(player, true);
 
-        if(!queuePlayer.isPresent()) {
-            if(!event.getPlayer().getCurrentServer().isPresent()) {
+        if(queuePlayer.isEmpty()) {
+            if(event.getPlayer().getCurrentServer().isEmpty()) {
 				Optional<RegisteredServer> waitingServer = proxyQueues.getWaitingServer();
 
                 if(waitingServer.isPresent()) {

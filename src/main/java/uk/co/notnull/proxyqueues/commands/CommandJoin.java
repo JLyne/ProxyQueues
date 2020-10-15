@@ -25,7 +25,7 @@ public class CommandJoin extends BaseCommand {
     public void execute(CommandIssuer sender, String serverName) {
         Optional<RegisteredServer> server = ProxyQueues.getInstance().getProxyServer().getServer(serverName);
 
-        if(!server.isPresent()) {
+        if(server.isEmpty()) {
             sender.sendError(Messages.ERRORS__SERVER_UNKNOWN, "%server%", serverName);
             return;
         }

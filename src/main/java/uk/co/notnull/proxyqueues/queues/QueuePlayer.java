@@ -17,7 +17,7 @@ public class QueuePlayer {
 
     private Instant lastConnectionAttempt;
     private Instant lastSeen;
-    private Instant queued;
+    private final Instant queued;
 
     public QueuePlayer(Player player, QueueType queueType) {
         this.player = player;

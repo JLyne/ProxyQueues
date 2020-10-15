@@ -18,10 +18,8 @@ import uk.co.notnull.proxyqueues.utils.Constants;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalUnit;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.concurrent.TimeUnit;
 
 @CommandAlias("%dq")
 public class CommandInfo extends BaseCommand {
@@ -35,7 +33,7 @@ public class CommandInfo extends BaseCommand {
     public void server(CommandIssuer sender, String serverName) {
         Optional<RegisteredServer> server = ProxyQueues.getInstance().getProxyServer().getServer(serverName);
 
-        if(!server.isPresent()) {
+        if(server.isEmpty()) {
             sender.sendError(Messages.ERRORS__SERVER_UNKNOWN, "%server%", serverName);
             return;
         }
@@ -115,7 +113,7 @@ public class CommandInfo extends BaseCommand {
             if(player.getPlayer().isActive()) {
                 status = ProxyQueues.getInstance().getCommandManager()
                                       .formatMessage(sender, MessageType.INFO, Messages.COMMANDS__INFO_STATUS_ONLINE);
-            } else {;
+            } else {
                 int disconnectTimeout = ProxyQueues.getInstance().getSettingsHandler()
                         .getSettingsManager().getProperty(ConfigOptions.DISCONNECT_TIMEOUT);
 

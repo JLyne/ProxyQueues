@@ -27,7 +27,7 @@ public class CommandLeave extends BaseCommand {
         Player player = sender.getIssuer();
         Optional<ProxyQueue> currentQueue = queueHandler.getCurrentQueue(player);
 
-        if(!currentQueue.isPresent()) {
+        if(currentQueue.isEmpty()) {
             sender.sendError(Messages.ERRORS__PLAYER_NO_QUEUE);
             return;
         }

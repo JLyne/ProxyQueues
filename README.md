@@ -1,7 +1,7 @@
 # ProxyQueues
 
 Velocity queue system used on the RTGame Minecraft Server.
-Based off an older version of [DeluxeQueues](https://github.com/darbyjack/DeluxeQueues)
+Based off an older version of [DeluxeQueues](https://github.com/darbyjack/DeluxeQueues).
 
 ## Features
 * Queues for multiple servers
