@@ -2,7 +2,8 @@ package uk.co.notnull.proxyqueues.queues;
 
 import ch.jalu.configme.SettingsManager;
 import net.kyori.adventure.audience.MessageType;
-import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.identity.Identity;
+import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import net.kyori.adventure.title.Title;
 import org.geysermc.floodgate.FloodgateAPI;
@@ -72,13 +73,12 @@ public class ProxyQueueNotifier {
             case "text":
                 message = message.replace("{server}", queue.getServer().getServerInfo().getName());
                 message = message.replace("{pos}", String.valueOf(player.getPosition()));
-                player.getPlayer().sendMessage(serializer.deserialize(message), MessageType.SYSTEM);
+                player.getPlayer().sendMessage(Identity.nil(), serializer.deserialize(message), MessageType.SYSTEM);
                 break;
             case "title":
                 title_bottom = title_bottom.replace("{server}", queue.getServer().getServerInfo().getName());
                 title_bottom = title_bottom.replace("{pos}", String.valueOf(player.getPosition()));
-                Title title = Title.of(serializer.deserialize(title_top),
-                                       serializer.deserialize(title_bottom));
+                Title title = Title.title(serializer.deserialize(title_top), serializer.deserialize(title_bottom));
                 player.getPlayer().showTitle(title);
                 break;
         }
@@ -109,7 +109,7 @@ public class ProxyQueueNotifier {
         }
 
         player.showBossBar();
-        player.getBossBar().name(TextComponent.of(message));
+        player.getBossBar().name(Component.text(message));
     }
 
 	public String getNotifyMethod() {

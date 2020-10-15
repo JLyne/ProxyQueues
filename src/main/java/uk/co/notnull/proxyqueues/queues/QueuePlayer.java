@@ -1,7 +1,7 @@
 package uk.co.notnull.proxyqueues.queues;
 import com.velocitypowered.api.proxy.Player;
 import net.kyori.adventure.bossbar.BossBar;
-import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.Component;
 import uk.co.notnull.proxyqueues.QueueType;
 
 import java.time.Instant;
@@ -27,8 +27,8 @@ public class QueuePlayer {
         this.lastSeen = null;
         this.queued = Instant.now();
 
-        this.bossBar = BossBar.of(TextComponent.of("Joining queue..."), 0, getBossBarColor(),
-                                  BossBar.Overlay.PROGRESS);
+        this.bossBar = BossBar.bossBar(Component.text("Joining queue..."), 0, getBossBarColor(),
+                                       BossBar.Overlay.PROGRESS);
         this.player.showBossBar(bossBar);
     }
 

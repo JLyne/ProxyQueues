@@ -5,7 +5,7 @@ import co.aikar.commands.MessageType;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ServerConnection;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
-import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.Component;
 import uk.co.notnull.proxyqueues.ProxyQueues;
 import uk.co.notnull.proxyqueues.configuration.sections.ConfigOptions;
 import uk.co.notnull.proxyqueues.messages.Messages;
@@ -156,7 +156,7 @@ public class QueueHandler {
         Optional<ServerConnection> currentServer = player.getCurrentServer();
 
         if(currentServer.isPresent() && currentServer.get().getServer().equals(waitingServer)) {
-            player.disconnect(TextComponent.of(proxyQueues.getCommandManager()
+            player.disconnect(Component.text(proxyQueues.getCommandManager()
                                       .formatMessage(proxyQueues.getCommandManager().getCommandIssuer(player), MessageType.ERROR,
                                                      message)));
         } else {

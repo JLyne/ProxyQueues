@@ -6,7 +6,7 @@ import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ServerConnection;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
 import com.velocitypowered.api.scheduler.ScheduledTask;
-import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.Component;
 import uk.co.notnull.proxyqueues.ProxyQueues;
 import uk.co.notnull.proxyqueues.QueueType;
 import uk.co.notnull.proxyqueues.configuration.sections.ConfigOptions;
@@ -159,9 +159,12 @@ public class ProxyQueue {
             proxyQueues.getLogger().info(player.getUsername() + "'s PlayerQueueEvent cancelled");
 
             if(currentServer == null || currentServer.getServer().equals(waitingServer)) {
-                player.disconnect(TextComponent.of(proxyQueues.getCommandManager()
-                                      .formatMessage(proxyQueues.getCommandManager().getCommandIssuer(player), MessageType.ERROR,
-                                                     Messages.ERRORS__QUEUE_CANNOT_JOIN, "%reason%", reason)));
+                player.disconnect(Component.text(proxyQueues.getCommandManager()
+                                                         .formatMessage(
+                                                                 proxyQueues.getCommandManager().getCommandIssuer(
+                                                                         player), MessageType.ERROR,
+                                                                 Messages.ERRORS__QUEUE_CANNOT_JOIN, "%reason%",
+                                                                 reason)));
             } else {
                 proxyQueues.getCommandManager().getCommandIssuer(player).sendError(Messages.ERRORS__QUEUE_CANNOT_JOIN, "%reason%", reason);
             }
@@ -269,11 +272,15 @@ public class ProxyQueue {
 
             Optional<ServerConnection> currentServer = player.getPlayer().getCurrentServer();
 
-            if(!waitingServer.isPresent() || !currentServer.isPresent() || waitingServer.get().equals(currentServer.get().getServer())) {
-                player.getPlayer().disconnect(TextComponent.of(proxyQueues.getCommandManager()
-                                      .formatMessage(proxyQueues.getCommandManager().getCommandIssuer(player.getPlayer()),
-                                                     MessageType.ERROR,
-                                                     Messages.ERRORS__QUEUE_DESTROYED, "%server%", server.getServerInfo().getName())));
+            if(waitingServer.isEmpty() || currentServer.isEmpty() || waitingServer.get().equals(currentServer.get().getServer())) {
+                player.getPlayer().disconnect(Component.text(proxyQueues.getCommandManager()
+                                                                     .formatMessage(
+                                                                             proxyQueues.getCommandManager().getCommandIssuer(
+                                                                                     player.getPlayer()),
+                                                                             MessageType.ERROR,
+                                                                             Messages.ERRORS__QUEUE_DESTROYED,
+                                                                             "%server%",
+                                                                             server.getServerInfo().getName())));
             } else {
                 proxyQueues.getCommandManager().getCommandIssuer(player.getPlayer())
                         .sendError(Messages.ERRORS__QUEUE_DESTROYED, "%server%", server.getServerInfo().getName());

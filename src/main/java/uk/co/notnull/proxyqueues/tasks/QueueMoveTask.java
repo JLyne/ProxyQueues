@@ -2,13 +2,13 @@ package uk.co.notnull.proxyqueues.tasks;
 
 import com.velocitypowered.api.proxy.ServerConnection;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
+import net.kyori.adventure.identity.Identity;
 import uk.co.notnull.proxyqueues.ProxyQueues;
 import uk.co.notnull.proxyqueues.configuration.sections.ConfigOptions;
 import uk.co.notnull.proxyqueues.messages.Messages;
 import uk.co.notnull.proxyqueues.queues.ProxyQueue;
 import uk.co.notnull.proxyqueues.queues.QueuePlayer;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.serializer.plain.PlainComponentSerializer;
 
 import java.time.Instant;
@@ -89,9 +89,9 @@ public class QueueMoveTask implements Runnable {
                                   + queue.getServer().getServerInfo().getName()
                                   + ". Reason: \""
                                   + PlainComponentSerializer.plain()
-                            .serialize(result.getReasonComponent().orElse(TextComponent.of("(None)"))) + "\"");
+                            .serialize(result.getReasonComponent().orElse(Component.text("(None)"))) + "\"");
 
-            Component reason = result.getReasonComponent().orElse(TextComponent.empty());
+            Component reason = result.getReasonComponent().orElse(Component.empty());
             String reasonPlain = PlainComponentSerializer.plain().serialize(reason);
             ServerConnection currentServer = targetPlayer.getPlayer().getCurrentServer().orElse(null);
 
@@ -99,12 +99,12 @@ public class QueueMoveTask implements Runnable {
 
 		    if(fatal) {
                 if(currentServer == null || currentServer.getServer().equals(waitingServer)) {
-                    targetPlayer.getPlayer().disconnect(result.getReasonComponent().orElse(TextComponent.empty()));
+                    targetPlayer.getPlayer().disconnect(result.getReasonComponent().orElse(Component.empty()));
                 } else {
                     queue.removePlayer(targetPlayer, false);
 
                     proxyQueues.getCommandManager().getCommandIssuer(targetPlayer.getPlayer()).sendError(Messages.ERRORS__QUEUE_CANNOT_JOIN);
-                    targetPlayer.getPlayer().sendMessage(reason);
+                    targetPlayer.getPlayer().sendMessage(Identity.nil(), reason);
                 }
             }
         });

@@ -10,7 +10,6 @@ import com.velocitypowered.api.event.player.ServerPreConnectEvent;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.serializer.plain.PlainComponentSerializer;
 import uk.co.notnull.proxyqueues.ProxyQueues;
@@ -63,7 +62,7 @@ public class ProxyQueueEventHandler {
                 if(waitingServer.isPresent()) {
                     event.setResult(ServerPreConnectEvent.ServerResult.allowed(waitingServer.get()));
                 } else {
-                    player.disconnect(TextComponent.of(
+                    player.disconnect(Component.text(
                             "This server has queueing enabled and can't be connected to directly. Please connect via minecraft.rtgame.co.uk")
                                               .color(NamedTextColor.RED));
 
@@ -147,7 +146,7 @@ public class ProxyQueueEventHandler {
                 .info("Player " + event.getPlayer().getUsername() + " kicked from " +
                               event.getServer().getServerInfo().getName() + ". Reason: " + event.getServerKickReason());
 
-		Component reason = event.getServerKickReason().orElse(TextComponent.empty());
+		Component reason = event.getServerKickReason().orElse(Component.empty());
 		String reasonPlain = PlainComponentSerializer.plain().serialize(reason);
 		List<String> fatalErrors = proxyQueues.getSettingsHandler().getSettingsManager().getProperty(
 				ConfigOptions.FATAL_ERRORS);
