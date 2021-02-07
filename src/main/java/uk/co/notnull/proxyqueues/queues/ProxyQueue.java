@@ -166,7 +166,6 @@ public class ProxyQueue {
                                                                  Messages.ERRORS__QUEUE_CANNOT_JOIN, "{reason}",
                                                                  reason)));
             } else {
-                proxyQueues.getLogger().info(reason);
                 proxyQueues.getCommandManager().getCommandIssuer(player)
                         .sendError(Messages.ERRORS__QUEUE_CANNOT_JOIN, "{reason}", reason);
             }

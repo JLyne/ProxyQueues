@@ -2,7 +2,7 @@ package uk.co.notnull.proxyqueues.tasks;
 
 import com.velocitypowered.api.proxy.ServerConnection;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
-import net.kyori.adventure.identity.Identity;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import uk.co.notnull.proxyqueues.ProxyQueues;
 import uk.co.notnull.proxyqueues.configuration.sections.ConfigOptions;
 import uk.co.notnull.proxyqueues.messages.Messages;
@@ -103,8 +103,8 @@ public class QueueMoveTask implements Runnable {
                 } else {
                     queue.removePlayer(targetPlayer, false);
 
-                    proxyQueues.getCommandManager().getCommandIssuer(targetPlayer.getPlayer()).sendError(Messages.ERRORS__QUEUE_CANNOT_JOIN);
-                    targetPlayer.getPlayer().sendMessage(Identity.nil(), reason);
+                    proxyQueues.getCommandManager().getCommandIssuer(targetPlayer.getPlayer())
+                        .sendError(Messages.ERRORS__QUEUE_CANNOT_JOIN, "{reason}", reasonPlain);
                 }
             }
         });
