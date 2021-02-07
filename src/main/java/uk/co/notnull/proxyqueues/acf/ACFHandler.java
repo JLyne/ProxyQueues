@@ -1,12 +1,15 @@
 package uk.co.notnull.proxyqueues.acf;
 
+import co.aikar.commands.InvalidCommandArgument;
 import co.aikar.commands.MessageType;
 import co.aikar.commands.VelocityCommandManager;
 import co.aikar.locales.MessageKey;
 import ch.jalu.configme.SettingsManager;
+import com.velocitypowered.api.proxy.server.RegisteredServer;
 import net.kyori.text.format.TextColor;
 import uk.co.notnull.proxyqueues.ProxyQueues;
 import uk.co.notnull.proxyqueues.commands.*;
+import uk.co.notnull.proxyqueues.messages.Messages;
 import uk.co.notnull.proxyqueues.queues.QueueHandler;
 import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.yaml.YAMLConfigurationLoader;
@@ -26,6 +29,17 @@ public class ACFHandler {
         registerLanguages(proxyQueues, commandManager);
         registerDependencyInjection(commandManager);
         registerCommandReplacements(commandManager);
+
+        commandManager.getCommandContexts().registerContext(RegisteredServer.class, c -> {
+            String name = c.popFirstArg();
+            Optional<RegisteredServer> server = proxyQueues.getProxyServer().getServer(name);
+
+            if(server.isEmpty()) {
+                throw new InvalidCommandArgument(Messages.ERRORS__SERVER_UNKNOWN, "{server}", name);
+            } else {
+                return server.get();
+            }
+        });
 
         commandManager.setFormat(MessageType.ERROR, TextColor.GOLD, TextColor.RED, TextColor.YELLOW);
         commandManager.setFormat(MessageType.INFO, TextColor.BLUE, TextColor.GREEN, TextColor.LIGHT_PURPLE);

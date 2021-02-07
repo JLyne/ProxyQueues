@@ -18,7 +18,6 @@ import uk.co.notnull.proxyqueues.utils.Constants;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.Optional;
 import java.util.UUID;
 
 @CommandAlias("%dq")
@@ -30,18 +29,11 @@ public class CommandInfo extends BaseCommand {
     @Description("{@@commands.info-description}")
     @CommandPermission(Constants.BASE_PERM + "info")
     @CommandCompletion("*")
-    public void server(CommandIssuer sender, String serverName) {
-        Optional<RegisteredServer> server = ProxyQueues.getInstance().getProxyServer().getServer(serverName);
-
-        if(server.isEmpty()) {
-            sender.sendError(Messages.ERRORS__SERVER_UNKNOWN, "{server}", serverName);
-            return;
-        }
-
-        ProxyQueue queue = queueHandler.getQueue(server.get());
+    public void server(CommandIssuer sender, RegisteredServer server) {
+        ProxyQueue queue = queueHandler.getQueue(server);
 
         if(queue == null) {
-            sender.sendError(Messages.ERRORS__SERVER_NO_QUEUE, "{server}", serverName);
+            sender.sendError(Messages.ERRORS__SERVER_NO_QUEUE, "{server}", server.getServerInfo().getName());
             return;
         }
 
@@ -64,7 +56,7 @@ public class CommandInfo extends BaseCommand {
         QueuePlayer[] staffPlayers = queue.getTopPlayers(QueueType.STAFF, 3);
 
         sender.sendInfo(Messages.COMMANDS__INFO_SERVER_RESPONSE,
-                        "{server}", server.get().getServerInfo().getName(),
+                        "{server}", server.getServerInfo().getName(),
                         "{size}", String.valueOf(normalSize),
                         "{prioritySize}", String.valueOf(prioritySize),
                         "{staffSize}", String.valueOf(staffSize),
