@@ -21,6 +21,7 @@ public class CommandJoin extends BaseCommand {
     @Subcommand("join")
     @Description("{@@commands.join-description}")
     @CommandPermission(Constants.BASE_PERM + "join")
+    @CommandCompletion("@servers")
     public void execute(CommandIssuer sender, RegisteredServer server) {
         ProxyQueue queue = queueHandler.getQueue(server);
 

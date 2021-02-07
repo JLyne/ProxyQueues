@@ -28,7 +28,7 @@ public class CommandInfo extends BaseCommand {
     @Subcommand("info server")
     @Description("{@@commands.info-description}")
     @CommandPermission(Constants.BASE_PERM + "info")
-    @CommandCompletion("*")
+    @CommandCompletion("@servers")
     public void server(CommandIssuer sender, RegisteredServer server) {
         ProxyQueue queue = queueHandler.getQueue(server);
 

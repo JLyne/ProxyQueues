@@ -17,6 +17,7 @@ import ninja.leaping.configurate.yaml.YAMLConfigurationLoader;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class ACFHandler {
 
@@ -39,6 +40,12 @@ public class ACFHandler {
             } else {
                 return server.get();
             }
+        });
+
+        commandManager.getCommandCompletions().registerCompletion("servers", c -> {
+            return proxyQueues.getProxyServer().getAllServers().stream().filter((RegisteredServer server) -> {
+                return proxyQueues.getQueueHandler().getQueue(server) != null;
+            }).map(server -> server.getServerInfo().getName()).collect(Collectors.toList());
         });
 
         commandManager.setFormat(MessageType.ERROR, TextColor.GOLD, TextColor.RED, TextColor.YELLOW);
