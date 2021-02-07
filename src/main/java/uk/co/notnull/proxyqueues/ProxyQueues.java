@@ -29,7 +29,6 @@ import java.nio.file.Path;
 import java.util.Optional;
 
 @Plugin(id="proxyqueues", name="ProxyQueues", dependencies = {
-        @Dependency(id="luckperms"),
         @Dependency(id="velocity-prometheus-exporter", optional = true),
         @Dependency(id="floodgate", optional = true)
 })
