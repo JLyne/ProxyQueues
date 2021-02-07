@@ -26,21 +26,21 @@ public class CommandJoin extends BaseCommand {
         Optional<RegisteredServer> server = ProxyQueues.getInstance().getProxyServer().getServer(serverName);
 
         if(server.isEmpty()) {
-            sender.sendError(Messages.ERRORS__SERVER_UNKNOWN, "%server%", serverName);
+            sender.sendError(Messages.ERRORS__SERVER_UNKNOWN, "{server}", serverName);
             return;
         }
 
         ProxyQueue queue = queueHandler.getQueue(server.get());
 
         if(queue == null || !queue.isActive()) {
-            sender.sendError(Messages.ERRORS__SERVER_NO_QUEUE, "%server%", serverName);
+            sender.sendError(Messages.ERRORS__SERVER_NO_QUEUE, "{server}", serverName);
             return;
         }
 
         Optional<ServerConnection> currentServer = ((Player) sender.getIssuer()).getCurrentServer();
 
         if(currentServer.isPresent() && currentServer.get().getServer().equals(server.get())) {
-            sender.sendError(Messages.ERRORS__PLAYER_SAME_SERVER, "%server%", serverName);
+            sender.sendError(Messages.ERRORS__PLAYER_SAME_SERVER, "{server}", serverName);
             return;
         }
 

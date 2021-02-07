@@ -34,14 +34,14 @@ public class CommandInfo extends BaseCommand {
         Optional<RegisteredServer> server = ProxyQueues.getInstance().getProxyServer().getServer(serverName);
 
         if(server.isEmpty()) {
-            sender.sendError(Messages.ERRORS__SERVER_UNKNOWN, "%server%", serverName);
+            sender.sendError(Messages.ERRORS__SERVER_UNKNOWN, "{server}", serverName);
             return;
         }
 
         ProxyQueue queue = queueHandler.getQueue(server.get());
 
         if(queue == null) {
-            sender.sendError(Messages.ERRORS__SERVER_NO_QUEUE, "%server%", serverName);
+            sender.sendError(Messages.ERRORS__SERVER_NO_QUEUE, "{server}", serverName);
             return;
         }
 
@@ -64,26 +64,26 @@ public class CommandInfo extends BaseCommand {
         QueuePlayer[] staffPlayers = queue.getTopPlayers(QueueType.STAFF, 3);
 
         sender.sendInfo(Messages.COMMANDS__INFO_SERVER_RESPONSE,
-                        "%server%", server.get().getServerInfo().getName(),
-                        "%size%", String.valueOf(normalSize),
-                        "%prioritySize%", String.valueOf(prioritySize),
-                        "%staffSize%", String.valueOf(staffSize),
-                        "%connectedSize%", String.valueOf(connectedSize),
-                        "%priorityConnectedSize%", String.valueOf(priorityConnectedSize),
-                        "%staffConnectedSize%", String.valueOf(staffConnectedSize),
-                        "%required%", String.valueOf(playersRequired),
-                        "%max%", String.valueOf(normalMax),
-                        "%priorityMax%", String.valueOf(priorityMax),
-                        "%globalMax%", String.valueOf(staffMax),
-                        "%staffFirst%", staffPlayers[0] != null ? staffPlayers[0].getPlayer().getUsername() : "n/a",
-                        "%staffSecond%", staffPlayers[1] != null ? staffPlayers[1].getPlayer().getUsername() : "n/a",
-                        "%staffThird%", staffPlayers[2] != null ? staffPlayers[2].getPlayer().getUsername() : "n/a",
-                        "%priorityFirst%", priorityPlayers[0] != null ? priorityPlayers[0].getPlayer().getUsername() : "n/a",
-                        "%prioritySecond%", priorityPlayers[1] != null ? priorityPlayers[1].getPlayer().getUsername() : "n/a",
-                        "%priorityThird%", priorityPlayers[2] != null ? priorityPlayers[2].getPlayer().getUsername() : "n/a",
-                        "%first%", normalPlayers[0] != null ? normalPlayers[0].getPlayer().getUsername() : "n/a",
-                        "%second%", normalPlayers[1] != null ? normalPlayers[1].getPlayer().getUsername() : "n/a",
-                        "%third%", normalPlayers[2] != null ? normalPlayers[2].getPlayer().getUsername() : "n/a");
+                        "{server}", server.get().getServerInfo().getName(),
+                        "{size}", String.valueOf(normalSize),
+                        "{prioritySize}", String.valueOf(prioritySize),
+                        "{staffSize}", String.valueOf(staffSize),
+                        "{connectedSize}", String.valueOf(connectedSize),
+                        "{priorityConnectedSize}", String.valueOf(priorityConnectedSize),
+                        "{staffConnectedSize}", String.valueOf(staffConnectedSize),
+                        "{required}", String.valueOf(playersRequired),
+                        "{max}", String.valueOf(normalMax),
+                        "{priorityMax}", String.valueOf(priorityMax),
+                        "{globalMax}", String.valueOf(staffMax),
+                        "{staffFirst}", staffPlayers[0] != null ? staffPlayers[0].getPlayer().getUsername() : "n/a",
+                        "{staffSecond}", staffPlayers[1] != null ? staffPlayers[1].getPlayer().getUsername() : "n/a",
+                        "{staffThird}", staffPlayers[2] != null ? staffPlayers[2].getPlayer().getUsername() : "n/a",
+                        "{priorityFirst}", priorityPlayers[0] != null ? priorityPlayers[0].getPlayer().getUsername() : "n/a",
+                        "{prioritySecond}", priorityPlayers[1] != null ? priorityPlayers[1].getPlayer().getUsername() : "n/a",
+                        "{priorityThird}", priorityPlayers[2] != null ? priorityPlayers[2].getPlayer().getUsername() : "n/a",
+                        "{first}", normalPlayers[0] != null ? normalPlayers[0].getPlayer().getUsername() : "n/a",
+                        "{second}", normalPlayers[1] != null ? normalPlayers[1].getPlayer().getUsername() : "n/a",
+                        "{third}", normalPlayers[2] != null ? normalPlayers[2].getPlayer().getUsername() : "n/a");
     }
 
     @Subcommand("info player")
@@ -95,14 +95,14 @@ public class CommandInfo extends BaseCommand {
 
         luckPermsApi.getUserManager().lookupUniqueId(target).thenAccept((UUID uuid) -> {
             if (uuid == null) {
-                sender.sendError(Messages.ERRORS__TARGET_UNKNOWN, "%player%", target);
+                sender.sendError(Messages.ERRORS__TARGET_UNKNOWN, "{player}", target);
                 return;
             }
 
             ProxyQueue queue = queueHandler.getCurrentQueue(uuid).orElse(null);
 
             if(queue == null) {
-                sender.sendError(Messages.ERRORS__TARGET_NO_QUEUE, "%player%", target);
+                sender.sendError(Messages.ERRORS__TARGET_NO_QUEUE, "{player}", target);
                 return;
             }
 
@@ -123,18 +123,18 @@ public class CommandInfo extends BaseCommand {
 
                 status = ProxyQueues.getInstance().getCommandManager()
                                       .formatMessage(sender, MessageType.INFO, Messages.COMMANDS__INFO_STATUS_OFFLINE,
-                                                     "%lastseen%", lastSeenTime + "s",
-                                                     "%remaining%", remainingTime + "s"
+                                                     "{lastseen}", lastSeenTime + "s",
+                                                     "{remaining}", remainingTime + "s"
                                                      );
             }
 
             sender.sendInfo(Messages.COMMANDS__INFO_PLAYER_RESPONSE,
-                            "%player%", target,
-                            "%server%", queue.getServer().getServerInfo().getName(),
-                            "%type%", player.getQueueType().toString(),
-                            "%position%", Integer.toString(player.getPosition()),
-                            "%status%", status,
-                            "%queuedTime%", queuedTime + "s");
+                            "{player}", target,
+                            "{server}", queue.getServer().getServerInfo().getName(),
+                            "{type}", player.getQueueType().toString(),
+                            "{position}", Integer.toString(player.getPosition()),
+                            "{status}", status,
+                            "{queuedTime}", queuedTime + "s");
         });
     }
 }

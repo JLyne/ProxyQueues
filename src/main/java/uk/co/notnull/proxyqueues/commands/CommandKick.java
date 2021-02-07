@@ -27,21 +27,21 @@ public class CommandKick extends BaseCommand {
 
         luckPermsApi.getUserManager().lookupUniqueId(target).thenAccept((UUID uuid) -> {
             if(uuid == null) {
-                sender.sendError(Messages.ERRORS__TARGET_UNKNOWN, "%player%", target);
+                sender.sendError(Messages.ERRORS__TARGET_UNKNOWN, "{player}", target);
                 return;
             }
 
             Optional<ProxyQueue> currentQueue = queueHandler.getCurrentQueue(uuid);
 
             if(currentQueue.isEmpty()) {
-                sender.sendError(Messages.ERRORS__TARGET_NO_QUEUE, "%player%", target);
+                sender.sendError(Messages.ERRORS__TARGET_NO_QUEUE, "{player}", target);
                 return;
             }
 
             queueHandler.kickPlayer(uuid);
             sender.sendInfo(Messages.COMMANDS__KICK_SUCCESS,
-                        "%player%", target,
-                        "%server%", currentQueue.get().getServer().getServerInfo().getName());
+                        "{player}", target,
+                        "{server}", currentQueue.get().getServer().getServerInfo().getName());
         });
     }
 }

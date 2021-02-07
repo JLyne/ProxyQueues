@@ -163,10 +163,12 @@ public class ProxyQueue {
                                                          .formatMessage(
                                                                  proxyQueues.getCommandManager().getCommandIssuer(
                                                                          player), MessageType.ERROR,
-                                                                 Messages.ERRORS__QUEUE_CANNOT_JOIN, "%reason%",
+                                                                 Messages.ERRORS__QUEUE_CANNOT_JOIN, "{reason}",
                                                                  reason)));
             } else {
-                proxyQueues.getCommandManager().getCommandIssuer(player).sendError(Messages.ERRORS__QUEUE_CANNOT_JOIN, "%reason%", reason);
+                proxyQueues.getLogger().info(reason);
+                proxyQueues.getCommandManager().getCommandIssuer(player)
+                        .sendError(Messages.ERRORS__QUEUE_CANNOT_JOIN, "{reason}", reason);
             }
         }
 
@@ -279,11 +281,11 @@ public class ProxyQueue {
                                                                                      player.getPlayer()),
                                                                              MessageType.ERROR,
                                                                              Messages.ERRORS__QUEUE_DESTROYED,
-                                                                             "%server%",
+                                                                             "{server}",
                                                                              server.getServerInfo().getName())));
             } else {
                 proxyQueues.getCommandManager().getCommandIssuer(player.getPlayer())
-                        .sendError(Messages.ERRORS__QUEUE_DESTROYED, "%server%", server.getServerInfo().getName());
+                        .sendError(Messages.ERRORS__QUEUE_DESTROYED, "{server}", server.getServerInfo().getName());
             }
         }
     }
