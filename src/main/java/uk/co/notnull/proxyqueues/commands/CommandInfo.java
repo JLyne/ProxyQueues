@@ -4,9 +4,9 @@ import co.aikar.commands.BaseCommand;
 import co.aikar.commands.CommandIssuer;
 import co.aikar.commands.MessageType;
 import co.aikar.commands.annotation.*;
+import co.aikar.commands.velocity.contexts.OnlinePlayer;
+import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
-import net.luckperms.api.LuckPerms;
-import net.luckperms.api.LuckPermsProvider;
 import uk.co.notnull.proxyqueues.ProxyQueues;
 import uk.co.notnull.proxyqueues.QueueType;
 import uk.co.notnull.proxyqueues.configuration.sections.ConfigOptions;
@@ -89,52 +89,46 @@ public class CommandInfo extends BaseCommand {
     @Subcommand("info player")
     @Description("{@@commands.info-description}")
     @CommandPermission(Constants.BASE_PERM + "info")
-    @CommandCompletion("*")
-    public void player(CommandIssuer sender, String target) {
-        LuckPerms luckPermsApi = LuckPermsProvider.get();
+    @CommandCompletion("@players")
+    public void player(CommandIssuer sender, OnlinePlayer target) {
+        Player player = target.getPlayer();
+        UUID uuid = player.getUniqueId();
 
-        luckPermsApi.getUserManager().lookupUniqueId(target).thenAccept((UUID uuid) -> {
-            if (uuid == null) {
-                sender.sendError(Messages.ERRORS__TARGET_UNKNOWN, "{player}", target);
-                return;
-            }
+        ProxyQueue queue = queueHandler.getCurrentQueue(uuid).orElse(null);
 
-            ProxyQueue queue = queueHandler.getCurrentQueue(uuid).orElse(null);
+        if(queue == null) {
+            sender.sendError(Messages.ERRORS__TARGET_NO_QUEUE, "{player}", player.getUsername());
+            return;
+        }
 
-            if(queue == null) {
-                sender.sendError(Messages.ERRORS__TARGET_NO_QUEUE, "{player}", target);
-                return;
-            }
+        QueuePlayer queuePlayer = queue.getQueuePlayer(uuid).get();
+        String status;
+        long queuedTime = queuePlayer.getQueuedTime();
 
-            QueuePlayer player = queue.getQueuePlayer(uuid).get();
-            String status;
-            long queuedTime = player.getQueuedTime();
+        if(queuePlayer.getPlayer().isActive()) {
+            status = ProxyQueues.getInstance().getCommandManager()
+                                  .formatMessage(sender, MessageType.INFO, Messages.COMMANDS__INFO_STATUS_ONLINE);
+        } else {
+            int disconnectTimeout = ProxyQueues.getInstance().getSettingsHandler()
+                    .getSettingsManager().getProperty(ConfigOptions.DISCONNECT_TIMEOUT);
 
-            if(player.getPlayer().isActive()) {
-                status = ProxyQueues.getInstance().getCommandManager()
-                                      .formatMessage(sender, MessageType.INFO, Messages.COMMANDS__INFO_STATUS_ONLINE);
-            } else {
-                int disconnectTimeout = ProxyQueues.getInstance().getSettingsHandler()
-                        .getSettingsManager().getProperty(ConfigOptions.DISCONNECT_TIMEOUT);
+            long lastSeenTime = queuePlayer.getLastSeen().until(Instant.now(), ChronoUnit.SECONDS);
+            long remainingTime = Math.max(0, Instant.now().minusSeconds(disconnectTimeout)
+                    .until(queuePlayer.getLastSeen(), ChronoUnit.SECONDS));
 
-                long lastSeenTime = player.getLastSeen().until(Instant.now(), ChronoUnit.SECONDS);
-                long remainingTime = Math.max(0, Instant.now().minusSeconds(disconnectTimeout)
-                        .until(player.getLastSeen(), ChronoUnit.SECONDS));
+            status = ProxyQueues.getInstance().getCommandManager()
+                                  .formatMessage(sender, MessageType.INFO, Messages.COMMANDS__INFO_STATUS_OFFLINE,
+                                                 "{lastseen}", lastSeenTime + "s",
+                                                 "{remaining}", remainingTime + "s"
+                                                 );
+        }
 
-                status = ProxyQueues.getInstance().getCommandManager()
-                                      .formatMessage(sender, MessageType.INFO, Messages.COMMANDS__INFO_STATUS_OFFLINE,
-                                                     "{lastseen}", lastSeenTime + "s",
-                                                     "{remaining}", remainingTime + "s"
-                                                     );
-            }
-
-            sender.sendInfo(Messages.COMMANDS__INFO_PLAYER_RESPONSE,
-                            "{player}", target,
-                            "{server}", queue.getServer().getServerInfo().getName(),
-                            "{type}", player.getQueueType().toString(),
-                            "{position}", Integer.toString(player.getPosition()),
-                            "{status}", status,
-                            "{queuedTime}", queuedTime + "s");
-        });
+        sender.sendInfo(Messages.COMMANDS__INFO_PLAYER_RESPONSE,
+                        "{player}", player.getUsername(),
+                        "{server}", queue.getServer().getServerInfo().getName(),
+                        "{type}", queuePlayer.getQueueType().toString(),
+                        "{position}", Integer.toString(queuePlayer.getPosition()),
+                        "{status}", status,
+                        "{queuedTime}", queuedTime + "s");
     }
 }

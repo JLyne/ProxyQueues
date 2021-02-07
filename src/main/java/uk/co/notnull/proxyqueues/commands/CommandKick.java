@@ -3,8 +3,8 @@ package uk.co.notnull.proxyqueues.commands;
 import co.aikar.commands.BaseCommand;
 import co.aikar.commands.CommandIssuer;
 import co.aikar.commands.annotation.*;
-import net.luckperms.api.LuckPerms;
-import net.luckperms.api.LuckPermsProvider;
+import co.aikar.commands.velocity.contexts.OnlinePlayer;
+import com.velocitypowered.api.proxy.Player;
 import uk.co.notnull.proxyqueues.messages.Messages;
 import uk.co.notnull.proxyqueues.queues.ProxyQueue;
 import uk.co.notnull.proxyqueues.queues.QueueHandler;
@@ -22,26 +22,20 @@ public class CommandKick extends BaseCommand {
     @Description("{@@commands.kick-description}")
     @CommandPermission(Constants.BASE_PERM + "kick")
     @CommandCompletion("@players")
-    public void execute(CommandIssuer sender, String target) {
-        LuckPerms luckPermsApi = LuckPermsProvider.get();
+    public void execute(CommandIssuer sender, OnlinePlayer target) {
+        Player player = target.getPlayer();
+        UUID uuid = player.getUniqueId();
 
-        luckPermsApi.getUserManager().lookupUniqueId(target).thenAccept((UUID uuid) -> {
-            if(uuid == null) {
-                sender.sendError(Messages.ERRORS__TARGET_UNKNOWN, "{player}", target);
-                return;
-            }
+        Optional<ProxyQueue> currentQueue = queueHandler.getCurrentQueue(uuid);
 
-            Optional<ProxyQueue> currentQueue = queueHandler.getCurrentQueue(uuid);
+        if(currentQueue.isEmpty()) {
+            sender.sendError(Messages.ERRORS__TARGET_NO_QUEUE, "{player}", player.getUsername());
+            return;
+        }
 
-            if(currentQueue.isEmpty()) {
-                sender.sendError(Messages.ERRORS__TARGET_NO_QUEUE, "{player}", target);
-                return;
-            }
-
-            queueHandler.kickPlayer(uuid);
-            sender.sendInfo(Messages.COMMANDS__KICK_SUCCESS,
-                        "{player}", target,
-                        "{server}", currentQueue.get().getServer().getServerInfo().getName());
-        });
+        queueHandler.kickPlayer(uuid);
+        sender.sendInfo(Messages.COMMANDS__KICK_SUCCESS,
+                    "{player}", player.getUsername(),
+                    "{server}", currentQueue.get().getServer().getServerInfo().getName());
     }
 }
