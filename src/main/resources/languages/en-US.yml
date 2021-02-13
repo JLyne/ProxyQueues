@@ -12,7 +12,7 @@ commands:
   join-success: "You have joined the queue for &e{server}"
   leave-success: "You have left the queue"
   info-server-response: |-
-    &dS&e{server} Queue Status
+    &d&e{server} &dQueue Status
     &bPlayers in queue: &e{size} &b(&e{prioritySize} &bpriority, &e{staffSize} &bstaff)
     &bPlayers on Server: &e{connectedSize} &b(&e{priorityConnectedSize} &bpriority, &e{staffConnectedSize} &bstaff)
 
@@ -41,7 +41,7 @@ errors:
   server-unknown: "Unknown server: &c{server}"
   player-no-queue: "You are not queued for any server"
   player-same-server: "You are already connected to &c{server}"
-  target-no-queue: "&c{player} is not queued for any server"
+  target-no-queue: "&c{player}&e is not queued for any server"
   target-unknown: "Unknown player: &c{player}"
   queue-cannot-join: "Sorry, you're currently unable to join the queue:\n &c{reason}"
   queue-removed-error: "Sorry, you have been removed from the queue due to a fatal error:\n"
