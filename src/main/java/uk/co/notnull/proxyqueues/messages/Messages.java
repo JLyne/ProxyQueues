@@ -5,6 +5,8 @@ import co.aikar.locales.MessageKeyProvider;
 
 @SuppressWarnings("unused")
 public enum Messages implements MessageKeyProvider {
+    PREFIX__ERROR,
+    PREFIX__INFO,
     COMMANDS__JOIN_DESCRIPTION,
     COMMANDS__LEAVE_DESCRIPTION,
     COMMANDS__INFO_DESCRIPTION,
@@ -19,7 +21,8 @@ public enum Messages implements MessageKeyProvider {
     COMMANDS__INFO_PLAYER_RESPONSE,
     COMMANDS__INFO_STATUS_ONLINE,
     COMMANDS__INFO_STATUS_OFFLINE,
-    RECONNECT__RESTORE_SUCCESS,
+    RECONNECT__RESTORE_POSITION,
+    RECONNECT__RESTORE_PRIORITY,
     ERRORS__SERVER_UNKNOWN,
     ERRORS__SERVER_NO_QUEUE,
     ERRORS__PLAYER_NO_QUEUE,

@@ -31,9 +31,11 @@ public class CommandInfo extends BaseCommand {
     @CommandCompletion("@servers")
     public void server(CommandIssuer sender, RegisteredServer server) {
         ProxyQueue queue = queueHandler.getQueue(server);
+        ProxyQueues proxyQueues = ProxyQueues.getInstance();
 
         if(queue == null) {
-            sender.sendError(Messages.ERRORS__SERVER_NO_QUEUE, "{server}", server.getServerInfo().getName());
+            proxyQueues.sendMessage(sender, MessageType.ERROR, Messages.ERRORS__SERVER_NO_QUEUE,
+                                    "{server}", server.getServerInfo().getName());
             return;
         }
 
@@ -55,7 +57,7 @@ public class CommandInfo extends BaseCommand {
         QueuePlayer[] priorityPlayers = queue.getTopPlayers(QueueType.PRIORITY, 3);
         QueuePlayer[] staffPlayers = queue.getTopPlayers(QueueType.STAFF, 3);
 
-        sender.sendInfo(Messages.COMMANDS__INFO_SERVER_RESPONSE,
+        proxyQueues.sendMessage(sender, MessageType.INFO, Messages.COMMANDS__INFO_SERVER_RESPONSE,
                         "{server}", server.getServerInfo().getName(),
                         "{size}", String.valueOf(normalSize),
                         "{prioritySize}", String.valueOf(prioritySize),
@@ -83,13 +85,15 @@ public class CommandInfo extends BaseCommand {
     @CommandPermission(Constants.BASE_PERM + "info")
     @CommandCompletion("@players")
     public void player(CommandIssuer sender, OnlinePlayer target) {
+        ProxyQueues proxyQueues = ProxyQueues.getInstance();
         Player player = target.getPlayer();
         UUID uuid = player.getUniqueId();
 
         ProxyQueue queue = queueHandler.getCurrentQueue(uuid).orElse(null);
 
         if(queue == null) {
-            sender.sendError(Messages.ERRORS__TARGET_NO_QUEUE, "{player}", player.getUsername());
+            proxyQueues.sendMessage(sender, MessageType.ERROR, Messages.ERRORS__TARGET_NO_QUEUE,
+                                    "{player}", player.getUsername());
             return;
         }
 
@@ -115,7 +119,7 @@ public class CommandInfo extends BaseCommand {
                                                  );
         }
 
-        sender.sendInfo(Messages.COMMANDS__INFO_PLAYER_RESPONSE,
+        proxyQueues.sendMessage(sender, MessageType.INFO, Messages.COMMANDS__INFO_PLAYER_RESPONSE,
                         "{player}", player.getUsername(),
                         "{server}", queue.getServer().getServerInfo().getName(),
                         "{type}", queuePlayer.getQueueType().toString(),

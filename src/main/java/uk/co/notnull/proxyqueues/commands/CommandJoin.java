@@ -2,10 +2,12 @@ package uk.co.notnull.proxyqueues.commands;
 
 import co.aikar.commands.BaseCommand;
 import co.aikar.commands.CommandIssuer;
+import co.aikar.commands.MessageType;
 import co.aikar.commands.annotation.*;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ServerConnection;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
+import uk.co.notnull.proxyqueues.ProxyQueues;
 import uk.co.notnull.proxyqueues.messages.Messages;
 import uk.co.notnull.proxyqueues.queues.ProxyQueue;
 import uk.co.notnull.proxyqueues.queues.QueueHandler;
@@ -24,16 +26,19 @@ public class CommandJoin extends BaseCommand {
     @CommandCompletion("@servers")
     public void execute(CommandIssuer sender, RegisteredServer server) {
         ProxyQueue queue = queueHandler.getQueue(server);
+        ProxyQueues proxyQueues = ProxyQueues.getInstance();
 
         if(queue == null || !queue.isActive()) {
-            sender.sendError(Messages.ERRORS__SERVER_NO_QUEUE, "{server}", server.getServerInfo().getName());
+            proxyQueues.sendMessage(sender, MessageType.ERROR, Messages.ERRORS__SERVER_NO_QUEUE,
+                                    "{server}", server.getServerInfo().getName());
             return;
         }
 
         Optional<ServerConnection> currentServer = ((Player) sender.getIssuer()).getCurrentServer();
 
         if(currentServer.isPresent() && currentServer.get().getServer().equals(server)) {
-            sender.sendError(Messages.ERRORS__PLAYER_SAME_SERVER, "{server}", server.getServerInfo().getName());
+            proxyQueues.sendMessage(sender, MessageType.ERROR, Messages.ERRORS__PLAYER_SAME_SERVER,
+                                    "{server}", server.getServerInfo().getName());
             return;
         }
 

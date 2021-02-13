@@ -1,5 +1,6 @@
 package uk.co.notnull.proxyqueues.tasks;
 
+import co.aikar.commands.MessageType;
 import com.velocitypowered.api.proxy.ServerConnection;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
@@ -51,7 +52,7 @@ public class QueueMoveTask implements Runnable {
         }
 
         if(targetPlayer != null && targetPlayer.getLastConnectionAttempt().isBefore(Instant.now().minusSeconds(10))) {
-            proxyQueues.getLogger().info("Target player timed out");
+            proxyQueues.getLogger().debug("Target player timed out");
             targetPlayer.setConnecting(false);
             targetPlayer = null;
         }
@@ -103,8 +104,8 @@ public class QueueMoveTask implements Runnable {
                 } else {
                     queue.removePlayer(targetPlayer, false);
 
-                    proxyQueues.getCommandManager().getCommandIssuer(targetPlayer.getPlayer())
-                        .sendError(Messages.ERRORS__QUEUE_CANNOT_JOIN, "{reason}", reasonPlain);
+                    proxyQueues.sendMessage(targetPlayer.getPlayer(), MessageType.ERROR,
+                                            Messages.ERRORS__QUEUE_CANNOT_JOIN, "{reason}", reasonPlain);
                 }
             }
         });

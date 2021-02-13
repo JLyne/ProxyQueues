@@ -140,8 +140,12 @@ public class ProxyQueue {
                 }
             } else {
                 proxyQueues.getLogger().info("Restoring queue position of " + player.getUsername());
-                proxyQueues.getCommandManager().getCommandIssuer(result.getPlayer())
-                            .sendInfo(Messages.RECONNECT__RESTORE_SUCCESS);
+
+                if(result.getQueueType() == QueueType.PRIORITY) {
+                    proxyQueues.sendMessage(result.getPlayer(), MessageType.INFO, Messages.RECONNECT__RESTORE_PRIORITY);
+                } else {
+                    proxyQueues.sendMessage(result.getPlayer(), MessageType.INFO, Messages.RECONNECT__RESTORE_POSITION);
+                }
             }
         }
     }
@@ -166,8 +170,8 @@ public class ProxyQueue {
                                                                  Messages.ERRORS__QUEUE_CANNOT_JOIN, "{reason}",
                                                                  reason)));
             } else {
-                proxyQueues.getCommandManager().getCommandIssuer(player)
-                        .sendError(Messages.ERRORS__QUEUE_CANNOT_JOIN, "{reason}", reason);
+                proxyQueues.sendMessage(player, MessageType.ERROR, Messages.ERRORS__QUEUE_CANNOT_JOIN,
+                                        "{reason}", reason);
             }
         }
 
@@ -185,7 +189,6 @@ public class ProxyQueue {
         boolean removed;
 
         if(!connected) {
-            proxyQueues.getLogger().info("Not connected to queued server, removing cache entry");
             clearConnectedState(player.getPlayer());
         }
 
@@ -195,7 +198,6 @@ public class ProxyQueue {
 
                 //Update connected players cache
                 if(connected) {
-                    proxyQueues.getLogger().info("Connected to queued server, adding cache entry");
                     connectedStaff.add(player.getPlayer().getUniqueId()); //Is connected to queued server, add to connected
                 }
 
@@ -206,7 +208,6 @@ public class ProxyQueue {
 
                 //Update connected players cache
                 if(connected) {
-                    proxyQueues.getLogger().info("Connected to queued server, adding cache entry");
                     connectedPriority.add(player.getPlayer().getUniqueId()); //Is connected to queued server, add to connected
                 }
 
@@ -283,8 +284,8 @@ public class ProxyQueue {
                                                                              "{server}",
                                                                              server.getServerInfo().getName())));
             } else {
-                proxyQueues.getCommandManager().getCommandIssuer(player.getPlayer())
-                        .sendError(Messages.ERRORS__QUEUE_DESTROYED, "{server}", server.getServerInfo().getName());
+                proxyQueues.sendMessage(player.getPlayer(), MessageType.ERROR, Messages.ERRORS__QUEUE_DESTROYED,
+                                        "{server}", server.getServerInfo().getName());
             }
         }
     }

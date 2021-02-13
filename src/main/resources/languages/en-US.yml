@@ -1,3 +1,6 @@
+prefix:
+  error: "&c&lQueue > &e"
+  info: "&d&lQueue > &b"
 commands:
   join-description: "Join the queue for a server"
   leave-description: "Leave the current queue you are in"
@@ -5,47 +8,47 @@ commands:
   kick-description: "Kick the specified player from any queue they are in"
   reload-description: "Reload the configuration of the plugin"
   help-description: "Help menu"
-  kick-success: "<c1>Kicked</c1><c2> {player} </c2><c1>from the </c1><c3>{server}</c3><c1> queue</c1>"
-  join-success: "<c1>You have joined the queue for </c1><c2>{server}</c2>"
-  leave-success: "<c1>You have left the queue</c1>"
+  kick-success: "Kicked &e{player}&b from the &e{server}&b queue"
+  join-success: "You have joined the queue for &e{server}"
+  leave-success: "You have left the queue"
   info-server-response: |-
-    <c3>=======</c3> <c2>{server} Queue</c2> <c3>=======</c3>
-    Players in queue: <c2>{size}</c2> <c3>(</c3><c2>{prioritySize}</c2><c3> priority, </c3><c2>{staffSize}</c2><c3> staff)</c3>
-    Players on Server: <c2>{connectedSize}</c2> <c3>(</c3><c2>{priorityConnectedSize}</c2><c3> priority, </c3><c2>{staffConnectedSize}</c2><c3> staff)</c3>
+    &dS&e{server} Queue Status
+    &bPlayers in queue: &e{size} &b(&e{prioritySize} &bpriority, &e{staffSize} &bstaff)
+    &bPlayers on Server: &e{connectedSize} &b(&e{priorityConnectedSize} &bpriority, &e{staffConnectedSize} &bstaff)
 
-    Queue Settings: <c2>{required}</c2> <c1>min</c1>/<c3>{max}</c3><c1> normal max</c1>/<c3>{priorityMax}</c3><c1> priority max</c1>/<c3>{globalMax}</c3><c1> global max</c1>
+    &bQueue Settings: &e{required} &bmin/&e{max} &bnormal max/&e{priorityMax} &bpriority max/&e{globalMax} &bglobal max
 
-    <c3>Front 3 staff:</c3>
-    <c2>{staffFirst}, {staffSecond}, {staffThird}</c2>
+    &bFront 3 staff:
+    &e{staffFirst}, {staffSecond}, {staffThird}
 
-    <c3>Front 3 priority:</c3>
-    <c2>{priorityFirst}, {prioritySecond}, {priorityThird}</c2>
+    &bFront 3 priority:
+    &e{priorityFirst}, {prioritySecond}, {priorityThird}
 
-    <c3>Front 3 normal:</c3>
-    <c2>{first}, {second}, {third}</c2>
+    &bFront 3 normal:
+    &e{first}, {second}, {third}
   info-player-response: |-
-    <c3>=======</c3> <c2>{player}</c2> <c3>=======</c3>
-    Queued For: <c2>{server}</c2>
-    Queue Type: <c2>{type}</c2>
-    Position: <c2>{position}</c2>
-    Status: {status}
-    Queueing for: <c2>{queuedTime}</c2>
-  info-status-online: "<c3>Online</c3>"
-  info-status-offline: "<c3>Offline</c3><c2>. Last seen </c2><c3>{lastseen}</c3><c2> ago (</c2><c3>{remaining}</c3><c2> remaining).</c2>"
-  reload-success: "<c1>You've successfully reloaded the configuration!</c1>"
+    &e{player} &dStatus
+    &bQueued For: &e{server}
+    &bQueue Type: &e{type}
+    &bPosition: &e{position}
+    &btatus: {status}
+    &bQueueing for: &e{queuedTime}
+  info-status-online: "&aOnline"
+  info-status-offline: "&cOffline. &bLast seen &e{lastseen}&b ago (&e{remaining}&b remaining)."
+  reload-success: "You've successfully reloaded the configuration!"
 errors:
-  server-no-queue: "<c1>Queueing is disabled for </c1><c2>{server}</c2>"
-  server-unknown: "<c1>Unknown server:</c1> <c2>{server}</c2>"
-  player-no-queue: "<c1>You are not queued for any server</c1>"
-  player-same-server: "<c1>You are already connected to </c1><c2>{server}</c2>"
-  target-no-queue: "<c2>{player}</c2><c1> is not queued for any server</c1>"
-  target-unknown: "<c1>Unknown player: </c1><c2>{player}</c2>"
-  queue-cannot-join: "<c1>Sorry, you're currently unable to join the queue:</c1>\n<c2>{reason}</c2>"
-  queue-removed-error: "<c1>Sorry, you have been removed from the queue due to a fatal error:\n</c1>"
-  queue-removed: "<c1>You have been removed from the queue by an admin</c1>"
-  queue-destroyed: "<c1>Queueing for </c1><c2>{server}</c2><c1> is no longer available</c1>"
+  server-no-queue: "Queueing is disabled for &c{server}"
+  server-unknown: "Unknown server: &c{server}"
+  player-no-queue: "You are not queued for any server"
+  player-same-server: "You are already connected to &c{server}"
+  target-no-queue: "&c{player} is not queued for any server"
+  target-unknown: "Unknown player: &c{player}"
+  queue-cannot-join: "Sorry, you're currently unable to join the queue:\n &c{reason}"
+  queue-removed-error: "Sorry, you have been removed from the queue due to a fatal error:\n"
+  queue-removed: "You have been removed from the queue by an admin"
+  queue-destroyed: "Queueing for &c{server}&e is no longer available"
 reconnect:
-  restore-success: |-
-    <c3>Seems you lost connection to the server</c3>
-    <c2>We have </c2><c1>restored</c1><c2> your previous queue position, or placed you in </c2><c1>priority</c1><c2> if you were already on the server.</c2>
-    <c2>You're welcome.</c2>
+  restore-position: |-
+    Seems you lost connection to the server. We have &erestored&b your previous queue position.
+  restore-priority: |-
+    Seems you lost connection to the server. We have placed you in the &epriority queue.

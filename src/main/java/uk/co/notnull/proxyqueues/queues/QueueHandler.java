@@ -117,7 +117,7 @@ public class QueueHandler {
             return;
         }
 
-        notifyQueueRemoval(player, Messages.COMMANDS__LEAVE_SUCCESS);
+        notifyQueueRemoval(player, Messages.COMMANDS__LEAVE_SUCCESS, MessageType.INFO);
     }
 
     /**
@@ -132,22 +132,22 @@ public class QueueHandler {
         }
 
         ProxyQueues.getInstance().getProxyServer().getPlayer(uuid).ifPresent(
-                onlinePlayer -> notifyQueueRemoval(onlinePlayer, Messages.COMMANDS__LEAVE_SUCCESS));
+                onlinePlayer -> notifyQueueRemoval(onlinePlayer, Messages.COMMANDS__LEAVE_SUCCESS, MessageType.INFO));
     }
 
     public void kickPlayer(Player player) {
         clearPlayer(player, true);
-        notifyQueueRemoval(player, Messages.ERRORS__QUEUE_REMOVED);
+        notifyQueueRemoval(player, Messages.ERRORS__QUEUE_REMOVED, MessageType.ERROR);
     }
 
     public void kickPlayer(UUID uuid) {
         clearPlayer(uuid, true);
 
         ProxyQueues.getInstance().getProxyServer().getPlayer(uuid).ifPresent(
-                onlinePlayer -> notifyQueueRemoval(onlinePlayer, Messages.ERRORS__QUEUE_REMOVED));
+                onlinePlayer -> notifyQueueRemoval(onlinePlayer, Messages.ERRORS__QUEUE_REMOVED, MessageType.ERROR));
     }
 
-    private void notifyQueueRemoval(Player player, Messages message) {
+    private void notifyQueueRemoval(Player player, Messages message, MessageType messageType) {
         if(!player.isActive()) {
             return;
         }
@@ -157,10 +157,10 @@ public class QueueHandler {
 
         if(currentServer.isPresent() && currentServer.get().getServer().equals(waitingServer)) {
             player.disconnect(Component.text(proxyQueues.getCommandManager()
-                                      .formatMessage(proxyQueues.getCommandManager().getCommandIssuer(player), MessageType.ERROR,
+                                      .formatMessage(proxyQueues.getCommandManager().getCommandIssuer(player), messageType,
                                                      message)));
         } else {
-            proxyQueues.getCommandManager().getCommandIssuer(player).sendError(message);
+            proxyQueues.sendMessage(player, messageType, message);
         }
     }
 

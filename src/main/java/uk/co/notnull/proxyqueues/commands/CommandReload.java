@@ -3,6 +3,7 @@ package uk.co.notnull.proxyqueues.commands;
 import ch.jalu.configme.SettingsManager;
 import co.aikar.commands.BaseCommand;
 import co.aikar.commands.CommandIssuer;
+import co.aikar.commands.MessageType;
 import co.aikar.commands.annotation.CommandAlias;
 import co.aikar.commands.annotation.CommandPermission;
 import co.aikar.commands.annotation.Dependency;
@@ -24,6 +25,6 @@ public class CommandReload extends BaseCommand {
     public void execute(CommandIssuer issuer) {
         settingsManager.reload();
         proxyQueues.getQueueHandler().updateQueues();
-        issuer.sendInfo(Messages.COMMANDS__RELOAD_SUCCESS);
+        proxyQueues.sendMessage(issuer, MessageType.INFO, Messages.COMMANDS__RELOAD_SUCCESS);
     }
 }
