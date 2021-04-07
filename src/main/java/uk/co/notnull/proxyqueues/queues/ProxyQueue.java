@@ -259,14 +259,14 @@ public class ProxyQueue {
         proxyQueues.getProxyServer().getEventManager().unregisterListener(proxyQueues, eventHandler);
         scheduledTask.cancel();
 
-        clearQueue(staffQueue);
-        clearQueue(priorityQueue);
-        clearQueue(queue);
+        clearQueue(staffQueue, true);
+        clearQueue(priorityQueue, true);
+        clearQueue(queue, true);
 
         queuePlayers.clear();
     }
 
-    private void clearQueue(ConcurrentLinkedQueue<QueuePlayer> q) {
+    private void clearQueue(ConcurrentLinkedQueue<QueuePlayer> q, boolean destroying) {
         Optional<RegisteredServer> waitingServer = proxyQueues.getWaitingServer();
 
         for (QueuePlayer player : q) {
@@ -288,6 +288,14 @@ public class ProxyQueue {
                                         "{server}", server.getServerInfo().getName());
             }
         }
+    }
+
+    public void clear() {
+        //FIXME: Players could join concurrently while the queue is being cleared. Not a big deal I guess?
+        clearQueue(staffQueue, false);
+        clearQueue(priorityQueue, false);
+        clearQueue(queue, false);
+        queuePlayers.clear();
     }
 
     /**

@@ -8,9 +8,11 @@ commands:
   kick-description: "Kick the specified player from any queue they are in"
   reload-description: "Reload the configuration of the plugin"
   help-description: "Help menu"
+  clear-description: "Clear the queue for the specified server, removing all players currently in the queue"
   kick-success: "Kicked &e{player}&b from the &e{server}&b queue"
   join-success: "You have joined the queue for &e{server}"
   leave-success: "You have left the queue"
+  clear-success: "The queue for &e{server}&b has been cleared"
   info-server-response: |-
     &d&e{server} &dQueue Status
     &bPlayers in queue: &e{size} &b(&e{prioritySize} &bpriority, &e{staffSize} &bstaff)
