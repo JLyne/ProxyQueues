@@ -63,7 +63,7 @@ public class ProxyQueueEventHandler {
                     event.setResult(ServerPreConnectEvent.ServerResult.allowed(waitingServer.get()));
                 } else {
                     player.disconnect(Component.text(
-                            "This server has queueing enabled and can't be connected to directly. Please connect via minecraft.rtgame.co.uk")
+                            "This server has queueing enabled and can't be connected to directly. Please connect via playmc.rtgame.co.uk")
                                               .color(NamedTextColor.RED));
 
                     return;
