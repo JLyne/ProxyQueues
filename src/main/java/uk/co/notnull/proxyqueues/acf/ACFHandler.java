@@ -70,6 +70,7 @@ public class ACFHandler {
         commandManager.registerCommand(new CommandReload());
         commandManager.registerCommand(new CommandInfo());
         commandManager.registerCommand(new CommandKick());
+        commandManager.registerCommand(new CommandClear());
     }
 
     /**
