@@ -1,33 +1,37 @@
 package uk.co.notnull.proxyqueues.queues;
 
 import ch.jalu.configme.SettingsManager;
+import com.velocitypowered.api.plugin.PluginContainer;
 import net.kyori.adventure.audience.MessageType;
 import net.kyori.adventure.identity.Identity;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import net.kyori.adventure.title.Title;
-import org.geysermc.floodgate.api.FloodgateApi;
+import uk.co.notnull.platformdetection.PlatformDetectionVelocity;
 import uk.co.notnull.proxyqueues.ProxyQueues;
 import uk.co.notnull.proxyqueues.configuration.sections.ConfigOptions;
+
+import java.util.Optional;
 
 public class ProxyQueueNotifier {
 
 	private final SettingsManager settingsManager;
 	private final ProxyQueue queue;
 	private final String notifyMethod;
-    private final boolean floodgateEnabled;
-    private FloodgateApi floodgateApi;
+    private final boolean platformDetectionEnabled;
+    private PlatformDetectionVelocity platformDetection;
 
     public ProxyQueueNotifier(ProxyQueues proxyQueues, ProxyQueue queue) {
 		this.settingsManager = proxyQueues.getSettingsHandler().getSettingsManager();
 		this.queue = queue;
 
 		notifyMethod =settingsManager.getProperty(ConfigOptions.INFORM_METHOD);
-		floodgateEnabled = proxyQueues.getProxyServer().getPluginManager().getPlugin(
-                "floodgate").isPresent();
 
-		if(floodgateEnabled) {
-		    floodgateApi = FloodgateApi.getInstance();
+		Optional<PluginContainer> platformDetection = proxyQueues.getProxyServer().getPluginManager().getPlugin("platform-detection");
+        platformDetectionEnabled = platformDetection.isPresent();
+
+        if(platformDetectionEnabled) {
+            this.platformDetection = (PlatformDetectionVelocity) platformDetection.get();
         }
 	}
 
@@ -109,7 +113,7 @@ public class ProxyQueueNotifier {
         message = message.replace("{server}", queue.getServer().getServerInfo().getName());
         message = message.replace("{pos}", String.valueOf(position));
 
-        if(floodgateEnabled && floodgateApi.isFloodgatePlayer(player.getPlayer().getUniqueId())) {
+        if(platformDetectionEnabled && platformDetection.getPlatform(player.getPlayer()).isBedrock()) {
             player.hideBossBar();
         }
 

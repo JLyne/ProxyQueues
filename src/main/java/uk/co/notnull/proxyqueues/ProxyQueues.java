@@ -35,7 +35,7 @@ import java.util.Optional;
 
 @Plugin(id="proxyqueues", name="ProxyQueues", dependencies = {
         @Dependency(id="velocity-prometheus-exporter", optional = true),
-        @Dependency(id="floodgate", optional = true)
+        @Dependency(id="platform-detection", optional = true),
 })
 public final class ProxyQueues {
 
