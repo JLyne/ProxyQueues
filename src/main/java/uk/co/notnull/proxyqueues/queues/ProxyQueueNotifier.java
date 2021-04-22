@@ -27,11 +27,12 @@ public class ProxyQueueNotifier {
 
 		notifyMethod =settingsManager.getProperty(ConfigOptions.INFORM_METHOD);
 
-		Optional<PluginContainer> platformDetection = proxyQueues.getProxyServer().getPluginManager().getPlugin("platform-detection");
+		Optional<PluginContainer> platformDetection = proxyQueues.getProxyServer().getPluginManager()
+                .getPlugin("platform-detection");
         platformDetectionEnabled = platformDetection.isPresent();
 
         if(platformDetectionEnabled) {
-            this.platformDetection = (PlatformDetectionVelocity) platformDetection.get();
+            this.platformDetection = (PlatformDetectionVelocity) platformDetection.get().getInstance().get();
         }
 	}
 
