@@ -6,7 +6,7 @@ import net.kyori.adventure.identity.Identity;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import net.kyori.adventure.title.Title;
-import org.geysermc.floodgate.FloodgateAPI;
+import org.geysermc.floodgate.api.FloodgateApi;
 import uk.co.notnull.proxyqueues.ProxyQueues;
 import uk.co.notnull.proxyqueues.configuration.sections.ConfigOptions;
 
@@ -16,6 +16,7 @@ public class ProxyQueueNotifier {
 	private final ProxyQueue queue;
 	private final String notifyMethod;
     private final boolean floodgateEnabled;
+    private FloodgateApi floodgateApi;
 
     public ProxyQueueNotifier(ProxyQueues proxyQueues, ProxyQueue queue) {
 		this.settingsManager = proxyQueues.getSettingsHandler().getSettingsManager();
@@ -24,6 +25,10 @@ public class ProxyQueueNotifier {
 		notifyMethod =settingsManager.getProperty(ConfigOptions.INFORM_METHOD);
 		floodgateEnabled = proxyQueues.getProxyServer().getPluginManager().getPlugin(
                 "floodgate").isPresent();
+
+		if(floodgateEnabled) {
+		    floodgateApi = FloodgateApi.getInstance();
+        }
 	}
 
 	/**
@@ -104,7 +109,7 @@ public class ProxyQueueNotifier {
         message = message.replace("{server}", queue.getServer().getServerInfo().getName());
         message = message.replace("{pos}", String.valueOf(position));
 
-        if(floodgateEnabled && FloodgateAPI.isBedrockPlayer(player.getPlayer())) {
+        if(floodgateEnabled && floodgateApi.isFloodgatePlayer(player.getPlayer().getUniqueId())) {
             player.hideBossBar();
         }
 
