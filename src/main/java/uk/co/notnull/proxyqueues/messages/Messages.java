@@ -1,52 +1,55 @@
 package uk.co.notnull.proxyqueues.messages;
 
-import co.aikar.locales.MessageKey;
-import co.aikar.locales.MessageKeyProvider;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
+import ninja.leaping.configurate.ConfigurationNode;
 
-@SuppressWarnings("unused")
-public enum Messages implements MessageKeyProvider {
-    PREFIX__ERROR,
-    PREFIX__INFO,
-    COMMANDS__JOIN_DESCRIPTION,
-    COMMANDS__LEAVE_DESCRIPTION,
-    COMMANDS__INFO_DESCRIPTION,
-    COMMANDS__KICK_DESCRIPTION,
-    COMMANDS__RELOAD_DESCRIPTION,
-    COMMANDS__HELP_DESCRIPTION,
-    COMMANDS__CLEAR_DESCRIPTION,
-    COMMANDS__KICK_SUCCESS,
-    COMMANDS__JOIN_SUCCESS,
-    COMMANDS__LEAVE_SUCCESS,
-    COMMANDS__RELOAD_SUCCESS,
-    COMMANDS__CLEAR_SUCCESS,
-    COMMANDS__INFO_SERVER_RESPONSE,
-    COMMANDS__INFO_PLAYER_RESPONSE,
-    COMMANDS__INFO_STATUS_ONLINE,
-    COMMANDS__INFO_STATUS_OFFLINE,
-    RECONNECT__RESTORE_POSITION,
-    RECONNECT__RESTORE_PRIORITY,
-    ERRORS__SERVER_UNKNOWN,
-    ERRORS__SERVER_NO_QUEUE,
-    ERRORS__PLAYER_NO_QUEUE,
-    ERRORS__PLAYER_SAME_SERVER,
-    ERRORS__TARGET_UNKNOWN,
-    ERRORS__TARGET_NO_QUEUE,
-    ERRORS__QUEUE_CANNOT_JOIN,
-    ERRORS__QUEUE_REMOVED,
-    ERRORS__QUEUE_DESTROYED;
+import java.util.Collections;
+import java.util.Map;
 
+public class Messages {
+    private static ConfigurationNode messages;
+    private static final LegacyComponentSerializer legacyComponentSerializer = LegacyComponentSerializer.legacyAmpersand();
 
-    /**
-     * Message keys that grab from the config to send messages
-     */
-    private final MessageKey key = MessageKey.of(this.name().toLowerCase().replace("__", ".").replace("_", "-"));
+    public static void set(ConfigurationNode messages) {
+        Messages.messages = messages;
+    }
 
+    public static String get(String id) {
+        return get(id, Collections.emptyMap());
+    }
 
-    /**
-     * Get the message get from the config
-     * @return message key
-     */
-    public MessageKey getMessageKey() {
-        return key;
+    public static String get(String id, Map<String, String> replacements) {
+        if(messages == null) {
+            return "";
+        }
+
+        String message = messages.getNode((Object[]) id.split("\\."))
+                .getString("Message " + id + " does not exist");
+
+        for (Map.Entry<String, String> entry : replacements.entrySet()) {
+            message = message.replace(entry.getKey(), entry.getValue());
+        }
+
+        return message;
+    }
+
+    public static Component getComponent(String id) {
+        return getComponent(id, Collections.emptyMap());
+    }
+
+    public static Component getComponent(String id, Map<String, String> replacements) {
+        if(messages == null) {
+            return Component.empty();
+        }
+
+        String message = messages.getNode((Object[]) id.split("\\."))
+                .getString("Message " + id + " does not exist");
+
+        for (Map.Entry<String, String> entry : replacements.entrySet()) {
+            message = message.replace(entry.getKey(), entry.getValue());
+        }
+
+        return legacyComponentSerializer.deserialize(message);
     }
 }

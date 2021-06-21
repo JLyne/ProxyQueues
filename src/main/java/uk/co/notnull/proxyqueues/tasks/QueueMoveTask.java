@@ -1,12 +1,10 @@
 package uk.co.notnull.proxyqueues.tasks;
 
-import co.aikar.commands.MessageType;
 import com.velocitypowered.api.proxy.ServerConnection;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
-import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
+import uk.co.notnull.proxyqueues.MessageType;
 import uk.co.notnull.proxyqueues.ProxyQueues;
 import uk.co.notnull.proxyqueues.configuration.sections.ConfigOptions;
-import uk.co.notnull.proxyqueues.messages.Messages;
 import uk.co.notnull.proxyqueues.queues.ProxyQueue;
 import uk.co.notnull.proxyqueues.queues.QueuePlayer;
 import net.kyori.adventure.text.Component;
@@ -14,6 +12,7 @@ import net.kyori.adventure.text.serializer.plain.PlainComponentSerializer;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
@@ -105,7 +104,7 @@ public class QueueMoveTask implements Runnable {
                     queue.removePlayer(targetPlayer, false);
 
                     proxyQueues.sendMessage(targetPlayer.getPlayer(), MessageType.ERROR,
-                                            Messages.ERRORS__QUEUE_CANNOT_JOIN, "{reason}", reasonPlain);
+                                            "errors.queue-cannot-join", Map.of("{reason}", reasonPlain));
                 }
             }
         });

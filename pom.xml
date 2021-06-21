@@ -51,12 +51,16 @@
                             <goal>shade</goal>
                         </goals>
                         <configuration>
-                            <createDependencyReducedPom>false</createDependencyReducedPom>
+                            <dependencyReducedPomLocation>${project.build.directory}/dependency-reduced-pom.xml</dependencyReducedPomLocation>
                             <relocations>
-                                <relocation>
-                                    <pattern>co.aikar.commands</pattern>
-                                    <shadedPattern>uk.co.notnull.proxyqueues.libs.acf</shadedPattern>
-                                </relocation>
+                               <relocation>
+                                  <pattern>cloud.commandframework</pattern>
+                                  <shadedPattern>uk.co.notnull.proxyqueues.shaded.cloud</shadedPattern>
+                               </relocation>
+                               <relocation>
+                                  <pattern>io.leangen.geantyref</pattern>
+                                  <shadedPattern>uk.co.notnull.proxyqueues.shaded.typetoken</shadedPattern>
+                               </relocation>
                             </relocations>
                             <artifactSet>
                                 <excludes>
@@ -118,16 +122,25 @@
             <version>12.0</version>
         </dependency>
         <dependency>
-            <groupId>co.aikar</groupId>
-            <artifactId>acf-velocity</artifactId>
-            <version>0.5.0-SNAPSHOT</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
             <groupId>org.spongepowered</groupId>
             <artifactId>configurate-yaml</artifactId>
             <version>3.6</version>
             <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>cloud.commandframework</groupId>
+            <artifactId>cloud-velocity</artifactId>
+            <version>1.4.0</version>
+        </dependency>
+        <dependency>
+            <groupId>cloud.commandframework</groupId>
+            <artifactId>cloud-minecraft-extras</artifactId>
+            <version>1.4.0</version>
+        </dependency>
+        <dependency>
+            <groupId>cloud.commandframework</groupId>
+            <artifactId>cloud-annotations</artifactId>
+            <version>1.4.0</version>
         </dependency>
         <dependency>
             <groupId>commons-lang</groupId>

@@ -1,21 +1,25 @@
 package uk.co.notnull.proxyqueues;
 
-import co.aikar.commands.CommandIssuer;
-import co.aikar.commands.MessageType;
-import co.aikar.commands.VelocityCommandManager;
-import co.aikar.commands.VelocityMessageFormatter;
+import cloud.commandframework.CommandManager;
+import cloud.commandframework.annotations.AnnotationParser;
+import cloud.commandframework.execution.CommandExecutionCoordinator;
+import cloud.commandframework.meta.SimpleCommandMeta;
+import cloud.commandframework.minecraft.extras.MinecraftExceptionHandler;
+import cloud.commandframework.minecraft.extras.MinecraftHelp;
+import cloud.commandframework.velocity.VelocityCommandManager;
+import com.velocitypowered.api.command.CommandSource;
 import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.proxy.ProxyInitializeEvent;
 import com.velocitypowered.api.plugin.Dependency;
 import com.velocitypowered.api.plugin.Plugin;
 import com.velocitypowered.api.plugin.PluginContainer;
 import com.velocitypowered.api.plugin.annotation.DataDirectory;
-import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
+import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
-import net.kyori.text.format.TextColor;
-import uk.co.notnull.proxyqueues.acf.ACFHandler;
+import ninja.leaping.configurate.ConfigurationNode;
+import ninja.leaping.configurate.yaml.YAMLConfigurationLoader;
 import uk.co.notnull.proxyqueues.configuration.SettingsHandler;
 import uk.co.notnull.proxyqueues.configuration.sections.ConfigOptions;
 import uk.co.notnull.proxyqueues.messages.Messages;
@@ -29,7 +33,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Collections;
+import java.util.Map;
 import java.util.Optional;
+import java.util.function.Function;
 
 @Plugin(id="proxyqueues", name="ProxyQueues", dependencies = {
         @Dependency(id="velocity-prometheus-exporter", optional = true),
@@ -38,13 +45,12 @@ import java.util.Optional;
 public final class ProxyQueues {
 
     private static ProxyQueues instance;
-    private VelocityCommandManager commandManager;
     private SettingsHandler settingsHandler;
     private QueueHandler queueHandler;
+    private static final LegacyComponentSerializer legacyComponentSerializer = LegacyComponentSerializer.legacyAmpersand();
 
     private final ProxyServer proxyServer;
     private final Logger logger;
-    private final LegacyComponentSerializer serializer = LegacyComponentSerializer.legacyAmpersand();
 
     @Inject
     @DataDirectory
@@ -60,18 +66,55 @@ public final class ProxyQueues {
     @Subscribe
     public void onProxyInitialize(ProxyInitializeEvent event) {
         createFile("config.yml");
-        createFile("languages/en-US.yml");
+        createFile("messages.yml");
+
+        //Message config
+        ConfigurationNode messagesConfiguration;
+
+        try {
+			messagesConfiguration = YAMLConfigurationLoader.builder().setFile(
+					new File(dataFolder.toAbsolutePath().toString(), "messages.yml")).build().load();
+		    Messages.set(messagesConfiguration);
+		} catch (IOException e) {
+			logger.error("Error loading messages.yml");
+		}
+
         settingsHandler = new SettingsHandler(this);
         startQueues();
-        commandManager = new VelocityCommandManager(proxyServer, this);
-        new ACFHandler(this, commandManager);
-
-        commandManager.setFormat(MessageType.INFO, new VelocityMessageFormatter(
-                TextColor.YELLOW, TextColor.GREEN, TextColor.LIGHT_PURPLE));
 
         Optional<PluginContainer> prometheusExporter = proxyServer.getPluginManager().getPlugin("velocity-prometheus-exporter");
 
         prometheusExporter.flatMap(PluginContainer::getInstance).ifPresent(instance -> new MetricsHandler(this));
+
+        initCommands();
+    }
+
+    public void initCommands() {
+        CommandManager<CommandSource> manager = new VelocityCommandManager<>(
+                proxyServer.getPluginManager().fromInstance(this).get(),
+                proxyServer,
+                CommandExecutionCoordinator.simpleCoordinator(),
+                Function.identity(),
+                Function.identity());
+
+        new MinecraftExceptionHandler<CommandSource>()
+            .withArgumentParsingHandler()
+            .withInvalidSenderHandler()
+            .withInvalidSyntaxHandler()
+            .withNoPermissionHandler()
+            .withCommandExecutionHandler()
+            .withDecorator(message -> message)
+            .apply(manager, p -> p);
+
+        new MinecraftHelp<>("/queue help", p -> p, manager);
+
+        AnnotationParser<CommandSource> annotationParser = new AnnotationParser<>(
+                manager,
+                CommandSource.class,
+                parameters -> SimpleCommandMeta.empty()
+        );
+
+        annotationParser.parse(new Commands(this));
     }
 
     /**
@@ -98,10 +141,6 @@ public final class ProxyQueues {
                 ex.printStackTrace();
             }
         }
-    }
-
-    public VelocityCommandManager getCommandManager() {
-        return this.commandManager;
     }
 
     public SettingsHandler getSettingsHandler() {
@@ -137,19 +176,17 @@ public final class ProxyQueues {
         return instance;
     }
 
-    public void sendMessage(CommandIssuer player, MessageType messageType, Messages message, String... replacements) {
-        sendMessage((Player) player.getIssuer(), messageType, message, replacements);
+    public void sendMessage(CommandSource player, MessageType messageType, String message) {
+        sendMessage(player, messageType, message, Collections.emptyMap());
     }
 
-    public void sendMessage(Player player, MessageType messageType, Messages message, String... replacements) {
-        CommandIssuer issuer = getCommandManager().getCommandIssuer(player);
-        String prefix = commandManager.formatMessage(issuer, messageType, Messages.PREFIX__INFO);
+    public void sendMessage(CommandSource player, MessageType messageType, String message, Map<String, String> replacements) {
+        String result = Messages.get("prefix.info");
 
         if(messageType.equals(MessageType.ERROR)) {
-            prefix = commandManager.formatMessage(issuer, messageType, Messages.PREFIX__ERROR);
+            result = Messages.get("prefix.error");
         }
 
-        String result = prefix + commandManager.formatMessage(issuer, messageType, message, replacements);
-        player.sendMessage(serializer.deserialize(result));
+        player.sendMessage(legacyComponentSerializer.deserialize(result + Messages.get(message, replacements)));
     }
 }

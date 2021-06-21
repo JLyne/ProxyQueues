@@ -1,11 +1,10 @@
 package uk.co.notnull.proxyqueues.queues;
 
 import ch.jalu.configme.SettingsManager;
-import co.aikar.commands.MessageType;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ServerConnection;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
-import net.kyori.adventure.text.Component;
+import uk.co.notnull.proxyqueues.MessageType;
 import uk.co.notnull.proxyqueues.ProxyQueues;
 import uk.co.notnull.proxyqueues.configuration.sections.ConfigOptions;
 import uk.co.notnull.proxyqueues.messages.Messages;
@@ -117,7 +116,7 @@ public class QueueHandler {
             return;
         }
 
-        notifyQueueRemoval(player, Messages.COMMANDS__LEAVE_SUCCESS, MessageType.INFO);
+        notifyQueueRemoval(player, "commands.leave-success", MessageType.INFO);
     }
 
     /**
@@ -132,22 +131,22 @@ public class QueueHandler {
         }
 
         ProxyQueues.getInstance().getProxyServer().getPlayer(uuid).ifPresent(
-                onlinePlayer -> notifyQueueRemoval(onlinePlayer, Messages.COMMANDS__LEAVE_SUCCESS, MessageType.INFO));
+                onlinePlayer -> notifyQueueRemoval(onlinePlayer, "commands.leave-success", MessageType.INFO));
     }
 
     public void kickPlayer(Player player) {
         clearPlayer(player, true);
-        notifyQueueRemoval(player, Messages.ERRORS__QUEUE_REMOVED, MessageType.ERROR);
+        notifyQueueRemoval(player, "errors.queue-removed", MessageType.ERROR);
     }
 
     public void kickPlayer(UUID uuid) {
         clearPlayer(uuid, true);
 
         ProxyQueues.getInstance().getProxyServer().getPlayer(uuid).ifPresent(
-                onlinePlayer -> notifyQueueRemoval(onlinePlayer, Messages.ERRORS__QUEUE_REMOVED, MessageType.ERROR));
+                onlinePlayer -> notifyQueueRemoval(onlinePlayer, "errors.queue-removed", MessageType.ERROR));
     }
 
-    private void notifyQueueRemoval(Player player, Messages message, MessageType messageType) {
+    private void notifyQueueRemoval(Player player, String message, MessageType messageType) {
         if(!player.isActive()) {
             return;
         }
@@ -156,9 +155,7 @@ public class QueueHandler {
         Optional<ServerConnection> currentServer = player.getCurrentServer();
 
         if(currentServer.isPresent() && currentServer.get().getServer().equals(waitingServer)) {
-            player.disconnect(Component.text(proxyQueues.getCommandManager()
-                                      .formatMessage(proxyQueues.getCommandManager().getCommandIssuer(player), messageType,
-                                                     message)));
+            player.disconnect(Messages.getComponent(message));
         } else {
             proxyQueues.sendMessage(player, messageType, message);
         }

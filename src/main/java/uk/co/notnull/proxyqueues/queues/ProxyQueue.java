@@ -1,12 +1,11 @@
 package uk.co.notnull.proxyqueues.queues;
 
 import ch.jalu.configme.SettingsManager;
-import co.aikar.commands.MessageType;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ServerConnection;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
 import com.velocitypowered.api.scheduler.ScheduledTask;
-import net.kyori.adventure.text.Component;
+import uk.co.notnull.proxyqueues.MessageType;
 import uk.co.notnull.proxyqueues.ProxyQueues;
 import uk.co.notnull.proxyqueues.QueueType;
 import uk.co.notnull.proxyqueues.configuration.sections.ConfigOptions;
@@ -15,6 +14,7 @@ import uk.co.notnull.proxyqueues.messages.Messages;
 import uk.co.notnull.proxyqueues.tasks.QueueMoveTask;
 
 import java.time.Instant;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -142,9 +142,9 @@ public class ProxyQueue {
                 proxyQueues.getLogger().info("Restoring queue position of " + player.getUsername());
 
                 if(result.getQueueType() == QueueType.PRIORITY) {
-                    proxyQueues.sendMessage(result.getPlayer(), MessageType.INFO, Messages.RECONNECT__RESTORE_PRIORITY);
+                    proxyQueues.sendMessage(result.getPlayer(), MessageType.INFO, "reconnect.restore-priority");
                 } else {
-                    proxyQueues.sendMessage(result.getPlayer(), MessageType.INFO, Messages.RECONNECT__RESTORE_POSITION);
+                    proxyQueues.sendMessage(result.getPlayer(), MessageType.INFO, "reconnect.restore-position");
                 }
             }
         }
@@ -162,16 +162,13 @@ public class ProxyQueue {
 
             proxyQueues.getLogger().info(player.getUsername() + "'s PlayerQueueEvent cancelled");
 
-            if(currentServer == null || currentServer.getServer().equals(waitingServer)) {
-                player.disconnect(Component.text(proxyQueues.getCommandManager()
-                                                         .formatMessage(
-                                                                 proxyQueues.getCommandManager().getCommandIssuer(
-                                                                         player), MessageType.ERROR,
-                                                                 Messages.ERRORS__QUEUE_CANNOT_JOIN, "{reason}",
-                                                                 reason)));
+            if (currentServer == null || currentServer.getServer().equals(waitingServer)) {
+                player.disconnect(
+                        Messages.getComponent("errors.queue-cannot-join", Map.of("{reason}",
+                                                                                             reason)));
             } else {
-                proxyQueues.sendMessage(player, MessageType.ERROR, Messages.ERRORS__QUEUE_CANNOT_JOIN,
-                                        "{reason}", reason);
+                proxyQueues.sendMessage(player, MessageType.ERROR, "errors.queue-cannot-join",
+                                        Map.of("{reason}", reason));
             }
         }
 
@@ -274,30 +271,21 @@ public class ProxyQueue {
 
             Optional<ServerConnection> currentServer = player.getPlayer().getCurrentServer();
 
-            if(waitingServer.isEmpty() || currentServer.isEmpty() || waitingServer.get().equals(currentServer.get().getServer())) {
-                if(destroying) {
-                    player.getPlayer().disconnect(Component.text(proxyQueues.getCommandManager()
-                                                                         .formatMessage(
-                                                                                 proxyQueues.getCommandManager().getCommandIssuer(
-                                                                                         player.getPlayer()),
-                                                                                 MessageType.ERROR,
-                                                                                 Messages.ERRORS__QUEUE_DESTROYED,
-                                                                                 "{server}",
-                                                                                 server.getServerInfo().getName())));
+            if (waitingServer.isEmpty() || currentServer.isEmpty() || waitingServer.get().equals(
+                    currentServer.get().getServer())) {
+                if (destroying) {
+                    player.getPlayer().disconnect(
+                            Messages.getComponent("errors.queue-destroyed", Map.of("{server}",
+                                                                                               server.getServerInfo().getName())));
                 } else {
-                    player.getPlayer().disconnect(Component.text(proxyQueues.getCommandManager()
-                                                                     .formatMessage(
-                                                                             proxyQueues.getCommandManager().getCommandIssuer(
-                                                                                     player.getPlayer()),
-                                                                             MessageType.ERROR,
-                                                                             Messages.ERRORS__QUEUE_REMOVED)));
+                    player.getPlayer().disconnect(Messages.getComponent("errors.queue-removed"));
                 }
             } else {
-                if(destroying) {
-                    proxyQueues.sendMessage(player.getPlayer(), MessageType.ERROR, Messages.ERRORS__QUEUE_DESTROYED,
-                                            "{server}", server.getServerInfo().getName());
+                if (destroying) {
+                    proxyQueues.sendMessage(player.getPlayer(), MessageType.ERROR, "errors.queue-destroyed",
+                                            Map.of("{server}", server.getServerInfo().getName()));
                 } else {
-                    proxyQueues.sendMessage(player.getPlayer(), MessageType.ERROR, Messages.ERRORS__QUEUE_REMOVED);
+                    proxyQueues.sendMessage(player.getPlayer(), MessageType.ERROR, "errors.queue-removed");
                 }
             }
         }

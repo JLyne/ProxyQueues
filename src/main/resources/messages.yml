@@ -2,13 +2,6 @@ prefix:
   error: "&c&lQueue > &e"
   info: "&d&lQueue > &b"
 commands:
-  join-description: "Join the queue for a server"
-  leave-description: "Leave the current queue you are in"
-  info-description: "Shows information for the specified queue"
-  kick-description: "Kick the specified player from any queue they are in"
-  reload-description: "Reload the configuration of the plugin"
-  help-description: "Help menu"
-  clear-description: "Clear the queue for the specified server, removing all players currently in the queue"
   kick-success: "Kicked &e{player}&b from the &e{server}&b queue"
   join-success: "You have joined the queue for &e{server}"
   leave-success: "You have left the queue"
