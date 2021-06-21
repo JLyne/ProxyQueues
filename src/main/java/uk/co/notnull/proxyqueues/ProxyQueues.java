@@ -21,7 +21,6 @@ import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.yaml.YAMLConfigurationLoader;
 import uk.co.notnull.proxyqueues.configuration.SettingsHandler;
 import uk.co.notnull.proxyqueues.configuration.sections.ConfigOptions;
-import uk.co.notnull.proxyqueues.messages.Messages;
 import uk.co.notnull.proxyqueues.metrics.MetricsHandler;
 import uk.co.notnull.proxyqueues.queues.QueueHandler;
 import org.slf4j.Logger;

@@ -10,7 +10,7 @@ import uk.co.notnull.proxyqueues.ProxyQueues;
 import uk.co.notnull.proxyqueues.QueueType;
 import uk.co.notnull.proxyqueues.configuration.sections.ConfigOptions;
 import uk.co.notnull.proxyqueues.events.PlayerQueueEvent;
-import uk.co.notnull.proxyqueues.messages.Messages;
+import uk.co.notnull.proxyqueues.Messages;
 import uk.co.notnull.proxyqueues.tasks.QueueMoveTask;
 
 import java.time.Instant;

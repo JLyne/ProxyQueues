@@ -7,7 +7,7 @@ import com.velocitypowered.api.proxy.server.RegisteredServer;
 import uk.co.notnull.proxyqueues.MessageType;
 import uk.co.notnull.proxyqueues.ProxyQueues;
 import uk.co.notnull.proxyqueues.configuration.sections.ConfigOptions;
-import uk.co.notnull.proxyqueues.messages.Messages;
+import uk.co.notnull.proxyqueues.Messages;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
