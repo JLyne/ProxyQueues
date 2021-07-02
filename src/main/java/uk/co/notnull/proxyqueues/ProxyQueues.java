@@ -39,6 +39,7 @@ import java.util.function.Function;
 @Plugin(id="proxyqueues", name="ProxyQueues", dependencies = {
         @Dependency(id="velocity-prometheus-exporter", optional = true),
         @Dependency(id="platform-detection", optional = true),
+        @Dependency(id="proxydiscord", optional = true),
 })
 public final class ProxyQueues {
 
@@ -85,6 +86,10 @@ public final class ProxyQueues {
         prometheusExporter.flatMap(PluginContainer::getInstance).ifPresent(instance -> new MetricsHandler(this));
 
         initCommands();
+
+        if(this.getProxyServer().getPluginManager().isLoaded("proxydiscord")) {
+            new ProxyDiscordHandler(this);
+        }
     }
 
     public void initCommands() {

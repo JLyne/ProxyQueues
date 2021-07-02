@@ -159,6 +159,12 @@
             <version>2.0-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>uk.co.notnull</groupId>
+            <artifactId>ProxyDiscordApi</artifactId>
+            <version>1.0</version>
+            <scope>provided</scope>
+        </dependency>
 
     </dependencies>
 </project>

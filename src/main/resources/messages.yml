@@ -42,6 +42,10 @@ errors:
   queue-removed-error: "Sorry, you have been removed from the queue due to a fatal error:\n"
   queue-removed: "You have been removed from the queue by an admin"
   queue-destroyed: "Queueing for &c{server}&e is no longer available"
+  discord-not-linked: |-
+    You need to link your Discord account and have one of the required roles to join this server.
+    Please follow the instructions to link your Discord account.
+  discord-not-verified: "Your Discord account does not have any of the roles required to join this server."
 reconnect:
   restore-position: |-
     Seems you lost connection to the server. We have &erestored&b your previous queue position.
