@@ -52,12 +52,12 @@ dependencies {
 
     compileOnly 'org.spongepowered:configurate-yaml:3.6'
     compileOnly 'com.intellij:annotations:12.0'
-    compileOnly 'com.velocitypowered:velocity-api:1.1.8'
+    compileOnly 'com.velocitypowered:velocity-api:3.0.0'
     compileOnly 'de.sldk.mc:velocity-prometheus-exporter:2.2.3'
     compileOnly 'uk.co.notnull:PlatformDetection-velocity:2.0-SNAPSHOT'
     compileOnly 'uk.co.notnull:ProxyDiscordApi:1.0-SNAPSHOT'
 
-    annotationProcessor 'com.velocitypowered:velocity-api:1.1.8'
+    annotationProcessor 'com.velocitypowered:velocity-api:3.0.0'
 }
 
 group = 'uk.co.notnull'

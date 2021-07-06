@@ -34,7 +34,7 @@ import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.serializer.plain.PlainComponentSerializer;
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import uk.co.notnull.proxyqueues.ProxyQueuesImpl;
 import uk.co.notnull.proxyqueues.api.QueueType;
 import uk.co.notnull.proxyqueues.api.queues.QueuePlayer;
@@ -171,7 +171,7 @@ public class ProxyQueueEventHandler {
                               event.getServer().getServerInfo().getName() + ". Reason: " + event.getServerKickReason());
 
 		Component reason = event.getServerKickReason().orElse(Component.empty());
-		String reasonPlain = PlainComponentSerializer.plain().serialize(reason);
+		String reasonPlain = PlainTextComponentSerializer.plainText().serialize(reason);
 		List<String> fatalErrors = proxyQueues.getSettingsHandler().getSettingsManager().getProperty(
 				ConfigOptions.FATAL_ERRORS);
 

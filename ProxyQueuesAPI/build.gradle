@@ -28,7 +28,7 @@ plugins {
 
 dependencies {
     compileOnly 'com.intellij:annotations:12.0'
-    compileOnly 'com.velocitypowered:velocity-api:1.1.8'
+    compileOnly 'com.velocitypowered:velocity-api:3.0.0'
 }
 
 group = 'uk.co.notnull'

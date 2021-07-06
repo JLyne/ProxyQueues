@@ -27,13 +27,13 @@ package uk.co.notnull.proxyqueues.tasks;
 
 import com.velocitypowered.api.proxy.ServerConnection;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import uk.co.notnull.proxyqueues.api.MessageType;
 import uk.co.notnull.proxyqueues.ProxyQueuesImpl;
 import uk.co.notnull.proxyqueues.configuration.sections.ConfigOptions;
 import uk.co.notnull.proxyqueues.queues.ProxyQueueImpl;
 import uk.co.notnull.proxyqueues.queues.QueuePlayerImpl;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.serializer.plain.PlainComponentSerializer;
 
 import java.time.Instant;
 import java.util.List;
@@ -109,11 +109,11 @@ public class QueueMoveTask implements Runnable {
                                   targetPlayer.getPlayer().getUsername() + " failed to join "
                                   + queue.getServer().getServerInfo().getName()
                                   + ". Reason: \""
-                                  + PlainComponentSerializer.plain()
+                                  + PlainTextComponentSerializer.plainText()
                             .serialize(result.getReasonComponent().orElse(Component.text("(None)"))) + "\"");
 
             Component reason = result.getReasonComponent().orElse(Component.empty());
-            String reasonPlain = PlainComponentSerializer.plain().serialize(reason);
+            String reasonPlain = PlainTextComponentSerializer.plainText().serialize(reason);
             ServerConnection currentServer = targetPlayer.getPlayer().getCurrentServer().orElse(null);
 
             boolean fatal = fatalErrors.stream().anyMatch(reasonPlain::contains);
