@@ -36,7 +36,6 @@ import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.proxy.ProxyInitializeEvent;
 import com.velocitypowered.api.plugin.Dependency;
 import com.velocitypowered.api.plugin.Plugin;
-import com.velocitypowered.api.plugin.PluginContainer;
 import com.velocitypowered.api.plugin.annotation.DataDirectory;
 import com.velocitypowered.api.proxy.ProxyServer;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
@@ -71,26 +70,21 @@ import java.util.function.Function;
 public final class ProxyQueuesImpl implements ProxyQueues {
 
     private static ProxyQueuesImpl instance;
-    private SettingsHandler settingsHandler;
+    private final SettingsHandler settingsHandler;
     private QueueHandlerImpl queueHandler;
     private static final LegacyComponentSerializer legacyComponentSerializer = LegacyComponentSerializer.legacyAmpersand();
 
     private final ProxyServer proxyServer;
     private final Logger logger;
+    private final Path dataFolder;
 
     @Inject
-    @DataDirectory
-    private Path dataFolder;
-
-    @Inject
-    public ProxyQueuesImpl(ProxyServer proxy, Logger logger) {
+    public ProxyQueuesImpl(ProxyServer proxy, Logger logger, @DataDirectory Path dataFolder) {
         this.proxyServer = proxy;
         this.logger = logger;
+        this.dataFolder = dataFolder;
         instance = this;
-    }
 
-    @Subscribe
-    public void onProxyInitialize(ProxyInitializeEvent event) {
         createFile("config.yml");
         createFile("messages.yml");
 
@@ -106,13 +100,16 @@ public final class ProxyQueuesImpl implements ProxyQueues {
 		}
 
         settingsHandler = new SettingsHandler(this);
+    }
+
+    @Subscribe
+    public void onProxyInitialize(ProxyInitializeEvent event) {
         startQueues();
-
-        Optional<PluginContainer> prometheusExporter = proxyServer.getPluginManager().getPlugin("velocity-prometheus-exporter");
-
-        prometheusExporter.flatMap(PluginContainer::getInstance).ifPresent(instance -> new MetricsHandler(this));
-
         initCommands();
+
+        if(this.getProxyServer().getPluginManager().isLoaded("velocity-prometheus-exporter")) {
+            new MetricsHandler(this);
+        }
 
         if(this.getProxyServer().getPluginManager().isLoaded("proxydiscord")) {
             new ProxyDiscordHandler(this);
