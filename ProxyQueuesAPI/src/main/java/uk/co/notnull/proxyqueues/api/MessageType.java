@@ -21,15 +21,9 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package uk.co.notnull.proxyqueues.metrics;
+package uk.co.notnull.proxyqueues.api;
 
-import de.sldk.mc.core.MetricRegistry;
-import uk.co.notnull.proxyqueues.ProxyQueuesImpl;
-
-public class MetricsHandler {
-	public MetricsHandler(ProxyQueuesImpl plugin) {
-		PlayersQueued playersQueued = new PlayersQueued(plugin);
-		MetricRegistry.getInstance().register(playersQueued);
-		playersQueued.enable();
-	}
+public enum MessageType {
+	INFO,
+	ERROR
 }

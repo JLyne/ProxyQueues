@@ -31,7 +31,8 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import net.kyori.adventure.title.Title;
 import uk.co.notnull.platformdetection.PlatformDetectionVelocity;
-import uk.co.notnull.proxyqueues.ProxyQueues;
+import uk.co.notnull.proxyqueues.ProxyQueuesImpl;
+import uk.co.notnull.proxyqueues.api.queues.QueuePlayer;
 import uk.co.notnull.proxyqueues.configuration.sections.ConfigOptions;
 
 import java.util.Optional;
@@ -39,12 +40,12 @@ import java.util.Optional;
 public class ProxyQueueNotifier {
 
 	private final SettingsManager settingsManager;
-	private final ProxyQueue queue;
+	private final ProxyQueueImpl queue;
 	private final String notifyMethod;
     private final boolean platformDetectionEnabled;
     private PlatformDetectionVelocity platformDetection;
 
-    public ProxyQueueNotifier(ProxyQueues proxyQueues, ProxyQueue queue) {
+    public ProxyQueueNotifier(ProxyQueuesImpl proxyQueues, ProxyQueueImpl queue) {
 		this.settingsManager = proxyQueues.getSettingsHandler().getSettingsManager();
 		this.queue = queue;
 

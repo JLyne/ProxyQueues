@@ -27,12 +27,24 @@ plugins {
     id 'maven-publish'
 }
 
-repositories {
-    mavenLocal()
-    mavenCentral()
+allprojects {
+    repositories {
+        mavenLocal()
+        mavenCentral()
+        maven { url 'https://nexus.velocitypowered.com/repository/maven-public/' }
+        flatDir {
+           dirs 'libs'
+        }
+    }
+
+    compileJava {
+        options.compilerArgs += ["-Xlint:all", "-Xlint:-processing"]
+        options.encoding = 'UTF-8'
+    }
 }
 
 dependencies {
+    implementation project(":ProxyQueuesAPI")
     implementation 'ch.jalu:configme:1.1.0'
     implementation 'cloud.commandframework:cloud-velocity:1.5.0'
     implementation 'cloud.commandframework:cloud-minecraft-extras:1.5.0'

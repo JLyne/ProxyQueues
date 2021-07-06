@@ -1,5 +1,5 @@
 /*
- * ProxyDiscord, a Velocity Discord bot
+ * ProxyDiscord, a Velocity queueing solution
  * Copyright (c) 2021 James Lyne
  *
  * Some portions of this file were taken from https://github.com/darbyjack/DeluxeQueues
@@ -43,10 +43,13 @@ import com.velocitypowered.api.proxy.server.RegisteredServer;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.yaml.YAMLConfigurationLoader;
+import uk.co.notnull.proxyqueues.api.MessageType;
+import uk.co.notnull.proxyqueues.api.ProxyQueues;
+import uk.co.notnull.proxyqueues.api.queues.QueueHandler;
 import uk.co.notnull.proxyqueues.configuration.SettingsHandler;
 import uk.co.notnull.proxyqueues.configuration.sections.ConfigOptions;
 import uk.co.notnull.proxyqueues.metrics.MetricsHandler;
-import uk.co.notnull.proxyqueues.queues.QueueHandler;
+import uk.co.notnull.proxyqueues.queues.QueueHandlerImpl;
 import org.slf4j.Logger;
 
 import javax.inject.Inject;
@@ -65,11 +68,11 @@ import java.util.function.Function;
         @Dependency(id="platform-detection", optional = true),
         @Dependency(id="proxydiscord", optional = true),
 })
-public final class ProxyQueues {
+public final class ProxyQueuesImpl implements ProxyQueues {
 
-    private static ProxyQueues instance;
+    private static ProxyQueuesImpl instance;
     private SettingsHandler settingsHandler;
-    private QueueHandler queueHandler;
+    private QueueHandlerImpl queueHandler;
     private static final LegacyComponentSerializer legacyComponentSerializer = LegacyComponentSerializer.legacyAmpersand();
 
     private final ProxyServer proxyServer;
@@ -80,7 +83,7 @@ public final class ProxyQueues {
     private Path dataFolder;
 
     @Inject
-    public ProxyQueues(ProxyServer proxy, Logger logger) {
+    public ProxyQueuesImpl(ProxyServer proxy, Logger logger) {
         this.proxyServer = proxy;
         this.logger = logger;
         instance = this;
@@ -177,7 +180,7 @@ public final class ProxyQueues {
     }
 
     public void startQueues() {
-        queueHandler = new QueueHandler(settingsHandler.getSettingsManager(), this);
+        queueHandler = new QueueHandlerImpl(settingsHandler.getSettingsManager(), this);
     }
 
     public ProxyServer getProxyServer() {
@@ -197,7 +200,7 @@ public final class ProxyQueues {
         return getProxyServer().getServer(waitingServerName);
     }
 
-    public static ProxyQueues getInstance() {
+    public static ProxyQueuesImpl getInstance() {
         return instance;
     }
 

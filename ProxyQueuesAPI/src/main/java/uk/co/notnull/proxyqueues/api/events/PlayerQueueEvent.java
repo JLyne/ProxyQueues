@@ -21,15 +21,44 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package uk.co.notnull.proxyqueues.metrics;
+package uk.co.notnull.proxyqueues.api.events;
 
-import de.sldk.mc.core.MetricRegistry;
-import uk.co.notnull.proxyqueues.ProxyQueuesImpl;
+import com.velocitypowered.api.proxy.Player;
+import com.velocitypowered.api.proxy.server.RegisteredServer;
 
-public class MetricsHandler {
-	public MetricsHandler(ProxyQueuesImpl plugin) {
-		PlayersQueued playersQueued = new PlayersQueued(plugin);
-		MetricRegistry.getInstance().register(playersQueued);
-		playersQueued.enable();
+@SuppressWarnings("unused")
+public class PlayerQueueEvent {
+	private final Player player;
+	private final RegisteredServer server;
+	private String reason = null;
+	private boolean cancelled = false;
+
+	public PlayerQueueEvent(Player player, RegisteredServer server) {
+		this.player = player;
+		this.server = server;
+	}
+
+	public Player getPlayer() {
+		return player;
+	}
+
+	public RegisteredServer getServer() {
+		return server;
+	}
+
+	public String getReason() {
+		return reason;
+	}
+
+	public boolean isCancelled() {
+		return cancelled;
+	}
+
+	public void setCancelled(boolean cancelled) {
+        this.cancelled = cancelled;
+    }
+
+    public void setReason(String reason) {
+		this.reason = reason;
 	}
 }

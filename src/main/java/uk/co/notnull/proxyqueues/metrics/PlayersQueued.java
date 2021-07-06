@@ -26,9 +26,9 @@ package uk.co.notnull.proxyqueues.metrics;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
 import de.sldk.mc.metrics.ServerMetric;
 import io.prometheus.client.Gauge;
-import uk.co.notnull.proxyqueues.ProxyQueues;
-import uk.co.notnull.proxyqueues.QueueType;
-import uk.co.notnull.proxyqueues.queues.ProxyQueue;
+import uk.co.notnull.proxyqueues.ProxyQueuesImpl;
+import uk.co.notnull.proxyqueues.api.QueueType;
+import uk.co.notnull.proxyqueues.api.queues.ProxyQueue;
 
 public class PlayersQueued extends ServerMetric {
 	private static final Gauge playersQueued = Gauge.build()
@@ -37,13 +37,13 @@ public class PlayersQueued extends ServerMetric {
             .help("Number of players queued by server and queue type")
             .create();
 
-    public PlayersQueued(ProxyQueues plugin) {
+    public PlayersQueued(ProxyQueuesImpl plugin) {
         super(plugin, playersQueued);
     }
 
     @Override
     public void collect(RegisteredServer server) {
-        ProxyQueue queue = ((ProxyQueues) plugin).getQueueHandler().getQueue(server);
+        ProxyQueue queue = ((ProxyQueuesImpl) plugin).getQueueHandler().getQueue(server);
 
         if(queue != null) {
             playersQueued.labels("normal", server.getServerInfo().getName()).set(queue.getQueueSize(QueueType.NORMAL));

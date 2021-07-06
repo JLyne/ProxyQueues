@@ -21,9 +21,10 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package uk.co.notnull.proxyqueues;
+package uk.co.notnull.proxyqueues.api;
 
-public enum MessageType {
-	INFO,
-	ERROR
+public enum QueueType {
+	NORMAL,
+	PRIORITY,
+	STAFF,
 }

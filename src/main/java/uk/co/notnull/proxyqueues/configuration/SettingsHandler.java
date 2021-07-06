@@ -1,5 +1,5 @@
 /*
- * ProxyDiscord, a Velocity Discord bot
+ * ProxyDiscord, a Velocity queueing solution
  * Copyright (c) 2021 James Lyne
  *
  * Some portions of this file were taken from https://github.com/darbyjack/DeluxeQueues
@@ -28,7 +28,7 @@ package uk.co.notnull.proxyqueues.configuration;
 import ch.jalu.configme.SettingsManager;
 import ch.jalu.configme.SettingsManagerBuilder;
 import ch.jalu.configme.migration.PlainMigrationService;
-import uk.co.notnull.proxyqueues.ProxyQueues;
+import uk.co.notnull.proxyqueues.ProxyQueuesImpl;
 
 import java.io.File;
 
@@ -37,7 +37,7 @@ public class SettingsHandler {
 
     private final SettingsManager settingsManager;
 
-    public SettingsHandler(ProxyQueues proxyQueues) {
+    public SettingsHandler(ProxyQueuesImpl proxyQueues) {
 
         settingsManager = SettingsManagerBuilder
                 .withYamlFile(new File(proxyQueues.getDataFolder(), "config.yml"))

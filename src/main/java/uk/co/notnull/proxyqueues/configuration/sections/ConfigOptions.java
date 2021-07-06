@@ -1,5 +1,5 @@
 /*
- * ProxyDiscord, a Velocity Discord bot
+ * ProxyDiscord, a Velocity queueing solution
  * Copyright (c) 2021 James Lyne
  *
  * Some portions of this file were taken from https://github.com/darbyjack/DeluxeQueues

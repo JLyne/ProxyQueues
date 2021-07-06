@@ -1,5 +1,5 @@
 /*
- * ProxyDiscord, a Velocity Discord bot
+ * ProxyDiscord, a Velocity queueing solution
  * Copyright (c) 2021 James Lyne
  *
  * Some portions of this file were taken from https://github.com/darbyjack/DeluxeQueues
@@ -29,8 +29,10 @@ import ch.jalu.configme.SettingsManager;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ServerConnection;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
-import uk.co.notnull.proxyqueues.MessageType;
-import uk.co.notnull.proxyqueues.ProxyQueues;
+import uk.co.notnull.proxyqueues.api.MessageType;
+import uk.co.notnull.proxyqueues.ProxyQueuesImpl;
+import uk.co.notnull.proxyqueues.api.queues.ProxyQueue;
+import uk.co.notnull.proxyqueues.api.queues.QueueHandler;
 import uk.co.notnull.proxyqueues.configuration.sections.ConfigOptions;
 import uk.co.notnull.proxyqueues.Messages;
 import org.jetbrains.annotations.NotNull;
@@ -38,13 +40,13 @@ import org.jetbrains.annotations.NotNull;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class QueueHandler {
+public class QueueHandlerImpl implements QueueHandler {
 
     private final ConcurrentHashMap<RegisteredServer, ProxyQueue> queues;
     private final SettingsManager settingsManager;
-    private final ProxyQueues proxyQueues;
+    private final ProxyQueuesImpl proxyQueues;
 
-    public QueueHandler(SettingsManager settingsManager, ProxyQueues proxyQueues) {
+    public QueueHandlerImpl(SettingsManager settingsManager, ProxyQueuesImpl proxyQueues) {
         this.settingsManager = settingsManager;
         this.proxyQueues = proxyQueues;
         this.queues = new ConcurrentHashMap<>();
@@ -61,7 +63,7 @@ public class QueueHandler {
         return queues.compute(server, (s, queue) -> {
             if(queue == null) {
                 proxyQueues.getLogger().info("Creating queue for " + server.getServerInfo().getName());
-                return new ProxyQueue(proxyQueues, s, requiredPlayers, maxNormal, maxPriority, maxStaff);
+                return new ProxyQueueImpl(proxyQueues, s, requiredPlayers, maxNormal, maxPriority, maxStaff);
             } else {
                 proxyQueues.getLogger().info("Updating queue for " + server.getServerInfo().getName());
                 queue.setPlayersRequired(requiredPlayers);
@@ -150,7 +152,7 @@ public class QueueHandler {
             return;
         }
 
-        ProxyQueues.getInstance().getProxyServer().getPlayer(uuid).ifPresent(
+        ProxyQueuesImpl.getInstance().getProxyServer().getPlayer(uuid).ifPresent(
                 onlinePlayer -> notifyQueueRemoval(onlinePlayer, "commands.leave-success", MessageType.INFO));
     }
 
@@ -162,7 +164,7 @@ public class QueueHandler {
     public void kickPlayer(UUID uuid) {
         clearPlayer(uuid, true);
 
-        ProxyQueues.getInstance().getProxyServer().getPlayer(uuid).ifPresent(
+        ProxyQueuesImpl.getInstance().getProxyServer().getPlayer(uuid).ifPresent(
                 onlinePlayer -> notifyQueueRemoval(onlinePlayer, "errors.queue-removed", MessageType.ERROR));
     }
 
@@ -221,9 +223,5 @@ public class QueueHandler {
                 it.remove();
             }
         }
-    }
-
-    public Collection<ProxyQueue> getQueues() {
-        return this.queues.values();
     }
 }

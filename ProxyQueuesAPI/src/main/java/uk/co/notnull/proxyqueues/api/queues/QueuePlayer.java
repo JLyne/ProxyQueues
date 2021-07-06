@@ -21,15 +21,35 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package uk.co.notnull.proxyqueues.metrics;
+package uk.co.notnull.proxyqueues.api.queues;
+import com.velocitypowered.api.proxy.Player;
+import net.kyori.adventure.bossbar.BossBar;
+import uk.co.notnull.proxyqueues.api.QueueType;
 
-import de.sldk.mc.core.MetricRegistry;
-import uk.co.notnull.proxyqueues.ProxyQueuesImpl;
+import java.time.Instant;
 
-public class MetricsHandler {
-	public MetricsHandler(ProxyQueuesImpl plugin) {
-		PlayersQueued playersQueued = new PlayersQueued(plugin);
-		MetricRegistry.getInstance().register(playersQueued);
-		playersQueued.enable();
-	}
+@SuppressWarnings("unused")
+public interface QueuePlayer {
+
+    void showBossBar();
+
+    void hideBossBar();
+
+    Player getPlayer();
+
+    BossBar getBossBar();
+
+    boolean isConnecting();
+
+    Instant getLastConnectionAttempt();
+
+    int getPosition();
+
+    QueueType getQueueType();
+
+    Instant getLastSeen();
+
+    long getQueuedTime();
+
+    BossBar.Color getBossBarColor();
 }

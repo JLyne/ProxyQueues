@@ -34,10 +34,13 @@ import com.velocitypowered.api.command.CommandSource;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ServerConnection;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
+import uk.co.notnull.proxyqueues.api.MessageType;
+import uk.co.notnull.proxyqueues.api.QueueType;
+import uk.co.notnull.proxyqueues.api.queues.ProxyQueue;
+import uk.co.notnull.proxyqueues.api.queues.QueueHandler;
+import uk.co.notnull.proxyqueues.api.queues.QueuePlayer;
 import uk.co.notnull.proxyqueues.configuration.sections.ConfigOptions;
-import uk.co.notnull.proxyqueues.queues.ProxyQueue;
-import uk.co.notnull.proxyqueues.queues.QueueHandler;
-import uk.co.notnull.proxyqueues.queues.QueuePlayer;
+import uk.co.notnull.proxyqueues.queues.QueueHandlerImpl;
 import uk.co.notnull.proxyqueues.utils.Constants;
 
 import java.time.Instant;
@@ -49,11 +52,11 @@ import java.util.UUID;
 import static java.util.Map.entry;
 
 public class Commands {
-	private final ProxyQueues plugin;
+	private final ProxyQueuesImpl plugin;
 	private final QueueHandler queueHandler;
     private final MinecraftHelp<CommandSource> minecraftHelp;
 
-    public Commands(ProxyQueues plugin, CommandManager<CommandSource> commandManager) {
+    public Commands(ProxyQueuesImpl plugin, CommandManager<CommandSource> commandManager) {
 		this.plugin = plugin;
 		this.queueHandler = plugin.getQueueHandler();
 
@@ -73,7 +76,7 @@ public class Commands {
     @CommandPermission(Constants.BASE_PERM + "clear")
     public void clear(CommandSource sender, @Argument("server") RegisteredServer server) {
         ProxyQueue queue = queueHandler.getQueue(server);
-        ProxyQueues proxyQueues = ProxyQueues.getInstance();
+        ProxyQueuesImpl proxyQueues = ProxyQueuesImpl.getInstance();
 
         if(queue == null) {
             proxyQueues.sendMessage(sender, MessageType.ERROR, "errors.server-no-queue",
@@ -92,7 +95,7 @@ public class Commands {
     @CommandPermission(Constants.BASE_PERM + "info")
     public void serverInfo(CommandSource sender, @Argument("server") RegisteredServer server) {
         ProxyQueue queue = queueHandler.getQueue(server);
-        ProxyQueues proxyQueues = ProxyQueues.getInstance();
+        ProxyQueuesImpl proxyQueues = ProxyQueuesImpl.getInstance();
 
         if(queue == null) {
             proxyQueues.sendMessage(sender, MessageType.ERROR, "errors.server-no-queue",
@@ -148,7 +151,7 @@ public class Commands {
     @CommandDescription("Shows information about the specified player's queue status")
     @CommandPermission(Constants.BASE_PERM + "info")
     public void playerInfo(CommandSource sender, @Argument("player") Player player) {
-        ProxyQueues proxyQueues = ProxyQueues.getInstance();
+        ProxyQueuesImpl proxyQueues = ProxyQueuesImpl.getInstance();
         UUID uuid = player.getUniqueId();
 
         ProxyQueue queue = queueHandler.getCurrentQueue(uuid).orElse(null);
@@ -166,7 +169,7 @@ public class Commands {
         if(queuePlayer.getPlayer().isActive()) {
             status = Messages.get("commands.info-status-online");
         } else {
-            int disconnectTimeout = ProxyQueues.getInstance().getSettingsHandler()
+            int disconnectTimeout = ProxyQueuesImpl.getInstance().getSettingsHandler()
                     .getSettingsManager().getProperty(ConfigOptions.DISCONNECT_TIMEOUT);
 
             long lastSeenTime = queuePlayer.getLastSeen().until(Instant.now(), ChronoUnit.SECONDS);
@@ -191,7 +194,7 @@ public class Commands {
     @CommandPermission(Constants.BASE_PERM + "join")
     public void join(CommandSource sender, @Argument("server") RegisteredServer server) {
         ProxyQueue queue = queueHandler.getQueue(server);
-        ProxyQueues proxyQueues = ProxyQueues.getInstance();
+        ProxyQueuesImpl proxyQueues = ProxyQueuesImpl.getInstance();
 
         if(queue == null || !queue.isActive()) {
             proxyQueues.sendMessage(sender, MessageType.ERROR, "errors.server-no-queue",
@@ -215,7 +218,7 @@ public class Commands {
     @CommandDescription("Kick the specified player from any queue they are in")
     @CommandPermission(Constants.BASE_PERM + "kick")
     public void kick(CommandSource sender, @Argument("player") Player player) {
-        ProxyQueues proxyQueues = ProxyQueues.getInstance();
+        ProxyQueuesImpl proxyQueues = ProxyQueuesImpl.getInstance();
         UUID uuid = player.getUniqueId();
 
         Optional<ProxyQueue> currentQueue = queueHandler.getCurrentQueue(uuid);
@@ -236,7 +239,7 @@ public class Commands {
     @CommandDescription("Leave the current queue you are in")
     @CommandPermission(Constants.BASE_PERM + "leave")
     public void leave(CommandSource sender) {
-        ProxyQueues proxyQueues = ProxyQueues.getInstance();
+        ProxyQueuesImpl proxyQueues = ProxyQueuesImpl.getInstance();
         Player player = (Player) sender;
         Optional<ProxyQueue> currentQueue = queueHandler.getCurrentQueue(player);
 
@@ -253,7 +256,7 @@ public class Commands {
     @CommandPermission(Constants.ADMIN_PERM)
     public void reload(CommandSource issuer) {
         plugin.getSettingsHandler().getSettingsManager().reload();
-        queueHandler.updateQueues();
+        ((QueueHandlerImpl) queueHandler).updateQueues();
         plugin.sendMessage(issuer, MessageType.INFO, "commands.reload-success");
     }
 }

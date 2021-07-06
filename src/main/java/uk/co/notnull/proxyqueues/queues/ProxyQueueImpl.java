@@ -1,5 +1,5 @@
 /*
- * ProxyDiscord, a Velocity Discord bot
+ * ProxyDiscord, a Velocity queueing solution
  * Copyright (c) 2021 James Lyne
  *
  * Some portions of this file were taken from https://github.com/darbyjack/DeluxeQueues
@@ -30,11 +30,12 @@ import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ServerConnection;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
 import com.velocitypowered.api.scheduler.ScheduledTask;
-import uk.co.notnull.proxyqueues.MessageType;
-import uk.co.notnull.proxyqueues.ProxyQueues;
-import uk.co.notnull.proxyqueues.QueueType;
+import uk.co.notnull.proxyqueues.api.MessageType;
+import uk.co.notnull.proxyqueues.ProxyQueuesImpl;
+import uk.co.notnull.proxyqueues.api.QueueType;
+import uk.co.notnull.proxyqueues.api.events.PlayerQueueEvent;
+import uk.co.notnull.proxyqueues.api.queues.QueuePlayer;
 import uk.co.notnull.proxyqueues.configuration.sections.ConfigOptions;
-import uk.co.notnull.proxyqueues.events.PlayerQueueEvent;
 import uk.co.notnull.proxyqueues.Messages;
 import uk.co.notnull.proxyqueues.tasks.QueueMoveTask;
 
@@ -49,15 +50,15 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 
-public class ProxyQueue {
+public class ProxyQueueImpl implements uk.co.notnull.proxyqueues.api.queues.ProxyQueue {
 
-    private final ProxyQueues proxyQueues;
+    private final ProxyQueuesImpl proxyQueues;
 
-    private final ConcurrentLinkedQueue<QueuePlayer> queue = new ConcurrentLinkedQueue<>();
-    private final ConcurrentLinkedQueue<QueuePlayer> priorityQueue = new ConcurrentLinkedQueue<>();
-    private final ConcurrentLinkedQueue<QueuePlayer> staffQueue = new ConcurrentLinkedQueue<>();
+    private final ConcurrentLinkedQueue<QueuePlayerImpl> queue = new ConcurrentLinkedQueue<>();
+    private final ConcurrentLinkedQueue<QueuePlayerImpl> priorityQueue = new ConcurrentLinkedQueue<>();
+    private final ConcurrentLinkedQueue<QueuePlayerImpl> staffQueue = new ConcurrentLinkedQueue<>();
 
-    private final ConcurrentHashMap<UUID, QueuePlayer> queuePlayers = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<UUID, QueuePlayerImpl> queuePlayers = new ConcurrentHashMap<>();
 
     //Cache of connected priority/staff players, to ease calculation of queue player thresholds
     private final Set<UUID> connectedPriority = ConcurrentHashMap.newKeySet();
@@ -78,7 +79,7 @@ public class ProxyQueue {
     private final ProxyQueueNotifier notifier;
     private final QueueMoveTask moveTask;
 
-    public ProxyQueue(ProxyQueues proxyQueues, RegisteredServer server, int playersRequired, int maxSlots, int priorityMaxSlots, int staffMaxSlots) {
+    public ProxyQueueImpl(ProxyQueuesImpl proxyQueues, RegisteredServer server, int playersRequired, int maxSlots, int priorityMaxSlots, int staffMaxSlots) {
         this.proxyQueues = proxyQueues;
         this.server = server;
         this.settingsManager = proxyQueues.getSettingsHandler().getSettingsManager();
@@ -119,7 +120,7 @@ public class ProxyQueue {
     public void addPlayer(Player player, QueueType queueType) {
         AtomicBoolean added = new AtomicBoolean(false);
 
-        QueuePlayer result = queuePlayers.compute(player.getUniqueId(), (uuid, queuePlayer) -> {
+        QueuePlayerImpl result = queuePlayers.compute(player.getUniqueId(), (uuid, queuePlayer) -> {
             added.set(false);
 
             if(queuePlayer != null) {
@@ -137,7 +138,7 @@ public class ProxyQueue {
             } else { //New player
                 added.set(shouldAddPlayer(player));
 
-                return added.get() ? new QueuePlayer(player, queueType) : null;
+                return added.get() ? new QueuePlayerImpl(player, queueType) : null;
             }
         });
 
@@ -203,7 +204,7 @@ public class ProxyQueue {
      */
     public void removePlayer(QueuePlayer player, boolean connected) {
         player.hideBossBar();
-        player.setConnecting(false);
+        ((QueuePlayerImpl) player).setConnecting(false);
         boolean removed;
 
         if(!connected) {
@@ -284,10 +285,10 @@ public class ProxyQueue {
         queuePlayers.clear();
     }
 
-    private void clearQueue(ConcurrentLinkedQueue<QueuePlayer> q, boolean destroying) {
+    private void clearQueue(ConcurrentLinkedQueue<QueuePlayerImpl> q, boolean destroying) {
         Optional<RegisteredServer> waitingServer = proxyQueues.getWaitingServer();
 
-        for (QueuePlayer player : q) {
+        for (QueuePlayerImpl player : q) {
             removePlayer(player, false);
 
             Optional<ServerConnection> currentServer = player.getPlayer().getCurrentServer();
@@ -334,7 +335,7 @@ public class ProxyQueue {
     }
 
     public Optional<QueuePlayer> getQueuePlayer(Player player, boolean strict) {
-        QueuePlayer queuePlayer = queuePlayers.get(player.getUniqueId());
+        QueuePlayerImpl queuePlayer = queuePlayers.get(player.getUniqueId());
 
         if(queuePlayer == null) {
             queuePlayer = queuePlayers.computeIfAbsent(player.getUniqueId(), key -> null);
@@ -348,7 +349,7 @@ public class ProxyQueue {
     }
 
     public Optional<QueuePlayer> getQueuePlayer(UUID uuid) {
-        QueuePlayer queuePlayer = queuePlayers.get(uuid);
+        QueuePlayerImpl queuePlayer = queuePlayers.get(uuid);
 
         if(queuePlayer == null) {
             queuePlayer = queuePlayers.computeIfAbsent(uuid, key -> null);
@@ -440,7 +441,7 @@ public class ProxyQueue {
 
     public QueuePlayer[] getTopPlayers(QueueType queueType, int count) {
         QueuePlayer[] players = new QueuePlayer[count];
-        ConcurrentLinkedQueue<QueuePlayer> queue;
+        ConcurrentLinkedQueue<QueuePlayerImpl> queue;
 
         switch (queueType) {
             case STAFF:
@@ -457,7 +458,7 @@ public class ProxyQueue {
 
         int index = 0;
 
-        for(QueuePlayer player : queue) {
+        for(QueuePlayerImpl player : queue) {
             players[index] = player;
 
             if(++index > 2) {
@@ -468,15 +469,15 @@ public class ProxyQueue {
         return players;
     }
 
-    public ConcurrentLinkedQueue<QueuePlayer> getQueue() {
+    public ConcurrentLinkedQueue<QueuePlayerImpl> getQueue() {
         return queue;
     }
 
-    public ConcurrentLinkedQueue<QueuePlayer> getPriorityQueue() {
+    public ConcurrentLinkedQueue<QueuePlayerImpl> getPriorityQueue() {
         return priorityQueue;
     }
 
-    public ConcurrentLinkedQueue<QueuePlayer> getStaffQueue() {
+    public ConcurrentLinkedQueue<QueuePlayerImpl> getStaffQueue() {
         return staffQueue;
     }
 

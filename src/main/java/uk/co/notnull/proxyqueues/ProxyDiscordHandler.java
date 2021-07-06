@@ -31,15 +31,15 @@ import uk.co.notnull.proxydiscord.api.ProxyDiscord;
 import uk.co.notnull.proxydiscord.api.VerificationResult;
 import uk.co.notnull.proxydiscord.api.events.PlayerVerifyStateChangeEvent;
 import uk.co.notnull.proxydiscord.api.manager.VerificationManager;
-import uk.co.notnull.proxyqueues.events.PlayerQueueEvent;
+import uk.co.notnull.proxyqueues.api.events.PlayerQueueEvent;
 
 import java.util.Optional;
 
 public class ProxyDiscordHandler {
-	private final ProxyQueues plugin;
+	private final ProxyQueuesImpl plugin;
 	private static VerificationManager verificationManager;
 
-	public ProxyDiscordHandler(ProxyQueues plugin) {
+	public ProxyDiscordHandler(ProxyQueuesImpl plugin) {
 		this.plugin = plugin;
 
 		ProxyDiscord proxyDiscord = (ProxyDiscord) plugin.getProxyServer().getPluginManager()

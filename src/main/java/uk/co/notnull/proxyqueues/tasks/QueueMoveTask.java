@@ -1,5 +1,5 @@
 /*
- * ProxyDiscord, a Velocity Discord bot
+ * ProxyDiscord, a Velocity queueing solution
  * Copyright (c) 2021 James Lyne
  *
  * Some portions of this file were taken from https://github.com/darbyjack/DeluxeQueues
@@ -27,11 +27,11 @@ package uk.co.notnull.proxyqueues.tasks;
 
 import com.velocitypowered.api.proxy.ServerConnection;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
-import uk.co.notnull.proxyqueues.MessageType;
-import uk.co.notnull.proxyqueues.ProxyQueues;
+import uk.co.notnull.proxyqueues.api.MessageType;
+import uk.co.notnull.proxyqueues.ProxyQueuesImpl;
 import uk.co.notnull.proxyqueues.configuration.sections.ConfigOptions;
-import uk.co.notnull.proxyqueues.queues.ProxyQueue;
-import uk.co.notnull.proxyqueues.queues.QueuePlayer;
+import uk.co.notnull.proxyqueues.queues.ProxyQueueImpl;
+import uk.co.notnull.proxyqueues.queues.QueuePlayerImpl;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.plain.PlainComponentSerializer;
 
@@ -42,15 +42,15 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 
 public class QueueMoveTask implements Runnable {
-    private final ProxyQueue queue;
+    private final ProxyQueueImpl queue;
     private final RegisteredServer server;
-    private final ProxyQueues proxyQueues;
+    private final ProxyQueuesImpl proxyQueues;
     private final List<String> fatalErrors;
     private final RegisteredServer waitingServer;
 
-    private QueuePlayer targetPlayer = null;
+    private QueuePlayerImpl targetPlayer = null;
 
-    public QueueMoveTask(ProxyQueue queue, RegisteredServer server, ProxyQueues proxyQueues) {
+    public QueueMoveTask(ProxyQueueImpl queue, RegisteredServer server, ProxyQueuesImpl proxyQueues) {
         this.queue = queue;
         this.server = server;
         this.proxyQueues = proxyQueues;
@@ -62,9 +62,9 @@ public class QueueMoveTask implements Runnable {
 
     @Override
     public void run() {
-        ConcurrentLinkedQueue<QueuePlayer> normalQueue = queue.getQueue();
-        ConcurrentLinkedQueue<QueuePlayer> priorityQueue = queue.getPriorityQueue();
-        ConcurrentLinkedQueue<QueuePlayer> staffQueue = queue.getStaffQueue();
+        ConcurrentLinkedQueue<QueuePlayerImpl> normalQueue = queue.getQueue();
+        ConcurrentLinkedQueue<QueuePlayerImpl> priorityQueue = queue.getPriorityQueue();
+        ConcurrentLinkedQueue<QueuePlayerImpl> staffQueue = queue.getStaffQueue();
 
         if(targetPlayer != null && (!targetPlayer.isConnecting() || !targetPlayer.getPlayer().isActive())) {
             targetPlayer.setConnecting(false);
@@ -133,12 +133,12 @@ public class QueueMoveTask implements Runnable {
         targetPlayer.setConnecting(true);
     }
 
-    private void handleQueue(ConcurrentLinkedQueue<QueuePlayer> q) {
+    private void handleQueue(ConcurrentLinkedQueue<QueuePlayerImpl> q) {
         int position = 1;
         int disconnectTimeout = proxyQueues.getSettingsHandler()
                 .getSettingsManager().getProperty(ConfigOptions.DISCONNECT_TIMEOUT);
 
-        for (QueuePlayer player : q) {
+        for (QueuePlayerImpl player : q) {
             boolean online = player.getPlayer().isActive();
 
             if (online || player.getLastSeen() == null) {

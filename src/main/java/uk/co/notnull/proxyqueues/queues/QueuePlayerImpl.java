@@ -1,5 +1,5 @@
 /*
- * ProxyDiscord, a Velocity Discord bot
+ * ProxyDiscord, a Velocity queueing solution
  * Copyright (c) 2021 James Lyne
  *
  * Some portions of this file were taken from https://github.com/darbyjack/DeluxeQueues
@@ -27,12 +27,13 @@ package uk.co.notnull.proxyqueues.queues;
 import com.velocitypowered.api.proxy.Player;
 import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.text.Component;
-import uk.co.notnull.proxyqueues.QueueType;
+import uk.co.notnull.proxyqueues.api.QueueType;
+import uk.co.notnull.proxyqueues.api.queues.QueuePlayer;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 
-public class QueuePlayer {
+public class QueuePlayerImpl implements QueuePlayer {
 
     private final BossBar bossBar;
     private boolean connecting;
@@ -44,7 +45,7 @@ public class QueuePlayer {
     private Instant lastSeen;
     private final Instant queued;
 
-    public QueuePlayer(Player player, QueueType queueType) {
+    public QueuePlayerImpl(Player player, QueueType queueType) {
         this.player = player;
         this.connecting = false;
         this.queueType = queueType;

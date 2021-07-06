@@ -1,7 +1,9 @@
 /*
  * ProxyDiscord, a Velocity queueing solution
- *
  * Copyright (c) 2021 James Lyne
+ *
+ * Some portions of this file were taken from https://github.com/darbyjack/DeluxeQueues
+ * These portions are Copyright (c) 2019 Glare
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,10 +23,16 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package uk.co.notnull.proxyqueues;
+package uk.co.notnull.proxyqueues.api;
 
-public enum QueueType {
-	NORMAL,
-	PRIORITY,
-	STAFF,
+import com.velocitypowered.api.proxy.server.RegisteredServer;
+import uk.co.notnull.proxyqueues.api.queues.QueueHandler;
+
+import java.util.Optional;
+
+@SuppressWarnings("unused")
+public interface ProxyQueues {
+    QueueHandler getQueueHandler();
+
+    Optional<RegisteredServer> getWaitingServer();
 }

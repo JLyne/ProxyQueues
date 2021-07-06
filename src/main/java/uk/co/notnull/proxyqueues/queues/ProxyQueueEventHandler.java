@@ -35,8 +35,9 @@ import com.velocitypowered.api.proxy.server.RegisteredServer;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.serializer.plain.PlainComponentSerializer;
-import uk.co.notnull.proxyqueues.ProxyQueues;
-import uk.co.notnull.proxyqueues.QueueType;
+import uk.co.notnull.proxyqueues.ProxyQueuesImpl;
+import uk.co.notnull.proxyqueues.api.QueueType;
+import uk.co.notnull.proxyqueues.api.queues.QueuePlayer;
 import uk.co.notnull.proxyqueues.configuration.sections.ConfigOptions;
 
 import java.time.Instant;
@@ -44,13 +45,13 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class ProxyQueueEventHandler {
-	private final ProxyQueues proxyQueues;
+	private final ProxyQueuesImpl proxyQueues;
 	private final SettingsManager settingsManager;
-	private final ProxyQueue queue;
+	private final ProxyQueueImpl queue;
 
 	private final Set<UUID> fatalKicks = ConcurrentHashMap.newKeySet();
 
-	public ProxyQueueEventHandler(ProxyQueues proxyQueues, ProxyQueue queue) {
+	public ProxyQueueEventHandler(ProxyQueuesImpl proxyQueues, ProxyQueueImpl queue) {
 		this.settingsManager = proxyQueues.getSettingsHandler().getSettingsManager();
 		this.proxyQueues = proxyQueues;
 		this.queue = queue;
@@ -136,7 +137,7 @@ public class ProxyQueueEventHandler {
 
         if (queuePlayer.isPresent()) {
             proxyQueues.getLogger().info("Player in queue, setting last seen");
-            queuePlayer.get().setLastSeen(Instant.now());
+			((QueuePlayerImpl) queuePlayer.get()).setLastSeen(Instant.now());
             return;
         }
 
