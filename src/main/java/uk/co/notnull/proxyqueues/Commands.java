@@ -23,10 +23,13 @@
 
 package uk.co.notnull.proxyqueues;
 
+import cloud.commandframework.CommandManager;
 import cloud.commandframework.annotations.Argument;
 import cloud.commandframework.annotations.CommandDescription;
 import cloud.commandframework.annotations.CommandMethod;
 import cloud.commandframework.annotations.CommandPermission;
+import cloud.commandframework.annotations.specifier.Greedy;
+import cloud.commandframework.minecraft.extras.MinecraftHelp;
 import com.velocitypowered.api.command.CommandSource;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ServerConnection;
@@ -48,11 +51,22 @@ import static java.util.Map.entry;
 public class Commands {
 	private final ProxyQueues plugin;
 	private final QueueHandler queueHandler;
+    private final MinecraftHelp<CommandSource> minecraftHelp;
 
-	public Commands(ProxyQueues plugin) {
+    public Commands(ProxyQueues plugin, CommandManager<CommandSource> commandManager) {
 		this.plugin = plugin;
 		this.queueHandler = plugin.getQueueHandler();
+
+        this.minecraftHelp = new MinecraftHelp<>("/queue", p -> p, commandManager);
 	}
+
+    @CommandMethod("queue help [query]")
+    private void commandHelp(
+            final CommandSource sender,
+            final @Argument("query") @Greedy String query
+    ) {
+        this.minecraftHelp.queryCommands(query == null ? "" : query, sender);
+    }
 
 	@CommandMethod("queue clear <server>")
     @CommandDescription("Clear the queue for the specified server, removing all players currently in the queue")

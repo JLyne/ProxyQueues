@@ -30,7 +30,6 @@ import cloud.commandframework.annotations.AnnotationParser;
 import cloud.commandframework.execution.CommandExecutionCoordinator;
 import cloud.commandframework.meta.SimpleCommandMeta;
 import cloud.commandframework.minecraft.extras.MinecraftExceptionHandler;
-import cloud.commandframework.minecraft.extras.MinecraftHelp;
 import cloud.commandframework.velocity.VelocityCommandManager;
 import com.velocitypowered.api.command.CommandSource;
 import com.velocitypowered.api.event.Subscribe;
@@ -134,15 +133,13 @@ public final class ProxyQueues {
             .withDecorator(message -> message)
             .apply(manager, p -> p);
 
-        new MinecraftHelp<>("/queue help", p -> p, manager);
-
         AnnotationParser<CommandSource> annotationParser = new AnnotationParser<>(
                 manager,
                 CommandSource.class,
                 parameters -> SimpleCommandMeta.empty()
         );
 
-        annotationParser.parse(new Commands(this));
+        annotationParser.parse(new Commands(this, manager));
     }
 
     /**
