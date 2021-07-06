@@ -55,13 +55,10 @@ description = 'Velocity queueing solution'
 java.sourceCompatibility = JavaVersion.VERSION_11
 java.targetCompatibility = JavaVersion.VERSION_11
 
-tasks.withType(JavaCompile) {
-    options.encoding = 'UTF-8'
-}
-
 tasks {
     compileJava {
         options.compilerArgs += ["-Xlint:all", "-Xlint:-processing"]
+        options.encoding = 'UTF-8'
     }
 
     shadowJar {
