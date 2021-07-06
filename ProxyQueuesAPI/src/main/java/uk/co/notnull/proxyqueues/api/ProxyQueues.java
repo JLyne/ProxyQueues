@@ -1,9 +1,7 @@
 /*
- * ProxyDiscord, a Velocity queueing solution
- * Copyright (c) 2021 James Lyne
+ * ProxyQueues, a Velocity queueing solution
  *
- * Some portions of this file were taken from https://github.com/darbyjack/DeluxeQueues
- * These portions are Copyright (c) 2019 Glare
+ * Copyright (c) 2021 James Lyne
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
