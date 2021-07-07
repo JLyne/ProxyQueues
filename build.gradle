@@ -25,7 +25,7 @@ import org.apache.tools.ant.filters.ReplaceTokens
 
 plugins {
     id 'java'
-    id 'com.github.johnrengelman.shadow' version '4.0.4'
+    id 'com.github.johnrengelman.shadow' version '7.0.0'
     id 'maven-publish'
 }
 
@@ -55,7 +55,7 @@ dependencies {
     compileOnly 'org.spongepowered:configurate-yaml:3.6'
     compileOnly 'com.intellij:annotations:12.0'
     compileOnly 'com.velocitypowered:velocity-api:3.0.0'
-    compileOnly 'de.sldk.mc:velocity-prometheus-exporter:2.2.3'
+    compileOnly 'uk.co.notnull:MinecraftPrometheusExporter-velocity:2.2.3'
     compileOnly 'uk.co.notnull:PlatformDetection-velocity:2.0-SNAPSHOT'
     compileOnly 'uk.co.notnull:ProxyDiscordApi:1.0-SNAPSHOT'
 
@@ -84,6 +84,7 @@ tasks {
     }
 
     shadowJar {
+        archiveClassifier.set('')
         relocate 'cloud.commandframework', 'uk.co.notnull.proxyqueues.shaded.cloud'
         relocate 'io.leangen.geantyref', 'uk.co.notnull.proxyqueues.shaded.typetoken'
     }
