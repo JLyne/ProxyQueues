@@ -1,0 +1,3 @@
+<component name="DependencyValidationManager">
+  <scope name="Old" pattern="file[ProxyQueues.main]:java/uk/co/notnull/proxyqueues/configuration//*||file[ProxyQueues.main]:java/uk/co/notnull/proxyqueues/queues/ProxyQueueImpl.java||file[ProxyQueues.main]:java/uk/co/notnull/proxyqueues/queues/QueueHandlerImpl.java||file[ProxyQueues.main]:java/uk/co/notnull/proxyqueues/queues/QueuePlayerImpl.java||file[ProxyQueues.main]:java/uk/co/notnull/proxyqueues/tasks/QueueMoveTask.java||file[ProxyQueues.main]:java/uk/co/notnull/proxyqueues/utils/Constants.java||file[ProxyQueues.main]:java/uk/co/notnull/proxyqueues/ProxyQueuesImpl.java" />
+</component>
