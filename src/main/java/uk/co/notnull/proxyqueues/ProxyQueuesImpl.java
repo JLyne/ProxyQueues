@@ -62,11 +62,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 
-@Plugin(id="proxyqueues", name="ProxyQueues", dependencies = {
-        @Dependency(id="velocity-prometheus-exporter", optional = true),
-        @Dependency(id="platform-detection", optional = true),
-        @Dependency(id="proxydiscord", optional = true),
-})
 public final class ProxyQueuesImpl implements ProxyQueues {
 
     private static ProxyQueuesImpl instance;

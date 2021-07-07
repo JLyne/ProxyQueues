@@ -1,0 +1,21 @@
+{
+  "id": "proxyqueues",
+  "name": "ProxyQueues",
+  "version": "@project.version@",
+  "authors": ["Jim (NotKatuen)"],
+  "dependencies": [
+    {
+      "id": "prometheus-exporter",
+      "optional": false
+    },
+    {
+      "id": "platform-detection",
+      "optional": true
+    },
+    {
+      "id": "proxydiscord",
+      "optional": true
+    }
+  ],
+  "main": "uk.co.notnull.proxyqueues.ProxyQueuesImpl"
+}
