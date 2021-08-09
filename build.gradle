@@ -29,6 +29,13 @@ plugins {
     id 'maven-publish'
 }
 
+rootProject.ext.mavenUserName=""
+rootProject.ext.mavenPassword=""
+
+if (file("./build.gradle.local").exists()) {
+    apply from: "./build.gradle.local"
+}
+
 allprojects {
     repositories {
         mavenLocal()

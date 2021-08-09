@@ -40,8 +40,38 @@ java.targetCompatibility = JavaVersion.VERSION_11
 
 publishing {
     publications {
-        maven(MavenPublication) {
+        mavenJava(MavenPublication) {
             from components.java
+            pom {
+                description = 'ProxyQueues API'
+                url = 'https://github.com/JLyne/ProxyQueues'
+                developers {
+                    developer {
+                        id = 'jim'
+                        name = 'James Lyne'
+                    }
+                }
+                scm {
+                    connection = 'scm:git:git://github.com/JLyne/ProxyQueues.git'
+                    developerConnection = 'scm:git:ssh://github.com/JLyne/ProxyQueues.git'
+                    url = 'https://github.com/JLyne/ProxyQueues'
+                }
+            }
+        }
+    }
+    repositories {
+        maven {
+            credentials {
+                username = rootProject.ext.mavenUserName
+                password = rootProject.ext.mavenPassword
+            }
+            authentication {
+                basic(BasicAuthentication)
+            }
+
+            def releasesRepoUrl = "https://repo.not-null.co.uk/releases/" // gradle -Prelease publish
+            def snapshotsRepoUrl = "https://repo.not-null.co.uk/snapshots/"
+            url = project.hasProperty('release') ? releasesRepoUrl : snapshotsRepoUrl
         }
     }
 }
