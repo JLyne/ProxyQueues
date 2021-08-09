@@ -24,31 +24,39 @@
 package uk.co.notnull.proxyqueues.metrics;
 
 import com.velocitypowered.api.proxy.server.RegisteredServer;
-import de.sldk.mc.metrics.ServerMetric;
-import io.prometheus.client.Gauge;
+import io.prometheus.client.Collector;
+import io.prometheus.client.GaugeMetricFamily;
 import uk.co.notnull.proxyqueues.ProxyQueuesImpl;
 import uk.co.notnull.proxyqueues.api.QueueType;
 import uk.co.notnull.proxyqueues.api.queues.ProxyQueue;
 
-public class PlayersQueued extends ServerMetric {
-	private static final Gauge playersQueued = Gauge.build()
-            .name(prefix("players_queued"))
-            .labelNames("queue_type", "server")
-            .help("Number of players queued by server and queue type")
-            .create();
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
-    public PlayersQueued(ProxyQueuesImpl plugin) {
-        super(plugin, playersQueued);
-    }
-
+public class PlayersQueued extends Collector {
     @Override
-    public void collect(RegisteredServer server) {
-        ProxyQueue queue = ((ProxyQueuesImpl) plugin).getQueueHandler().getQueue(server);
+    public List<MetricFamilySamples> collect() {
+        ProxyQueuesImpl plugin = ProxyQueuesImpl.getInstance();
+        List<MetricFamilySamples> mfs = new ArrayList<>();
+        GaugeMetricFamily labeledGauge = new GaugeMetricFamily("mc_players_queued",
+                                                               "Number of players queued by server and queue type",
+                                                               Arrays.asList("queue_type", "server"));
 
-        if(queue != null) {
-            playersQueued.labels("normal", server.getServerInfo().getName()).set(queue.getQueueSize(QueueType.NORMAL));
-            playersQueued.labels("priority", server.getServerInfo().getName()).set(queue.getQueueSize(QueueType.PRIORITY));
-            playersQueued.labels("staff", server.getServerInfo().getName()).set(queue.getQueueSize(QueueType.STAFF));
+        for (RegisteredServer server : plugin.getProxyServer().getAllServers()) {
+            ProxyQueue queue = plugin.getQueueHandler().getQueue(server);
+
+            if(queue != null) {
+                String serverName = server.getServerInfo().getName();
+                labeledGauge.addMetric(Arrays.asList(serverName, "normal"), queue.getQueueSize(QueueType.NORMAL));
+                labeledGauge.addMetric(Arrays.asList(serverName, "priority"), queue.getQueueSize(QueueType.PRIORITY));
+                labeledGauge.addMetric(Arrays.asList(serverName, "staff"), queue.getQueueSize(QueueType.STAFF));
+                mfs.add(labeledGauge);
+            }
         }
+
+        mfs.add(labeledGauge);
+
+        return mfs;
     }
 }

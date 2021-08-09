@@ -34,8 +34,6 @@ import cloud.commandframework.velocity.VelocityCommandManager;
 import com.velocitypowered.api.command.CommandSource;
 import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.proxy.ProxyInitializeEvent;
-import com.velocitypowered.api.plugin.Dependency;
-import com.velocitypowered.api.plugin.Plugin;
 import com.velocitypowered.api.plugin.annotation.DataDirectory;
 import com.velocitypowered.api.proxy.ProxyServer;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
@@ -47,7 +45,7 @@ import uk.co.notnull.proxyqueues.api.ProxyQueues;
 import uk.co.notnull.proxyqueues.api.queues.QueueHandler;
 import uk.co.notnull.proxyqueues.configuration.SettingsHandler;
 import uk.co.notnull.proxyqueues.configuration.sections.ConfigOptions;
-import uk.co.notnull.proxyqueues.metrics.MetricsHandler;
+import uk.co.notnull.proxyqueues.metrics.Metrics;
 import uk.co.notnull.proxyqueues.queues.QueueHandlerImpl;
 import org.slf4j.Logger;
 
@@ -102,8 +100,8 @@ public final class ProxyQueuesImpl implements ProxyQueues {
         startQueues();
         initCommands();
 
-        if(this.getProxyServer().getPluginManager().isLoaded("velocity-prometheus-exporter")) {
-            new MetricsHandler(this);
+        if(this.getProxyServer().getPluginManager().isLoaded("prometheus-exporter")) {
+            new Metrics();
         }
 
         if(this.getProxyServer().getPluginManager().isLoaded("proxydiscord")) {

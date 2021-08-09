@@ -23,13 +23,9 @@
 
 package uk.co.notnull.proxyqueues.metrics;
 
-import de.sldk.mc.core.MetricRegistry;
-import uk.co.notnull.proxyqueues.ProxyQueuesImpl;
+public class Metrics {
+	private final PlayersQueued playersQueued = new PlayersQueued().register();
 
-public class MetricsHandler {
-	public MetricsHandler(ProxyQueuesImpl plugin) {
-		PlayersQueued playersQueued = new PlayersQueued(plugin);
-		MetricRegistry.getInstance().register(playersQueued);
-		playersQueued.enable();
+	public Metrics() {
 	}
 }

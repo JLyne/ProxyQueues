@@ -71,5 +71,10 @@
       <option name="name" value="maven" />
       <option name="url" value="https://nexus.velocitypowered.com/repository/maven-public/" />
     </remote-repository>
+    <remote-repository>
+      <option name="id" value="maven2" />
+      <option name="name" value="maven2" />
+      <option name="url" value="https://repo.not-null.co.uk/releases/" />
+    </remote-repository>
   </component>
 </project>
