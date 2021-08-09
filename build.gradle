@@ -37,6 +37,9 @@ if (file("./build.gradle.local").exists()) {
 }
 
 allprojects {
+    group = 'uk.co.notnull'
+    version = '1.1'
+
     repositories {
         mavenLocal()
         mavenCentral()
@@ -67,8 +70,6 @@ dependencies {
     annotationProcessor 'com.velocitypowered:velocity-api:3.0.0'
 }
 
-group = 'uk.co.notnull'
-version = '1.1'
 description = 'Velocity queueing solution'
 
 java.sourceCompatibility = JavaVersion.VERSION_11
