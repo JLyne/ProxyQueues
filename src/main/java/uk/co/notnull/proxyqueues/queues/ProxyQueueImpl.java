@@ -44,6 +44,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.TimeUnit;
@@ -120,81 +121,78 @@ public class ProxyQueueImpl implements uk.co.notnull.proxyqueues.api.queues.Prox
     public void addPlayer(Player player, QueueType queueType) {
         AtomicBoolean added = new AtomicBoolean(false);
 
-        QueuePlayerImpl result = queuePlayers.compute(player.getUniqueId(), (uuid, queuePlayer) -> {
-            added.set(false);
+        shouldAddPlayer(player).thenApply(shouldAdd -> {
+            if(!shouldAdd) {
+                removePlayer(player, false);
+                return null;
+            }
 
-            if(queuePlayer != null) {
-                if(queuePlayer.getPlayer().equals(player)) { //Player is already in queue
-                    return queuePlayer;
-                } else { //Player was previous in queue before disconnecting, update and reuse object
-                    if(shouldAddPlayer(player)) {
-                        queuePlayer.setPlayer(player);
-                        queuePlayer.setLastSeen(Instant.now());
-                        return queuePlayer;
+            return queuePlayers.compute(player.getUniqueId(), (uuid, queuePlayer) -> {
+                if(queuePlayer == null) {  //New player
+                    added.set(true);
+                    return new QueuePlayerImpl(player, queueType);
+                } else if(!queuePlayer.getPlayer().equals(player)) { //Player was previous in queue before disconnecting, update and reuse object
+                    queuePlayer.setPlayer(player);
+                    queuePlayer.setLastSeen(Instant.now());
+                }
+
+                return queuePlayer;
+            });
+        }).thenAccept(result -> {
+            if(result != null) {
+                //Only add to queue if they aren't already there
+                if(added.get()) {
+                    proxyQueues.getLogger().info("Added " + player.getUsername() + " to queue");
+                    switch (result.getQueueType()) {
+                        case STAFF:
+                            staffQueue.add(result);
+                            break;
+
+                        case PRIORITY:
+                            priorityQueue.add(result);
+                            break;
+
+                        case NORMAL:
+                        default:
+                            queue.add(result);
+                            break;
+                    }
+                } else {
+                    proxyQueues.getLogger().info("Restoring queue position of " + player.getUsername());
+
+                    if(result.getQueueType() == QueueType.PRIORITY) {
+                        proxyQueues.sendMessage(result.getPlayer(), MessageType.INFO, "reconnect.restore-priority");
                     } else {
-                        return null;
+                        proxyQueues.sendMessage(result.getPlayer(), MessageType.INFO, "reconnect.restore-position");
                     }
                 }
-            } else { //New player
-                added.set(shouldAddPlayer(player));
-
-                return added.get() ? new QueuePlayerImpl(player, queueType) : null;
             }
         });
-
-        if(result != null) {
-            //Only add to queue if they aren't already there
-            if(added.get()) {
-                proxyQueues.getLogger().info("Added " + player.getUsername() + " added already in queue. Restoring position");
-                switch (result.getQueueType()) {
-                    case STAFF:
-                        staffQueue.add(result);
-                        break;
-
-                    case PRIORITY:
-                        priorityQueue.add(result);
-                        break;
-
-                    case NORMAL:
-                    default:
-                        queue.add(result);
-                        break;
-                }
-            } else {
-                proxyQueues.getLogger().info("Restoring queue position of " + player.getUsername());
-
-                if(result.getQueueType() == QueueType.PRIORITY) {
-                    proxyQueues.sendMessage(result.getPlayer(), MessageType.INFO, "reconnect.restore-priority");
-                } else {
-                    proxyQueues.sendMessage(result.getPlayer(), MessageType.INFO, "reconnect.restore-position");
-                }
-            }
-        }
     }
 
-    private boolean shouldAddPlayer(Player player) {
+    private CompletableFuture<Boolean> shouldAddPlayer(Player player) {
         PlayerQueueEvent event = new PlayerQueueEvent(player, server);
-        proxyQueues.getProxyServer().getEventManager().fire(event).join();
+        return proxyQueues.getProxyServer().getEventManager().fire(event).thenApply((PlayerQueueEvent result) -> {
+            //Don't add to queue if event cancelled, show player the reason
+            if (result.isCancelled()) {
+                String reason = result.getReason() != null ? result.getReason() : "An unexpected error occurred. Please try again later";
+                ServerConnection currentServer = player.getCurrentServer().orElse(null);
+                RegisteredServer waitingServer = proxyQueues.getWaitingServer().orElse(null);
 
-        //Don't add to queue if event cancelled, show player the reason
-        if (event.isCancelled()) {
-            String reason = event.getReason() != null ? event.getReason() : "An unexpected error occurred. Please try again later";
-            ServerConnection currentServer = player.getCurrentServer().orElse(null);
-            RegisteredServer waitingServer = proxyQueues.getWaitingServer().orElse(null);
+                proxyQueues.getLogger().info(player.getUsername() + "'s PlayerQueueEvent cancelled");
 
-            proxyQueues.getLogger().info(player.getUsername() + "'s PlayerQueueEvent cancelled");
-
-            if (currentServer == null || currentServer.getServer().equals(waitingServer)) {
-                player.disconnect(
-                        Messages.getComponent("errors.queue-cannot-join", Map.of("{reason}",
-                                                                                             reason)));
-            } else {
-                proxyQueues.sendMessage(player, MessageType.ERROR, "errors.queue-cannot-join",
-                                        Map.of("{reason}", reason));
+                if (currentServer == null || currentServer.getServer().equals(waitingServer)) {
+                    player.disconnect(
+                            Messages.getComponent("errors.queue-cannot-join", Map.of("{reason}",
+                                                                                                 reason)));
+                } else {
+                    proxyQueues.sendMessage(player, MessageType.ERROR, "errors.queue-cannot-join",
+                                            Map.of("{reason}", reason));
+                }
             }
-        }
 
-        return !event.isCancelled();
+            return !result.isCancelled();
+        });
     }
 
     /**
