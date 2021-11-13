@@ -133,10 +133,10 @@ public class ProxyQueueEventHandler {
         Optional<QueuePlayer> queuePlayer = queue.getQueuePlayer(player, false);
         queue.clearConnectedState(player);
 
-        proxyQueues.getLogger().info("Handling proxy disconnect for " + player.getUsername());
+        proxyQueues.getLogger().debug("Handling proxy disconnect for " + player.getUsername());
 
         if (queuePlayer.isPresent()) {
-            proxyQueues.getLogger().info("Player in queue, setting last seen");
+            proxyQueues.getLogger().debug("Player in queue, setting last seen");
 			((QueuePlayerImpl) queuePlayer.get()).setLastSeen(Instant.now());
             return;
         }
@@ -144,7 +144,7 @@ public class ProxyQueueEventHandler {
         player.getCurrentServer().ifPresent(server -> {
 			if(server.getServer().equals(queue.getServer())) {
 				if(fatalKicks.contains(player.getUniqueId())) {
-					proxyQueues.getLogger().info(
+					proxyQueues.getLogger().debug(
 						"Player disconnecting due to fatal kick. Not re-queueing.");
 
 					fatalKicks.remove(player.getUniqueId());
@@ -153,7 +153,7 @@ public class ProxyQueueEventHandler {
 				}
 
 				boolean staff = player.hasPermission(settingsManager.getProperty(ConfigOptions.STAFF_PERMISSION));
-				proxyQueues.getLogger().info(
+				proxyQueues.getLogger().debug(
 						"Player not in queue, adding to " + (staff ? "staff" : "priority") + " queue");
 				queue.addPlayer(player, staff ? QueueType.STAFF : QueueType.PRIORITY);
 			}
@@ -167,7 +167,7 @@ public class ProxyQueueEventHandler {
         }
 
         proxyQueues.getLogger()
-                .info("Player " + event.getPlayer().getUsername() + " kicked from " +
+                .debug("Player " + event.getPlayer().getUsername() + " kicked from " +
                               event.getServer().getServerInfo().getName() + ". Reason: " + event.getServerKickReason());
 
 		Component reason = event.getServerKickReason().orElse(Component.empty());
@@ -179,14 +179,14 @@ public class ProxyQueueEventHandler {
 
 		if(!fatal) {
 			proxyQueues.getLogger()
-			.info("Reason not fatal, re-queueing " + event.getPlayer().getUsername());
+			.debug("Reason not fatal, re-queueing " + event.getPlayer().getUsername());
 
 			boolean staff = event.getPlayer()
 					.hasPermission(settingsManager.getProperty(ConfigOptions.STAFF_PERMISSION));
 
 			queue.addPlayer(event.getPlayer(), staff ? QueueType.STAFF : QueueType.PRIORITY);
 		} else {
-			proxyQueues.getLogger().info("Reason fatal");
+			proxyQueues.getLogger().debug("Reason fatal");
 			fatalKicks.add(event.getPlayer().getUniqueId());
 		}
     }

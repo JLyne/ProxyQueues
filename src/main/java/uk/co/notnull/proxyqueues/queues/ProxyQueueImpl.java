@@ -236,7 +236,7 @@ public class ProxyQueueImpl implements uk.co.notnull.proxyqueues.api.queues.Prox
                 break;
         }
 
-        proxyQueues.getLogger().info("removePlayer: type = " + player.getQueueType() + ", removed? " + removed);
+        proxyQueues.getLogger().debug("removePlayer: type = " + player.getQueueType() + ", removed? " + removed);
         queuePlayers.remove(player.getPlayer().getUniqueId());
     }
 
@@ -251,7 +251,7 @@ public class ProxyQueueImpl implements uk.co.notnull.proxyqueues.api.queues.Prox
         if(queuePlayer.isPresent()) {
             removePlayer(queuePlayer.get(), connected);
         } else {
-            proxyQueues.getLogger().info("Not in queue, removing cached entries");
+            proxyQueues.getLogger().debug("Not in queue, removing cached entries");
             clearConnectedState(player);
         }
     }
@@ -267,7 +267,7 @@ public class ProxyQueueImpl implements uk.co.notnull.proxyqueues.api.queues.Prox
         if(queuePlayer.isPresent()) {
             removePlayer(queuePlayer.get(), connected);
         } else {
-            proxyQueues.getLogger().info("Not in queue, removing cached entries");
+            proxyQueues.getLogger().debug("Not in queue, removing cached entries");
             clearConnectedState(uuid);
         }
     }
