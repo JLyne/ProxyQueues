@@ -32,7 +32,9 @@ import cloud.commandframework.meta.SimpleCommandMeta;
 import cloud.commandframework.minecraft.extras.MinecraftExceptionHandler;
 import cloud.commandframework.velocity.VelocityCommandManager;
 import com.velocitypowered.api.command.CommandSource;
+import com.velocitypowered.api.event.ResultedEvent;
 import com.velocitypowered.api.event.Subscribe;
+import com.velocitypowered.api.event.connection.LoginEvent;
 import com.velocitypowered.api.event.proxy.ProxyInitializeEvent;
 import com.velocitypowered.api.plugin.annotation.DataDirectory;
 import com.velocitypowered.api.proxy.ProxyServer;
@@ -66,6 +68,7 @@ public final class ProxyQueuesImpl implements ProxyQueues {
     private final SettingsHandler settingsHandler;
     private QueueHandlerImpl queueHandler;
     private static final LegacyComponentSerializer legacyComponentSerializer = LegacyComponentSerializer.legacyAmpersand();
+    private int playerLimit;
 
     private final ProxyServer proxyServer;
     private final Logger logger;
@@ -93,6 +96,7 @@ public final class ProxyQueuesImpl implements ProxyQueues {
 		}
 
         settingsHandler = new SettingsHandler(this);
+        playerLimit = settingsHandler.getSettingsManager().getProperty(ConfigOptions.PLAYER_LIMIT);
     }
 
     @Subscribe
@@ -106,6 +110,14 @@ public final class ProxyQueuesImpl implements ProxyQueues {
 
         if(this.getProxyServer().getPluginManager().isLoaded("proxydiscord")) {
             new ProxyDiscordHandler(this);
+        }
+    }
+
+    @Subscribe
+    public void onLogin(LoginEvent event) {
+        if(playerLimit > -1 && proxyServer.getPlayerCount() >= playerLimit &&
+                !event.getPlayer().hasPermission("proxyqueues.bypass-limit")) {
+            event.setResult(ResultedEvent.ComponentResult.denied(Messages.getComponent("errors.player-limit")));
         }
     }
 
@@ -206,5 +218,13 @@ public final class ProxyQueuesImpl implements ProxyQueues {
         }
 
         player.sendMessage(legacyComponentSerializer.deserialize(result + Messages.get(message, replacements)));
+    }
+
+    public int getPlayerLimit() {
+        return playerLimit;
+    }
+
+    public void setPlayerLimit(int playerLimit) {
+        this.playerLimit = Math.max(playerLimit, -1);
     }
 }

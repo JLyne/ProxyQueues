@@ -37,6 +37,10 @@ import static ch.jalu.configme.properties.PropertyInitializer.newProperty;
 
 
 public class ConfigOptions implements SettingsHolder {
+    @Comment("How many players should be allowed on the server in total? -1 to disable")
+    public static final Property<Integer> PLAYER_LIMIT =
+            newProperty("settings.player-limit", -1);
+
     @Comment("How many seconds should be in-between each queue movement?")
     public static final Property<Integer> DELAY_LENGTH =
             newProperty("settings.delay-length", 2);
