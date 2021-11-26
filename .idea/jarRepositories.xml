@@ -76,5 +76,10 @@
       <option name="name" value="maven2" />
       <option name="url" value="https://repo.not-null.co.uk/releases/" />
     </remote-repository>
+    <remote-repository>
+      <option name="id" value="maven" />
+      <option name="name" value="maven" />
+      <option name="url" value="https://papermc.io/repo/repository/maven-public/" />
+    </remote-repository>
   </component>
 </project>
