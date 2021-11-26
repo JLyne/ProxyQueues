@@ -98,7 +98,8 @@ public class ProxyDiscordHandler {
 	@Subscribe(order = PostOrder.NORMAL)
 	public void onPlayerVerifyStateChange(PlayerVerifyStateChangeEvent e) {
     	//Remove player from any queue
-        if(!e.getState().isVerified()) {
+        if(e.getPreviousState() != VerificationResult.UNKNOWN && !e.getState().isVerified()) {
+			//FIXME: Removes players from public queues too which isn't desired
         	plugin.getQueueHandler().clearPlayer(e.getPlayer());
 		}
 	}
