@@ -28,9 +28,10 @@ import com.velocitypowered.api.event.PostOrder;
 import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.connection.DisconnectEvent;
 import com.velocitypowered.api.event.player.KickedFromServerEvent;
-import com.velocitypowered.api.event.player.ServerConnectedEvent;
+import com.velocitypowered.api.event.player.ServerPostConnectEvent;
 import com.velocitypowered.api.event.player.ServerPreConnectEvent;
 import com.velocitypowered.api.proxy.Player;
+import com.velocitypowered.api.proxy.ServerConnection;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -105,20 +106,21 @@ public class ProxyQueueEventHandler {
     }
 
 	@Subscribe(order = PostOrder.LATE)
-    public void onConnected(ServerConnectedEvent event) {
+    public void onConnected(ServerPostConnectEvent event) {
 		fatalKicks.remove(event.getPlayer().getUniqueId());
 
-		if(event.getServer().equals(queue.getServer())) {
+		RegisteredServer server = event.getPlayer().getCurrentServer()
+				.map(ServerConnection::getServer).orElse(null);
+
+		if(server != null && server.equals(queue.getServer())) {
 			queue.removePlayer(event.getPlayer(), true);
 		}
 
-        Optional<RegisteredServer> previousServer = event.getPreviousServer();
+        RegisteredServer previousServer = event.getPreviousServer();
 
-        previousServer.ifPresent(server -> {
-            if(server.equals(this.queue.getServer())) {
-                queue.clearConnectedState(event.getPlayer());
-            }
-        });
+        if(previousServer != null && previousServer.equals(this.queue.getServer())) {
+			queue.clearConnectedState(event.getPlayer());
+        }
     }
 
     /**
