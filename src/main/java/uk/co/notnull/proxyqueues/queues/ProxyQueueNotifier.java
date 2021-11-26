@@ -137,6 +137,7 @@ public class ProxyQueueNotifier {
 
         message = message.replace("{server}", queue.getServer().getServerInfo().getName());
         message = message.replace("{pos}", String.valueOf(position));
+        message = message.replace("{size}", String.valueOf(queue.getQueueSize(player.getQueueType())));
 
         if(platformDetectionEnabled && platformDetection.getPlatform(player.getPlayer()).isBedrock()) {
             player.hideBossBar();

@@ -49,6 +49,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 
 public class ProxyQueueImpl implements uk.co.notnull.proxyqueues.api.queues.ProxyQueue {
@@ -58,6 +59,11 @@ public class ProxyQueueImpl implements uk.co.notnull.proxyqueues.api.queues.Prox
     private final ConcurrentLinkedQueue<QueuePlayerImpl> queue = new ConcurrentLinkedQueue<>();
     private final ConcurrentLinkedQueue<QueuePlayerImpl> priorityQueue = new ConcurrentLinkedQueue<>();
     private final ConcurrentLinkedQueue<QueuePlayerImpl> staffQueue = new ConcurrentLinkedQueue<>();
+
+    //Cached queue sizes
+    private final AtomicInteger queueSize = new AtomicInteger(0);
+    private final AtomicInteger priorityQueueSize = new AtomicInteger(0);
+    private final AtomicInteger staffQueueSize = new AtomicInteger(0);
 
     private final ConcurrentHashMap<UUID, QueuePlayerImpl> queuePlayers = new ConcurrentHashMap<>();
 
@@ -146,15 +152,18 @@ public class ProxyQueueImpl implements uk.co.notnull.proxyqueues.api.queues.Prox
                     switch (result.getQueueType()) {
                         case STAFF:
                             staffQueue.add(result);
+                            staffQueueSize.incrementAndGet();
                             break;
 
                         case PRIORITY:
                             priorityQueue.add(result);
+                            priorityQueueSize.incrementAndGet();
                             break;
 
                         case NORMAL:
                         default:
                             queue.add(result);
+                            queueSize.incrementAndGet();
                             break;
                     }
                 } else {
@@ -218,6 +227,10 @@ public class ProxyQueueImpl implements uk.co.notnull.proxyqueues.api.queues.Prox
                     connectedStaff.add(player.getPlayer().getUniqueId()); //Is connected to queued server, add to connected
                 }
 
+                if(removed) {
+                    staffQueueSize.decrementAndGet();
+                }
+
                 break;
 
             case PRIORITY:
@@ -228,11 +241,20 @@ public class ProxyQueueImpl implements uk.co.notnull.proxyqueues.api.queues.Prox
                     connectedPriority.add(player.getPlayer().getUniqueId()); //Is connected to queued server, add to connected
                 }
 
+                if(removed) {
+                    priorityQueueSize.decrementAndGet();
+                }
+
                 break;
 
             case NORMAL:
             default:
                 removed = queue.remove(player);
+
+                if(removed) {
+                    queueSize.decrementAndGet();
+                }
+
                 break;
         }
 
@@ -412,12 +434,12 @@ public class ProxyQueueImpl implements uk.co.notnull.proxyqueues.api.queues.Prox
     public int getQueueSize(QueueType queueType) {
         switch (queueType) {
             case STAFF:
-                return staffQueue.size();
+                return staffQueueSize.get();
             case PRIORITY:
-                return priorityQueue.size();
+                return priorityQueueSize.get();
             case NORMAL:
             default:
-                return queue.size();
+                return queueSize.get();
         }
     }
 
