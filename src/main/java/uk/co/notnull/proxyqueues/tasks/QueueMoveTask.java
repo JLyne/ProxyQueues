@@ -119,11 +119,11 @@ public class QueueMoveTask implements Runnable {
             boolean fatal = fatalErrors.stream().anyMatch(reasonPlain::contains);
 
 		    if(fatal) {
+                queue.removePlayer(targetPlayer, false);
+
                 if(currentServer == null || currentServer.getServer().equals(waitingServer)) {
                     targetPlayer.getPlayer().disconnect(result.getReasonComponent().orElse(Component.empty()));
                 } else {
-                    queue.removePlayer(targetPlayer, false);
-
                     proxyQueues.sendMessage(targetPlayer.getPlayer(), MessageType.ERROR,
                                             "errors.queue-cannot-join", Map.of("{reason}", reasonPlain));
                 }

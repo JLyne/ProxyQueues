@@ -43,14 +43,11 @@ import uk.co.notnull.proxyqueues.configuration.sections.ConfigOptions;
 
 import java.time.Instant;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 
 public class ProxyQueueEventHandler {
 	private final ProxyQueuesImpl proxyQueues;
 	private final SettingsManager settingsManager;
 	private final ProxyQueueImpl queue;
-
-	private final Set<UUID> fatalKicks = ConcurrentHashMap.newKeySet();
 
 	public ProxyQueueEventHandler(ProxyQueuesImpl proxyQueues, ProxyQueueImpl queue) {
 		this.settingsManager = proxyQueues.getSettingsHandler().getSettingsManager();
@@ -107,8 +104,6 @@ public class ProxyQueueEventHandler {
 
 	@Subscribe(order = PostOrder.LATE)
     public void onConnected(ServerPostConnectEvent event) {
-		fatalKicks.remove(event.getPlayer().getUniqueId());
-
 		RegisteredServer server = event.getPlayer().getCurrentServer()
 				.map(ServerConnection::getServer).orElse(null);
 
@@ -145,15 +140,6 @@ public class ProxyQueueEventHandler {
 
         player.getCurrentServer().ifPresent(server -> {
 			if(server.getServer().equals(queue.getServer())) {
-				if(fatalKicks.contains(player.getUniqueId())) {
-					proxyQueues.getLogger().debug(
-						"Player disconnecting due to fatal kick. Not re-queueing.");
-
-					fatalKicks.remove(player.getUniqueId());
-
-					return;
-				}
-
 				boolean staff = player.hasPermission(settingsManager.getProperty(ConfigOptions.STAFF_PERMISSION));
 				proxyQueues.getLogger().debug(
 						"Player not in queue, adding to " + (staff ? "staff" : "priority") + " queue");
@@ -176,6 +162,7 @@ public class ProxyQueueEventHandler {
 		String reasonPlain = PlainTextComponentSerializer.plainText().serialize(reason);
 		List<String> fatalErrors = proxyQueues.getSettingsHandler().getSettingsManager().getProperty(
 				ConfigOptions.FATAL_ERRORS);
+		Optional<RegisteredServer> waitingServer = proxyQueues.getWaitingServer();
 
 		boolean fatal = fatalErrors.stream().anyMatch(reasonPlain::contains);
 
@@ -187,9 +174,12 @@ public class ProxyQueueEventHandler {
 					.hasPermission(settingsManager.getProperty(ConfigOptions.STAFF_PERMISSION));
 
 			queue.addPlayer(event.getPlayer(), staff ? QueueType.STAFF : QueueType.PRIORITY);
+
+			if(event.getResult() instanceof KickedFromServerEvent.DisconnectPlayer && waitingServer.isPresent()) {
+				event.setResult(KickedFromServerEvent.RedirectPlayer.create(waitingServer.get()));
+			}
 		} else {
 			proxyQueues.getLogger().debug("Reason fatal");
-			fatalKicks.add(event.getPlayer().getUniqueId());
 		}
     }
 }
