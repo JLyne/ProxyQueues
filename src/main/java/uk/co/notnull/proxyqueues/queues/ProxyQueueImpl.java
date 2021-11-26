@@ -210,13 +210,7 @@ public class ProxyQueueImpl implements uk.co.notnull.proxyqueues.api.queues.Prox
      * @param connected - Whether player has now connected to the queued server, for cache updates
      */
     public void removePlayer(QueuePlayer player, boolean connected) {
-        player.hideBossBar();
-        ((QueuePlayerImpl) player).setConnecting(false);
         boolean removed;
-
-        if(!connected) {
-            clearConnectedState(player.getPlayer());
-        }
 
         switch(player.getQueueType()) {
             case STAFF:
@@ -257,6 +251,13 @@ public class ProxyQueueImpl implements uk.co.notnull.proxyqueues.api.queues.Prox
 
                 break;
         }
+
+        if(!connected) {
+            clearConnectedState(player.getPlayer());
+        }
+
+        player.hideBossBar();
+        ((QueuePlayerImpl) player).setConnecting(false);
 
         proxyQueues.getLogger().debug("removePlayer: type = " + player.getQueueType() + ", removed? " + removed);
         queuePlayers.remove(player.getPlayer().getUniqueId());
