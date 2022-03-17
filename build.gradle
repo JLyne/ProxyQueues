@@ -60,7 +60,6 @@ dependencies {
     implementation 'cloud.commandframework:cloud-minecraft-extras:1.6.2'
     implementation 'cloud.commandframework:cloud-annotations:1.6.2'
 
-    compileOnly 'org.spongepowered:configurate-yaml:3.6'
     compileOnly 'com.intellij:annotations:12.0'
     compileOnly 'com.velocitypowered:velocity-api:3.1.2-SNAPSHOT'
     compileOnly 'uk.co.notnull:PlatformDetection-velocity:2.0'
