@@ -54,7 +54,7 @@ public class Messages {
                 .getString("Message " + id + " does not exist");
 
         for (Map.Entry<String, String> entry : replacements.entrySet()) {
-            message = message.replace(entry.getKey(), entry.getValue());
+            message = message.replace("<" + entry.getKey() + ">", entry.getValue());
         }
 
         return message;

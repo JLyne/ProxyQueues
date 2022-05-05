@@ -84,6 +84,13 @@ public final class ProxyQueuesImpl implements ProxyQueues {
         createFile("config.yml");
         createFile("messages.yml");
 
+        loadMessagesConfig();
+
+        settingsHandler = new SettingsHandler(this);
+        playerLimit = settingsHandler.getSettingsManager().getProperty(ConfigOptions.PLAYER_LIMIT);
+    }
+
+    public void loadMessagesConfig() {
         //Message config
         ConfigurationNode messagesConfiguration;
 
@@ -93,10 +100,8 @@ public final class ProxyQueuesImpl implements ProxyQueues {
 		    Messages.set(messagesConfiguration);
 		} catch (IOException e) {
 			logger.error("Error loading messages.yml");
+            e.printStackTrace();
 		}
-
-        settingsHandler = new SettingsHandler(this);
-        playerLimit = settingsHandler.getSettingsManager().getProperty(ConfigOptions.PLAYER_LIMIT);
     }
 
     @Subscribe

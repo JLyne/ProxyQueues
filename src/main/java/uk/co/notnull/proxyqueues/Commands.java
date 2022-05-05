@@ -256,6 +256,7 @@ public class Commands {
     @CommandDescription("Reload the configuration of the plugin")
     @CommandPermission(Constants.ADMIN_PERM)
     public void reload(CommandSource issuer) {
+        plugin.loadMessagesConfig();
         plugin.getSettingsHandler().getSettingsManager().reload();
         plugin.setPlayerLimit(plugin.getSettingsHandler().getSettingsManager().getProperty(ConfigOptions.PLAYER_LIMIT));
         ((QueueHandlerImpl) queueHandler).updateQueues();
