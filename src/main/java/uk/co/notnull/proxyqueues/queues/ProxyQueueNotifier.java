@@ -23,33 +23,31 @@
 
 package uk.co.notnull.proxyqueues.queues;
 
-import ch.jalu.configme.SettingsManager;
 import com.velocitypowered.api.plugin.PluginContainer;
 import net.kyori.adventure.audience.MessageType;
 import net.kyori.adventure.identity.Identity;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.title.Title;
 import uk.co.notnull.platformdetection.PlatformDetectionVelocity;
+import uk.co.notnull.proxyqueues.Messages;
 import uk.co.notnull.proxyqueues.ProxyQueuesImpl;
 import uk.co.notnull.proxyqueues.api.queues.QueuePlayer;
 import uk.co.notnull.proxyqueues.configuration.sections.ConfigOptions;
 
+import java.util.Collections;
+import java.util.Map;
 import java.util.Optional;
 
 public class ProxyQueueNotifier {
 
-	private final SettingsManager settingsManager;
-	private final ProxyQueueImpl queue;
+    private final ProxyQueueImpl queue;
 	private final String notifyMethod;
     private final boolean platformDetectionEnabled;
     private PlatformDetectionVelocity platformDetection;
 
     public ProxyQueueNotifier(ProxyQueuesImpl proxyQueues, ProxyQueueImpl queue) {
-		this.settingsManager = proxyQueues.getSettingsHandler().getSettingsManager();
 		this.queue = queue;
 
-		notifyMethod =settingsManager.getProperty(ConfigOptions.INFORM_METHOD);
+		notifyMethod = proxyQueues.getSettingsHandler().getSettingsManager().getProperty(ConfigOptions.INFORM_METHOD);
 
 		Optional<PluginContainer> platformDetection = proxyQueues.getProxyServer().getPluginManager()
                 .getPlugin("platform-detection");
@@ -65,33 +63,20 @@ public class ProxyQueueNotifier {
      * @param player the player to check
      */
     public void notifyPlayer(QueuePlayer player) {
-        String actionbar;
-        String message;
-        String title_top;
-        String title_bottom;
-        MiniMessage miniMessage = MiniMessage.miniMessage();
+        String key;
 
-        switch(player.getQueueType()) {
+        switch (player.getQueueType()) {
             case STAFF:
-                actionbar = settingsManager.getProperty(ConfigOptions.STAFF_ACTIONBAR_DESIGN);
-                message = settingsManager.getProperty(ConfigOptions.STAFF_TEXT_DESIGN);
-                title_top = settingsManager.getProperty(ConfigOptions.STAFF_TITLE_HEADER);
-                title_bottom = settingsManager.getProperty(ConfigOptions.STAFF_TITLE_FOOTER);
+                key = "notify.staff";
                 break;
 
             case PRIORITY:
-                actionbar = settingsManager.getProperty(ConfigOptions.PRIORITY_ACTIONBAR_DESIGN);
-                message = settingsManager.getProperty(ConfigOptions.PRIORITY_TEXT_DESIGN);
-                title_top = settingsManager.getProperty(ConfigOptions.PRIORITY_TITLE_HEADER);
-                title_bottom = settingsManager.getProperty(ConfigOptions.PRIORITY_TITLE_FOOTER);
+                key = "notify.priority";
                 break;
 
             case NORMAL:
             default:
-                actionbar = settingsManager.getProperty(ConfigOptions.NORMAL_ACTIONBAR_DESIGN);
-                message = settingsManager.getProperty(ConfigOptions.NORMAL_TEXT_DESIGN);
-                title_top = settingsManager.getProperty(ConfigOptions.NORMAL_TITLE_HEADER);
-                title_bottom = settingsManager.getProperty(ConfigOptions.NORMAL_TITLE_FOOTER);
+                key = "notify.normal";
                 break;
         }
 
@@ -100,51 +85,59 @@ public class ProxyQueueNotifier {
                 updateBossBar(player);
                 break;
             case "actionbar":
-                actionbar = actionbar.replace("server", queue.getServer().getServerInfo().getName());
-                actionbar = actionbar.replace("pos", String.valueOf(player.getPosition()));
-                player.getPlayer().sendActionBar(miniMessage.deserialize(actionbar));
+                player.getPlayer().sendActionBar(Messages.getComponent(key + ".actionbar", Map.of(
+                        "server", queue.getServer().getServerInfo().getName(),
+                        "pos", String.valueOf(player.getPosition()),
+                        "size", String.valueOf(queue.getQueueSize(player.getQueueType()))
+                ), Collections.emptyMap()));
                 break;
             case "text":
-                message = message.replace("server", queue.getServer().getServerInfo().getName());
-                message = message.replace("pos", String.valueOf(player.getPosition()));
-                player.getPlayer().sendMessage(Identity.nil(), miniMessage.deserialize(message), MessageType.SYSTEM);
+                player.getPlayer().sendMessage(Identity.nil(), Messages.getComponent(key + ".chat", Map.of(
+                        "server", queue.getServer().getServerInfo().getName(),
+                        "pos", String.valueOf(player.getPosition()),
+                        "size", String.valueOf(queue.getQueueSize(player.getQueueType()))
+                ), Collections.emptyMap()), MessageType.SYSTEM);
                 break;
             case "title":
-                title_bottom = title_bottom.replace("server", queue.getServer().getServerInfo().getName());
-                title_bottom = title_bottom.replace("pos", String.valueOf(player.getPosition()));
-                Title title = Title.title(miniMessage.deserialize(title_top), miniMessage.deserialize(title_bottom));
-                player.getPlayer().showTitle(title);
+                player.getPlayer().showTitle(
+                        Title.title(Messages.getComponent(key + ".title.title"),
+                                    Messages.getComponent(key + ".title.subtitle", Map.of(
+                                            "server", queue.getServer().getServerInfo().getName(),
+                                            "pos", String.valueOf(player.getPosition()),
+                                            "size", String.valueOf(queue.getQueueSize(player.getQueueType()))
+                                    ), Collections.emptyMap())));
                 break;
         }
     }
 
     private void updateBossBar(QueuePlayer player) {
         int position = player.getPosition();
-        String message;
+        String key;
 
         switch (player.getQueueType()) {
             case STAFF:
-                message = settingsManager.getProperty(ConfigOptions.STAFF_BOSSBAR_DESIGN);
+                key = "notify.staff.bossbar";
                 break;
             case PRIORITY:
-                message = settingsManager.getProperty(ConfigOptions.PRIORITY_BOSSBAR_DESIGN);
+                key = "notify.priority.bossbar";
                 break;
             case NORMAL:
             default:
-                message = settingsManager.getProperty(ConfigOptions.NORMAL_BOSSBAR_DESIGN);
+                key = "notify.normal.bossbar";
                 break;
         }
-
-        message = message.replace("<server>", queue.getServer().getServerInfo().getName());
-        message = message.replace("<pos>", String.valueOf(position));
-        message = message.replace("<size>", String.valueOf(queue.getQueueSize(player.getQueueType())));
 
         if(platformDetectionEnabled && platformDetection.getPlatform(player.getPlayer()).isBedrock()) {
             player.hideBossBar();
         }
 
         player.showBossBar();
-        player.getBossBar().name(Component.text(message));
+        player.getBossBar().name(
+                Messages.getComponent(key, Map.of(
+                                              "server", queue.getServer().getServerInfo().getName(),
+                                              "pos", String.valueOf(position),
+                                              "size", String.valueOf(queue.getQueueSize(player.getQueueType()))),
+                                      Collections.emptyMap()));
     }
 
 	public String getNotifyMethod() {

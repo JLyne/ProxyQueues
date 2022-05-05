@@ -83,63 +83,6 @@ public class ConfigOptions implements SettingsHolder {
     public static final Property<String> INFORM_METHOD =
             newProperty("notify.method", "ACTIONBAR");
 
-    @Comment("How would you like the design for the ActionBar to look for the normal queue?")
-    public static final Property<String> NORMAL_ACTIONBAR_DESIGN =
-            newProperty("notify.normal.actionbar.design", "Queued for {server}: {pos}");
-
-    @Comment("How would you like the design for the BossBar to look for the normal queue?")
-    public static final Property<String> NORMAL_BOSSBAR_DESIGN =
-            newProperty("notify.normal.bossbar.design", "Queued for {server}: {pos}");
-
-    @Comment("How would you like the design for the text to look for the normal queue?")
-    public static final Property<String> NORMAL_TEXT_DESIGN =
-            newProperty("notify.normal.text.design", "You are currently in position {pos}");
-
-    @Comment("How would you like the design for the title to look for the normal queue?")
-    public static final Property<String> NORMAL_TITLE_HEADER =
-            newProperty("notify.normal.title.title", "Current in queue");
-
-    public static final Property<String> NORMAL_TITLE_FOOTER =
-            newProperty("notify.normal.title.subtitle", "Position: {pos}");
-
-    @Comment("How would you like the design for the ActionBar to look for the priority queue?")
-    public static final Property<String> PRIORITY_ACTIONBAR_DESIGN =
-            newProperty("notify.priority.actionbar.design", "Queued for {server}: {pos}");
-
-    @Comment("How would you like the design for the BossBar to look for the priority queue?")
-    public static final Property<String> PRIORITY_BOSSBAR_DESIGN =
-            newProperty("notify.priority.bossbar.design", "Queued for {server}: {pos}");
-
-    @Comment("How would you like the design for the text to look for the priority queue?")
-    public static final Property<String> PRIORITY_TEXT_DESIGN =
-            newProperty("notify.priority.text.design", "You are currently in position {pos}");
-
-    @Comment("How would you like the design for the title to look for the priority queue?")
-    public static final Property<String> PRIORITY_TITLE_HEADER =
-            newProperty("notify.priority.title.title", "Current in queue");
-
-    public static final Property<String> PRIORITY_TITLE_FOOTER =
-            newProperty("notify.priority.title.subtitle", "Position: {pos}");
-
-        @Comment("How would you like the design for the ActionBar to look for the staff queue?")
-    public static final Property<String> STAFF_ACTIONBAR_DESIGN =
-            newProperty("notify.staff.actionbar.design", "Queued for {server}: {pos}");
-
-    @Comment("How would you like the design for the BossBar to look for the staff queue?")
-    public static final Property<String> STAFF_BOSSBAR_DESIGN =
-            newProperty("notify.staff.bossbar.design", "Queued for {server}: {pos}");
-
-    @Comment("How would you like the design for the text to look for the staff queue?")
-    public static final Property<String> STAFF_TEXT_DESIGN =
-            newProperty("notify.staff.text.design", "You are currently in position {pos}");
-
-    @Comment("How would you like the design for the title to look for the staff queue?")
-    public static final Property<String> STAFF_TITLE_HEADER =
-            newProperty("notify.staff.title.title", "Current in queue");
-
-    public static final Property<String> STAFF_TITLE_FOOTER =
-            newProperty("notify.staff.title.subtitle", "Position: {pos}");
-
     @Override
     public void registerComments(CommentsConfiguration configuration) {
         String[] pluginHeader = {

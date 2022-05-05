@@ -1,6 +1,28 @@
 prefix:
   error: "<red><bold>Queue > <reset><yellow>"
   info: "<light_purple><bold>Queue > <reset><aqua>"
+notify:
+  normal:
+    actionbar: "Queued for <server>: Position <pos>/<size>"
+    bossbar: "Queued for <server>: Position <pos>/<size>"
+    chat: "You are currently in position <pos>/<size>"
+    title:
+      title: "Currently in queue"
+      subtitle: "Position: <pos>/<size>"
+  priority:
+    actionbar: "Priority queued for <server>: Position <pos>/<size>"
+    bossbar: "Priority queued for <server>: Position <pos>/<size>"
+    chat: "You are currently in position <pos>/<size>"
+    title:
+      title: "Currently in queue"
+      subtitle: "Position: <pos>/<size>"
+  staff:
+    actionbar: "Staff queued for <server>: Position <pos>/<size>"
+    bossbar: "Staff queued for <server>: Position <pos>/<size>"
+    chat: "You are currently in position <pos>/<size>"
+    title:
+      title: "Currently in queue"
+      subtitle: "Position: <pos>/<size>"
 commands:
   kick-success: "Kicked <yellow><player><aqua> from the <yellow><server><aqua> queue"
   join-success: "You have joined the queue for <yellow><server>"
