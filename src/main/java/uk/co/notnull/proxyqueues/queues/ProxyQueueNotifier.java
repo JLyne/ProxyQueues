@@ -1,7 +1,7 @@
 /*
  * ProxyQueues, a Velocity queueing solution
  *
- * Copyright (c) 2021 James Lyne
+ * Copyright (c) 2022 James Lyne
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -28,7 +28,7 @@ import com.velocitypowered.api.plugin.PluginContainer;
 import net.kyori.adventure.audience.MessageType;
 import net.kyori.adventure.identity.Identity;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
+import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.title.Title;
 import uk.co.notnull.platformdetection.PlatformDetectionVelocity;
 import uk.co.notnull.proxyqueues.ProxyQueuesImpl;
@@ -69,7 +69,7 @@ public class ProxyQueueNotifier {
         String message;
         String title_top;
         String title_bottom;
-        LegacyComponentSerializer serializer = LegacyComponentSerializer.legacyAmpersand();
+        MiniMessage miniMessage = MiniMessage.miniMessage();
 
         switch(player.getQueueType()) {
             case STAFF:
@@ -100,19 +100,19 @@ public class ProxyQueueNotifier {
                 updateBossBar(player);
                 break;
             case "actionbar":
-                actionbar = actionbar.replace("{server}", queue.getServer().getServerInfo().getName());
-                actionbar = actionbar.replace("{pos}", String.valueOf(player.getPosition()));
-                player.getPlayer().sendActionBar(serializer.deserialize(actionbar));
+                actionbar = actionbar.replace("server", queue.getServer().getServerInfo().getName());
+                actionbar = actionbar.replace("pos", String.valueOf(player.getPosition()));
+                player.getPlayer().sendActionBar(miniMessage.deserialize(actionbar));
                 break;
             case "text":
-                message = message.replace("{server}", queue.getServer().getServerInfo().getName());
-                message = message.replace("{pos}", String.valueOf(player.getPosition()));
-                player.getPlayer().sendMessage(Identity.nil(), serializer.deserialize(message), MessageType.SYSTEM);
+                message = message.replace("server", queue.getServer().getServerInfo().getName());
+                message = message.replace("pos", String.valueOf(player.getPosition()));
+                player.getPlayer().sendMessage(Identity.nil(), miniMessage.deserialize(message), MessageType.SYSTEM);
                 break;
             case "title":
-                title_bottom = title_bottom.replace("{server}", queue.getServer().getServerInfo().getName());
-                title_bottom = title_bottom.replace("{pos}", String.valueOf(player.getPosition()));
-                Title title = Title.title(serializer.deserialize(title_top), serializer.deserialize(title_bottom));
+                title_bottom = title_bottom.replace("server", queue.getServer().getServerInfo().getName());
+                title_bottom = title_bottom.replace("pos", String.valueOf(player.getPosition()));
+                Title title = Title.title(miniMessage.deserialize(title_top), miniMessage.deserialize(title_bottom));
                 player.getPlayer().showTitle(title);
                 break;
         }
@@ -135,9 +135,9 @@ public class ProxyQueueNotifier {
                 break;
         }
 
-        message = message.replace("{server}", queue.getServer().getServerInfo().getName());
-        message = message.replace("{pos}", String.valueOf(position));
-        message = message.replace("{size}", String.valueOf(queue.getQueueSize(player.getQueueType())));
+        message = message.replace("<server>", queue.getServer().getServerInfo().getName());
+        message = message.replace("<pos>", String.valueOf(position));
+        message = message.replace("<size>", String.valueOf(queue.getQueueSize(player.getQueueType())));
 
         if(platformDetectionEnabled && platformDetection.getPlatform(player.getPlayer()).isBedrock()) {
             player.hideBossBar();

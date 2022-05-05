@@ -39,7 +39,7 @@ import com.velocitypowered.api.event.proxy.ProxyInitializeEvent;
 import com.velocitypowered.api.plugin.annotation.DataDirectory;
 import com.velocitypowered.api.proxy.ProxyServer;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
-import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
+import net.kyori.adventure.text.minimessage.MiniMessage;
 import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.yaml.YAMLConfigurationLoader;
 import uk.co.notnull.proxyqueues.api.MessageType;
@@ -67,7 +67,7 @@ public final class ProxyQueuesImpl implements ProxyQueues {
     private static ProxyQueuesImpl instance;
     private final SettingsHandler settingsHandler;
     private QueueHandlerImpl queueHandler;
-    private static final LegacyComponentSerializer legacyComponentSerializer = LegacyComponentSerializer.legacyAmpersand();
+    private static final MiniMessage miniMessage = MiniMessage.miniMessage();
     private int playerLimit;
 
     private final ProxyServer proxyServer;
@@ -217,7 +217,7 @@ public final class ProxyQueuesImpl implements ProxyQueues {
             result = Messages.get("prefix.error");
         }
 
-        player.sendMessage(legacyComponentSerializer.deserialize(result + Messages.get(message, replacements)));
+        player.sendMessage(miniMessage.deserialize(result + Messages.get(message, replacements)));
     }
 
     public int getPlayerLimit() {

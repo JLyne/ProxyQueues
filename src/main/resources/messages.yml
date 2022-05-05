@@ -1,53 +1,53 @@
 prefix:
-  error: "&c&lQueue > &e"
-  info: "&d&lQueue > &b"
+  error: "<red><bold>Queue > <reset><yellow>"
+  info: "<light_purple><bold>Queue > <reset><aqua>"
 commands:
-  kick-success: "Kicked &e{player}&b from the &e{server}&b queue"
-  join-success: "You have joined the queue for &e{server}"
+  kick-success: "Kicked <yellow><player><aqua> from the <yellow><server><aqua> queue"
+  join-success: "You have joined the queue for <yellow><server>"
   leave-success: "You have left the queue"
-  clear-success: "The queue for &e{server}&b has been cleared"
+  clear-success: "The queue for <yellow><server><aqua> has been cleared"
   info-server-response: |-
-    &d&e{server} &dQueue Status
-    &bPlayers in queue: &e{size} &b(&e{prioritySize} &bpriority, &e{staffSize} &bstaff)
-    &bPlayers on Server: &e{connectedSize} &b(&e{priorityConnectedSize} &bpriority, &e{staffConnectedSize} &bstaff)
+    <light_purple><yellow><server> <light_purple>Queue Status
+    <aqua>Players in queue: <yellow><size> <aqua>(<yellow><priority_size> <aqua>priority, <yellow><staff_size> <aqua>staff)
+    <aqua>Players on Server: <yellow><connected_size> <aqua>(<yellow><priority_connected_size> <aqua>priority, <yellow><staff_connected_size> <aqua>staff)
 
-    &bQueue Settings: &e{required} &bmin/&e{max} &bnormal max/&e{priorityMax} &bpriority max/&e{globalMax} &bglobal max
+    <aqua>Queue Settings: <yellow><required> <aqua>min/<yellow><max> <aqua>normal max/<yellow><priority_max> <aqua>priority max/<yellow><global_max> <aqua>global max
 
-    &bFront 3 staff:
-    &e{staffFirst}, {staffSecond}, {staffThird}
+    <aqua>Front 3 staff:
+    <yellow><staff_first>, <staff_second>, <staff_third>
 
-    &bFront 3 priority:
-    &e{priorityFirst}, {prioritySecond}, {priorityThird}
+    <aqua>Front 3 priority:
+    <yellow><priority_first>, <priority_second>, <priority_third>
 
-    &bFront 3 normal:
-    &e{first}, {second}, {third}
+    <aqua>Front 3 normal:
+    <yellow><first>, <second>, <third>
   info-player-response: |-
-    &e{player} &dStatus
-    &bQueued For: &e{server}
-    &bQueue Type: &e{type}
-    &bPosition: &e{position}
-    &btatus: {status}
-    &bQueueing for: &e{queuedTime}
-  info-status-online: "&aOnline"
-  info-status-offline: "&cOffline. &bLast seen &e{lastseen}&b ago (&e{remaining}&b remaining)."
+    <yellow><player> <light_purple>Status
+    <aqua>Queued For: <yellow><server>
+    <aqua>Queue Type: <yellow><type>
+    <aqua>Position: <yellow><position>
+    <aqua>Status: <status>
+    <aqua>Queueing for: <yellow><queued_time>
+  info-status-online: "<green>Online"
+  info-status-offline: "<red>Offline. <aqua>Last seen <yellow><last_seen><aqua> ago (<yellow><remaining><aqua> remaining)."
   reload-success: "You've successfully reloaded the configuration!"
 errors:
-  server-no-queue: "Queueing is disabled for &c{server}"
-  server-unknown: "Unknown server: &c{server}"
+  server-no-queue: "Queueing is disabled for <red><server>"
+  server-unknown: "Unknown server: <red><server>"
   player-no-queue: "You are not queued for any server"
-  player-same-server: "You are already connected to &c{server}"
-  target-no-queue: "&c{player}&e is not queued for any server"
-  target-unknown: "Unknown player: &c{player}"
-  queue-cannot-join: "Sorry, you're currently unable to join the queue:\n &c{reason}"
-  queue-removed-error: "Sorry, you have been removed from the queue due to a fatal error:\n"
+  player-same-server: "You are already connected to <red><server>"
+  target-no-queue: "<red><player><yellow> is not queued for any server"
+  target-unknown: "Unknown player: <red><player>"
+  queue-cannot-join: "Sorry, you're currently unable to join the queue:<break> <red><reason>"
+  queue-removed-error: "Sorry, you have been removed from the queue due to a fatal error:<break>"
   queue-removed: "You have been removed from the queue by an admin"
-  queue-destroyed: "Queueing for &c{server}&e is no longer available"
+  queue-destroyed: "Queueing for <red><server><yellow> is no longer available"
   discord-not-linked: |-
     You need to link your Discord account and have one of the required roles to join this server.
     Please follow the instructions to link your Discord account.
   discord-not-verified: "Your Discord account does not have any of the roles required to join this server."
 reconnect:
   restore-position: |-
-    Seems you lost connection to the server. We have &erestored&b your previous queue position.
+    Seems you lost connection to the server. We have <yellow>restored<aqua> your previous queue position.
   restore-priority: |-
-    Seems you lost connection to the server. We have placed you in the &epriority queue.
+    Seems you lost connection to the server. We have placed you in the <yellow>priority queue.

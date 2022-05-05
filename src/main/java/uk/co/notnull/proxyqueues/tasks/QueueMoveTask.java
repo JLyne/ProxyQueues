@@ -36,8 +36,8 @@ import uk.co.notnull.proxyqueues.queues.QueuePlayerImpl;
 import net.kyori.adventure.text.Component;
 
 import java.time.Instant;
+import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 
@@ -125,7 +125,8 @@ public class QueueMoveTask implements Runnable {
                     targetPlayer.getPlayer().disconnect(result.getReasonComponent().orElse(Component.empty()));
                 } else {
                     proxyQueues.sendMessage(targetPlayer.getPlayer(), MessageType.ERROR,
-                                            "errors.queue-cannot-join", Map.of("{reason}", reasonPlain));
+                                            "errors.queue-cannot-join",
+                                            Collections.singletonMap("reason", reasonPlain));
                 }
             }
         });

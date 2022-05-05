@@ -45,6 +45,7 @@ import uk.co.notnull.proxyqueues.utils.Constants;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
@@ -80,14 +81,14 @@ public class Commands {
 
         if(queue == null) {
             proxyQueues.sendMessage(sender, MessageType.ERROR, "errors.server-no-queue",
-                                    Map.of("{server}", server.getServerInfo().getName()));
+                                    Collections.singletonMap("server", server.getServerInfo().getName()));
             return;
         }
 
         queue.clear();
 
         proxyQueues.sendMessage(sender, MessageType.INFO, "commands.clear-success",
-                                Map.of("{server}", server.getServerInfo().getName()));
+                                Collections.singletonMap("server", server.getServerInfo().getName()));
     }
 
     @CommandMethod("queue info server <server>")
@@ -99,7 +100,7 @@ public class Commands {
 
         if(queue == null) {
             proxyQueues.sendMessage(sender, MessageType.ERROR, "errors.server-no-queue",
-                                    Map.of("{server}", server.getServerInfo().getName()));
+                                    Collections.singletonMap("server", server.getServerInfo().getName()));
             return;
         }
 
@@ -122,29 +123,29 @@ public class Commands {
         QueuePlayer[] staffPlayers = queue.getTopPlayers(QueueType.STAFF, 3);
 
         proxyQueues.sendMessage(sender, MessageType.INFO, "commands.info-server-response", Map.ofEntries(
-                entry("{server}", server.getServerInfo().getName()),
-                entry("{size}", String.valueOf(normalSize)),
-                entry("{prioritySize}", String.valueOf(prioritySize)),
-                entry("{staffSize}", String.valueOf(staffSize)),
-                entry("{connectedSize}", String.valueOf(connectedSize)),
-                entry("{priorityConnectedSize}", String.valueOf(priorityConnectedSize)),
-                entry("{staffConnectedSize}", String.valueOf(staffConnectedSize)),
-                entry("{required}", String.valueOf(playersRequired)),
-                entry("{max}", String.valueOf(normalMax)),
-                entry("{priorityMax}", String.valueOf(priorityMax)),
-                entry("{globalMax}", String.valueOf(staffMax)),
-                entry("{staffFirst}", staffPlayers[0] != null ? staffPlayers[0].getPlayer().getUsername() : "n/a"),
-                entry("{staffSecond}", staffPlayers[1] != null ? staffPlayers[1].getPlayer().getUsername() : "n/a"),
-                entry("{staffThird}", staffPlayers[2] != null ? staffPlayers[2].getPlayer().getUsername() : "n/a"),
-                entry("{priorityFirst}",
+                entry("server", server.getServerInfo().getName()),
+                entry("size", String.valueOf(normalSize)),
+                entry("priority_size", String.valueOf(prioritySize)),
+                entry("staff_size", String.valueOf(staffSize)),
+                entry("connected_size", String.valueOf(connectedSize)),
+                entry("priority_connected_size", String.valueOf(priorityConnectedSize)),
+                entry("staff_connected_size", String.valueOf(staffConnectedSize)),
+                entry("required", String.valueOf(playersRequired)),
+                entry("max", String.valueOf(normalMax)),
+                entry("priority_max", String.valueOf(priorityMax)),
+                entry("global_max", String.valueOf(staffMax)),
+                entry("staff_first", staffPlayers[0] != null ? staffPlayers[0].getPlayer().getUsername() : "n/a"),
+                entry("staff_second", staffPlayers[1] != null ? staffPlayers[1].getPlayer().getUsername() : "n/a"),
+                entry("staff_third", staffPlayers[2] != null ? staffPlayers[2].getPlayer().getUsername() : "n/a"),
+                entry("priority_first",
                       priorityPlayers[0] != null ? priorityPlayers[0].getPlayer().getUsername() : "n/a"),
-                entry("{prioritySecond}",
+                entry("priority_second",
                       priorityPlayers[1] != null ? priorityPlayers[1].getPlayer().getUsername() : "n/a"),
-                entry("{priorityThird}",
+                entry("priority_third",
                       priorityPlayers[2] != null ? priorityPlayers[2].getPlayer().getUsername() : "n/a"),
-                entry("{first}", normalPlayers[0] != null ? normalPlayers[0].getPlayer().getUsername() : "n/a"),
-                entry("{second}", normalPlayers[1] != null ? normalPlayers[1].getPlayer().getUsername() : "n/a"),
-                entry("{third}", normalPlayers[2] != null ? normalPlayers[2].getPlayer().getUsername() : "n/a")));
+                entry("first", normalPlayers[0] != null ? normalPlayers[0].getPlayer().getUsername() : "n/a"),
+                entry("second", normalPlayers[1] != null ? normalPlayers[1].getPlayer().getUsername() : "n/a"),
+                entry("third", normalPlayers[2] != null ? normalPlayers[2].getPlayer().getUsername() : "n/a")));
     }
 
     @CommandMethod("queue info player <player>")
@@ -158,7 +159,7 @@ public class Commands {
 
         if(queue == null) {
             proxyQueues.sendMessage(sender, MessageType.ERROR, "errors.target-no-queue",
-                                    Map.of("{player}", player.getUsername()));
+                                    Collections.singletonMap("player", player.getUsername()));
             return;
         }
 
@@ -177,16 +178,16 @@ public class Commands {
                     .until(queuePlayer.getLastSeen(), ChronoUnit.SECONDS));
 
             status = Messages.get("commands.info-status-offline",
-                                  Map.of("{lastseen}", lastSeenTime + "s", "{remaining}", remainingTime + "s"));
+                                  Map.of("last_seen", lastSeenTime + "s", "remaining", remainingTime + "s"));
         }
 
         proxyQueues.sendMessage(sender, MessageType.INFO, "commands.info-player-response",
-                        Map.of("{player}", player.getUsername(),
-                        "{server}", queue.getServer().getServerInfo().getName(),
-                        "{type}", queuePlayer.getQueueType().toString(),
-                        "{position}", Integer.toString(queuePlayer.getPosition()),
-                        "{status}", status,
-                        "{queuedTime}", queuedTime + "s"));
+                        Map.of("player", player.getUsername(),
+                        "server", queue.getServer().getServerInfo().getName(),
+                        "type", queuePlayer.getQueueType().toString(),
+                        "position", Integer.toString(queuePlayer.getPosition()),
+                        "status", status,
+                        "queued_time", queuedTime + "s"));
     }
 
     @CommandMethod("queue join <server>")
@@ -198,7 +199,7 @@ public class Commands {
 
         if(queue == null || !queue.isActive()) {
             proxyQueues.sendMessage(sender, MessageType.ERROR, "errors.server-no-queue",
-                                    Map.of("{server}", server.getServerInfo().getName()));
+                                    Collections.singletonMap("server", server.getServerInfo().getName()));
             return;
         }
 
@@ -206,7 +207,7 @@ public class Commands {
 
         if(currentServer.isPresent() && currentServer.get().getServer().equals(server)) {
             proxyQueues.sendMessage(sender, MessageType.ERROR, "errors.player-same-server",
-                                    Map.of("{server}", server.getServerInfo().getName()));
+                                    Collections.singletonMap("server", server.getServerInfo().getName()));
             return;
         }
 
@@ -225,14 +226,14 @@ public class Commands {
 
         if(currentQueue.isEmpty()) {
             proxyQueues.sendMessage(sender, MessageType.ERROR, "errors.target-no-queue",
-                                    Map.of("{player}", player.getUsername()));
+                                    Collections.singletonMap("player", player.getUsername()));
             return;
         }
 
         queueHandler.kickPlayer(uuid);
         proxyQueues.sendMessage(sender, MessageType.INFO, "commands.kick-success",
-                    Map.of("{player}", player.getUsername(),
-                    "{server}", currentQueue.get().getServer().getServerInfo().getName()));
+                    Map.of("player", player.getUsername(),
+                    "server", currentQueue.get().getServer().getServerInfo().getName()));
     }
 
  	@CommandMethod("queue leave")

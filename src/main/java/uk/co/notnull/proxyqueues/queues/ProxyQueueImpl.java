@@ -40,7 +40,7 @@ import uk.co.notnull.proxyqueues.Messages;
 import uk.co.notnull.proxyqueues.tasks.QueueMoveTask;
 
 import java.time.Instant;
-import java.util.Map;
+import java.util.Collections;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -192,11 +192,12 @@ public class ProxyQueueImpl implements uk.co.notnull.proxyqueues.api.queues.Prox
 
                 if (currentServer == null || currentServer.getServer().equals(waitingServer)) {
                     player.disconnect(
-                            Messages.getComponent("errors.queue-cannot-join", Map.of("{reason}",
-                                                                                                 reason)));
+                            Messages.getComponent("errors.queue-cannot-join",
+                                                  Collections.singletonMap("reason", reason),
+                                                  Collections.emptyMap()));
                 } else {
                     proxyQueues.sendMessage(player, MessageType.ERROR, "errors.queue-cannot-join",
-                                            Map.of("{reason}", reason));
+                                            Collections.singletonMap("reason", reason));
                 }
             }
 
@@ -318,15 +319,16 @@ public class ProxyQueueImpl implements uk.co.notnull.proxyqueues.api.queues.Prox
                     currentServer.get().getServer())) {
                 if (destroying) {
                     player.getPlayer().disconnect(
-                            Messages.getComponent("errors.queue-destroyed", Map.of("{server}",
-                                                                                               server.getServerInfo().getName())));
+                            Messages.getComponent("errors.queue-destroyed",
+                                                  Collections.singletonMap("server", server.getServerInfo().getName()),
+                                                  Collections.emptyMap()));
                 } else {
                     player.getPlayer().disconnect(Messages.getComponent("errors.queue-removed"));
                 }
             } else {
                 if (destroying) {
                     proxyQueues.sendMessage(player.getPlayer(), MessageType.ERROR, "errors.queue-destroyed",
-                                            Map.of("{server}", server.getServerInfo().getName()));
+                                            Collections.singletonMap("server", server.getServerInfo().getName()));
                 } else {
                     proxyQueues.sendMessage(player.getPlayer(), MessageType.ERROR, "errors.queue-removed");
                 }
