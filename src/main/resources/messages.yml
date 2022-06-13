@@ -61,7 +61,7 @@ errors:
   target-no-queue: "<red><player><yellow> is not queued for any server"
   target-unknown: "Unknown player: <red><player>"
   queue-cannot-join: "Sorry, you're currently unable to join the queue:<br> <red><reason>"
-  queue-removed-error: "Sorry, you have been removed from the queue due to a fatal error:<break>"
+  queue-removed-error: "Sorry, you have been removed from the queue due to a fatal error:<br>"
   queue-removed: "You have been removed from the queue by an admin"
   queue-destroyed: "Queueing for <red><server><yellow> is no longer available"
   discord-not-linked: |-
