@@ -92,7 +92,7 @@ public class ProxyQueueNotifier {
                 ), Collections.emptyMap()));
                 break;
             case "text":
-                player.getPlayer().sendMessage(Identity.nil(), Messages.getComponent(key + ".chat", Map.of(
+                player.getPlayer().sendMessage(Messages.getComponent(key + ".chat", Map.of(
                         "server", queue.getServer().getServerInfo().getName(),
                         "pos", String.valueOf(player.getPosition()),
                         "size", String.valueOf(queue.getQueueSize(player.getQueueType()))
