@@ -30,7 +30,7 @@ jobs:
       
       - uses: actions/setup-java@v1
         with:
-          java-version: 16
+          java-version: 17
 
       - name: Gradle Command
         # You may pin to the exact commit or the version.
