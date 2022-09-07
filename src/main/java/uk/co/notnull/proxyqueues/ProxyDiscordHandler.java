@@ -29,11 +29,16 @@ import com.velocitypowered.api.proxy.ServerConnection;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
 import uk.co.notnull.proxydiscord.api.ProxyDiscord;
 import uk.co.notnull.proxydiscord.api.VerificationResult;
+import uk.co.notnull.proxydiscord.api.events.PlayerInfoEvent;
 import uk.co.notnull.proxydiscord.api.events.PlayerVerifyStateChangeEvent;
+import uk.co.notnull.proxydiscord.api.info.PlayerInfo;
 import uk.co.notnull.proxydiscord.api.manager.VerificationManager;
 import uk.co.notnull.proxyqueues.api.events.PlayerQueueEvent;
+import uk.co.notnull.proxyqueues.api.queues.ProxyQueue;
+import uk.co.notnull.proxyqueues.api.queues.QueuePlayer;
 
 import java.util.Optional;
+import java.util.UUID;
 
 public class ProxyDiscordHandler {
 	private final ProxyQueuesImpl plugin;
@@ -102,5 +107,32 @@ public class ProxyDiscordHandler {
 			//FIXME: Removes players from public queues too which isn't desired
         	plugin.getQueueHandler().clearPlayer(e.getPlayer());
 		}
+	}
+
+	@Subscribe
+	public void onPlayerInfo(PlayerInfoEvent event) {
+		UUID uuid = event.getPlayerInfo().getUuid();
+		Optional<ProxyQueue> queue = plugin.getQueueHandler().getCurrentQueue(event.getPlayerInfo().getUuid());
+
+		if(queue.isEmpty()) {
+			return;
+		}
+
+		Optional<QueuePlayer> queuePlayer = queue.get().getQueuePlayer(uuid);
+
+		if(queuePlayer.isEmpty() || !queuePlayer.get().getPlayer().isActive()) {
+			return;
+		}
+
+		// Set player as queuing if they are in a queue and not already in a queue protected server
+		queuePlayer.get().getPlayer().getCurrentServer().ifPresent(server -> {
+			if(plugin.getQueueHandler().getQueue(server.getServer()) == null) {
+				PlayerInfo.QueueInfo queueInfo = new PlayerInfo.QueueInfo(
+						queue.get().getServer(),
+						queuePlayer.get().getQueueType() + " - #" + queuePlayer.get().getPosition());
+
+				event.getPlayerInfo().setQueueInfo(queueInfo);
+			}
+		});
 	}
 }
