@@ -81,5 +81,20 @@
       <option name="name" value="maven" />
       <option name="url" value="https://papermc.io/repo/repository/maven-public/" />
     </remote-repository>
+    <remote-repository>
+      <option name="id" value="MavenLocal" />
+      <option name="name" value="MavenLocal" />
+      <option name="url" value="file:$MAVEN_REPOSITORY$/" />
+    </remote-repository>
+    <remote-repository>
+      <option name="id" value="maven3" />
+      <option name="name" value="maven3" />
+      <option name="url" value="https://repo.not-null.co.uk/snpashots/" />
+    </remote-repository>
+    <remote-repository>
+      <option name="id" value="maven3" />
+      <option name="name" value="maven3" />
+      <option name="url" value="https://repo.not-null.co.uk/snapshots/" />
+    </remote-repository>
   </component>
 </project>

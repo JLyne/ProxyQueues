@@ -45,6 +45,7 @@ allprojects {
         mavenCentral()
         maven { url "https://papermc.io/repo/repository/maven-public/" }
         maven { url 'https://repo.not-null.co.uk/releases/' }
+        maven { url 'https://repo.not-null.co.uk/snapshots/' }
     }
 
     compileJava {
@@ -63,7 +64,7 @@ dependencies {
     compileOnly 'com.intellij:annotations:12.0'
     compileOnly 'com.velocitypowered:velocity-api:3.1.2-SNAPSHOT'
     compileOnly 'uk.co.notnull:PlatformDetection-velocity:2.0'
-    compileOnly 'uk.co.notnull:ProxyDiscordAPI:1.0'
+    compileOnly 'uk.co.notnull:ProxyDiscordAPI:1.1-SNAPSHOT'
     compileOnly 'io.prometheus:simpleclient_common:0.11.0'
 
     annotationProcessor 'com.velocitypowered:velocity-api:3.1.2-SNAPSHOT'

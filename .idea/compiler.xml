@@ -5,41 +5,41 @@
       <profile name="Gradle Imported" enabled="true">
         <outputRelativeToContentRoot value="true" />
         <processorPath useClasspath="false">
-          <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.velocitypowered/velocity-api/3.1.2-SNAPSHOT/fe88965487faa21c53bc053031e1b3cc1ce2442e/velocity-api-3.1.2-SNAPSHOT.jar" />
-          <entry name="$MAVEN_REPOSITORY$/com/moandjiezana/toml/toml4j/0.7.2/toml4j-0.7.2.jar" />
-          <entry name="$MAVEN_REPOSITORY$/org/spongepowered/configurate-gson/3.7.2/configurate-gson-3.7.2.jar" />
-          <entry name="$MAVEN_REPOSITORY$/net/kyori/adventure-text-serializer-gson/4.10.1/adventure-text-serializer-gson-4.10.1.jar" />
-          <entry name="$MAVEN_REPOSITORY$/com/google/code/gson/gson/2.8.8/gson-2.8.8.jar" />
-          <entry name="$MAVEN_REPOSITORY$/org/spongepowered/configurate-hocon/3.7.2/configurate-hocon-3.7.2.jar" />
-          <entry name="$MAVEN_REPOSITORY$/org/spongepowered/configurate-yaml/3.7.2/configurate-yaml-3.7.2.jar" />
-          <entry name="$MAVEN_REPOSITORY$/org/spongepowered/configurate-core/3.7.2/configurate-core-3.7.2.jar" />
-          <entry name="$MAVEN_REPOSITORY$/com/google/inject/guice/5.0.1/guice-5.0.1.jar" />
+          <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.velocitypowered/velocity-api/3.1.2-SNAPSHOT/6a6663d9a4a9fcb5d89d286b4bbc93bd0b7aca26/velocity-api-3.1.2-SNAPSHOT.jar" />
+          <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.moandjiezana.toml/toml4j/0.7.2/a03337911d0bd2c40932aca3946edb30d0e7d0c/toml4j-0.7.2.jar" />
+          <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.spongepowered/configurate-gson/3.7.3/4facb1a9abd996fa3cce45dd128997765f50f75b/configurate-gson-3.7.3.jar" />
+          <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/net.kyori/adventure-text-minimessage/4.10.1/c433cd701761c75ca06b7f36eb2623068203dd61/adventure-text-minimessage-4.10.1.jar" />
+          <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/net.kyori/adventure-text-serializer-legacy/4.10.1/6eb6fdb21f15a189246040f6c974cdd772b7366a/adventure-text-serializer-legacy-4.10.1.jar" />
+          <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/net.kyori/adventure-text-serializer-plain/4.10.1/79a94890420706e6b86edd05a64dfb8b8360732c/adventure-text-serializer-plain-4.10.1.jar" />
+          <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/net.kyori/adventure-api/4.10.1/4c493f62cb16bef98998cac0bbb314c7eeab7548/adventure-api-4.10.1.jar" />
+          <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/net.kyori/adventure-key/4.10.1/48d2ec889cb82dd79d7b1178001cfecc28ff3c1c/adventure-key-4.10.1.jar" />
+          <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/net.kyori/adventure-text-serializer-gson/4.10.1/4d3145fe0ea5b64dbe1742ecb1724e142104180a/adventure-text-serializer-gson-4.10.1.jar" />
+          <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.google.code.gson/gson/2.9.0/8a1167e089096758b49f9b34066ef98b2f4b37aa/gson-2.9.0.jar" />
+          <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.spongepowered/configurate-hocon/3.7.3/630e0562bd9b809428b55742aabe382f0347211f/configurate-hocon-3.7.3.jar" />
+          <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.spongepowered/configurate-yaml/3.7.3/5329d80a00c1e053ceaeb94d8325cb7de349409c/configurate-yaml-3.7.3.jar" />
+          <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.spongepowered/configurate-core/3.7.3/f852a1d0e336eb07c1f45ed1dc275b7d6a6d676a/configurate-core-3.7.3.jar" />
+          <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.google.inject/guice/5.0.1/dae7556b441cada2b4f0a2314eb68e1ff423429/guice-5.0.1.jar" />
           <entry name="$MAVEN_REPOSITORY$/com/google/guava/guava/30.1-jre/guava-30.1-jre.jar" />
-          <entry name="$MAVEN_REPOSITORY$/net/kyori/adventure-text-minimessage/4.10.1/adventure-text-minimessage-4.10.1.jar" />
-          <entry name="$MAVEN_REPOSITORY$/net/kyori/adventure-text-serializer-legacy/4.10.1/adventure-text-serializer-legacy-4.10.1.jar" />
-          <entry name="$MAVEN_REPOSITORY$/net/kyori/adventure-text-serializer-plain/4.10.1/adventure-text-serializer-plain-4.10.1.jar" />
-          <entry name="$MAVEN_REPOSITORY$/net/kyori/adventure-api/4.10.1/adventure-api-4.10.1.jar" />
           <entry name="$MAVEN_REPOSITORY$/org/slf4j/slf4j-api/1.7.30/slf4j-api-1.7.30.jar" />
-          <entry name="$MAVEN_REPOSITORY$/org/checkerframework/checker-qual/3.6.1/checker-qual-3.6.1.jar" />
-          <entry name="$MAVEN_REPOSITORY$/com/velocitypowered/velocity-brigadier/1.0.0-SNAPSHOT/velocity-brigadier-1.0.0-SNAPSHOT.jar" />
-          <entry name="$MAVEN_REPOSITORY$/net/kyori/adventure-key/4.10.1/adventure-key-4.10.1.jar" />
+          <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.checkerframework/checker-qual/3.6.1/52ca62b41f68584c4d2de39d6176758e9383d0b6/checker-qual-3.6.1.jar" />
+          <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.velocitypowered/velocity-brigadier/1.0.0-SNAPSHOT/c85456381b9942f529995996793190c091ef57a9/velocity-brigadier-1.0.0-SNAPSHOT.jar" />
           <entry name="$MAVEN_REPOSITORY$/com/google/code/findbugs/jsr305/3.0.2/jsr305-3.0.2.jar" />
           <entry name="$MAVEN_REPOSITORY$/com/google/errorprone/error_prone_annotations/2.3.4/error_prone_annotations-2.3.4.jar" />
           <entry name="$MAVEN_REPOSITORY$/com/google/j2objc/j2objc-annotations/1.3/j2objc-annotations-1.3.jar" />
           <entry name="$MAVEN_REPOSITORY$/javax/inject/javax.inject/1/javax.inject-1.jar" />
           <entry name="$MAVEN_REPOSITORY$/aopalliance/aopalliance/1.0/aopalliance-1.0.jar" />
-          <entry name="$MAVEN_REPOSITORY$/com/typesafe/config/1.4.0/config-1.4.0.jar" />
+          <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.typesafe/config/1.4.0/a8b341fe81552834edc231193afd6f56a96f0eff/config-1.4.0.jar" />
           <entry name="$MAVEN_REPOSITORY$/org/yaml/snakeyaml/1.26/snakeyaml-1.26.jar" />
           <entry name="$MAVEN_REPOSITORY$/net/kyori/examination-string/1.3.0/examination-string-1.3.0.jar" />
           <entry name="$MAVEN_REPOSITORY$/net/kyori/examination-api/1.3.0/examination-api-1.3.0.jar" />
-          <entry name="$MAVEN_REPOSITORY$/org/jetbrains/annotations/23.0.0/annotations-23.0.0.jar" />
           <entry name="$MAVEN_REPOSITORY$/com/google/guava/failureaccess/1.0.1/failureaccess-1.0.1.jar" />
           <entry name="$MAVEN_REPOSITORY$/com/google/guava/listenablefuture/9999.0-empty-to-avoid-conflict-with-guava/listenablefuture-9999.0-empty-to-avoid-conflict-with-guava.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/jetbrains/annotations/22.0.0/annotations-22.0.0.jar" />
         </processorPath>
         <module name="ProxyQueues.main" />
       </profile>
     </annotationProcessing>
-    <bytecodeTargetLevel target="11">
+    <bytecodeTargetLevel target="17">
       <module name="deluxequeues" target="11" />
     </bytecodeTargetLevel>
   </component>
