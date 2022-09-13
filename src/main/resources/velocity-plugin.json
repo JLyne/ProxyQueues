@@ -15,6 +15,10 @@
     {
       "id": "proxydiscord",
       "optional": true
+    },
+    {
+      "id": "supervanishbridge",
+      "optional": true
     }
   ],
   "main": "uk.co.notnull.proxyqueues.ProxyQueuesImpl"

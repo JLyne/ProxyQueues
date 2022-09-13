@@ -50,6 +50,8 @@ import uk.co.notnull.proxyqueues.configuration.sections.ConfigOptions;
 import uk.co.notnull.proxyqueues.metrics.Metrics;
 import uk.co.notnull.proxyqueues.queues.QueueHandlerImpl;
 import org.slf4j.Logger;
+import uk.co.notnull.supervanishbridge.helper.CloudHelper;
+import uk.co.notnull.supervanishbridge.helper.SuperVanishBridgeHelper;
 
 import javax.inject.Inject;
 import java.io.File;
@@ -116,6 +118,8 @@ public final class ProxyQueuesImpl implements ProxyQueues {
         if(this.getProxyServer().getPluginManager().isLoaded("proxydiscord")) {
             new ProxyDiscordHandler(this);
         }
+
+        SuperVanishBridgeHelper superVanishBridgeHelper = new SuperVanishBridgeHelper(proxyServer);
     }
 
     @Subscribe
@@ -149,6 +153,7 @@ public final class ProxyQueuesImpl implements ProxyQueues {
                 parameters -> SimpleCommandMeta.empty()
         );
 
+        CloudHelper.registerVisiblePlayerArgument(manager);
         annotationParser.parse(new Commands(this, manager));
     }
 

@@ -150,13 +150,13 @@ public class ProxyQueueEventHandler {
 
     @Subscribe(order = PostOrder.LAST)
     public void onKick(KickedFromServerEvent event) {
-        if(!event.getServer().equals(queue.getServer()) || event.kickedDuringServerConnect()) {
-            return;
-        }
+		if (!event.getServer().equals(queue.getServer()) || event.kickedDuringServerConnect()) {
+			return;
+		}
 
-        proxyQueues.getLogger()
-                .debug("Player " + event.getPlayer().getUsername() + " kicked from " +
-                              event.getServer().getServerInfo().getName() + ". Reason: " + event.getServerKickReason());
+		proxyQueues.getLogger()
+				.debug("Player " + event.getPlayer().getUsername() + " kicked from " +
+							   event.getServer().getServerInfo().getName() + ". Reason: " + event.getServerKickReason());
 
 		Component reason = event.getServerKickReason().orElse(Component.empty());
 		String reasonPlain = PlainTextComponentSerializer.plainText().serialize(reason);
@@ -166,20 +166,20 @@ public class ProxyQueueEventHandler {
 
 		boolean fatal = fatalErrors.stream().anyMatch(reasonPlain::contains);
 
-		if(!fatal) {
+		if (!fatal) {
 			proxyQueues.getLogger()
-			.debug("Reason not fatal, re-queueing " + event.getPlayer().getUsername());
+					.debug("Reason not fatal, re-queueing " + event.getPlayer().getUsername());
 
 			boolean staff = event.getPlayer()
 					.hasPermission(settingsManager.getProperty(ConfigOptions.STAFF_PERMISSION));
 
 			queue.addPlayer(event.getPlayer(), staff ? QueueType.STAFF : QueueType.PRIORITY);
 
-			if(event.getResult() instanceof KickedFromServerEvent.DisconnectPlayer && waitingServer.isPresent()) {
+			if (event.getResult() instanceof KickedFromServerEvent.DisconnectPlayer && waitingServer.isPresent()) {
 				event.setResult(KickedFromServerEvent.RedirectPlayer.create(waitingServer.get()));
 			}
 		} else {
 			proxyQueues.getLogger().debug("Reason fatal");
 		}
-    }
+	}
 }

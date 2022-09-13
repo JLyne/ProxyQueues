@@ -151,7 +151,7 @@ public class Commands {
     @CommandMethod("queue info player <player>")
     @CommandDescription("Shows information about the specified player's queue status")
     @CommandPermission(Constants.BASE_PERM + "info")
-    public void playerInfo(CommandSource sender, @Argument("player") Player player) {
+    public void playerInfo(CommandSource sender, @Argument(parserName = "visibleplayer", value = "player") Player player) {
         ProxyQueuesImpl proxyQueues = ProxyQueuesImpl.getInstance();
         UUID uuid = player.getUniqueId();
 
@@ -218,7 +218,7 @@ public class Commands {
     @CommandMethod("queue kick <player>")
     @CommandDescription("Kick the specified player from any queue they are in")
     @CommandPermission(Constants.BASE_PERM + "kick")
-    public void kick(CommandSource sender, @Argument("player") Player player) {
+    public void kick(CommandSource sender, @Argument(parserName = "visibleplayer", value = "player") Player player) {
         ProxyQueuesImpl proxyQueues = ProxyQueuesImpl.getInstance();
         UUID uuid = player.getUniqueId();
 
