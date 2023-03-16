@@ -1,35 +1,74 @@
 prefix:
   error: "<red><bold>Queue > <reset><yellow>"
+  warning: "<yellow><bold>Queue > <reset><gold>"
   info: "<light_purple><bold>Queue > <reset><aqua>"
 notify:
   normal:
-    actionbar: "Queued for <server>: Position <pos>/<size>"
-    bossbar: "Queued for <server>: Position <pos>/<size>"
-    chat: "You are currently in position <pos>/<size>"
+    actionbar:
+      active: "Queued for <server>: Position <pos>/<size>"
+      paused: "Queued for <server>: Position <pos>/<size> - Paused"
+    bossbar:
+      active: "Queued for <server>: Position <pos>/<size>"
+      paused: "Queued for <server>: Position <pos>/<size> - Paused"
+    chat:
+      active: "You are currently in position <pos>/<size>"
+      paused: "You are currently in position <pos>/<size> - Paused"
     title:
-      title: "Currently in queue"
-      subtitle: "Position: <pos>/<size>"
+      active:
+        title: "Currently in queue"
+        subtitle: "Position: <pos>/<size>"
+      paused:
+        title: "Currently in queue"
+        subtitle: "Position: <pos>/<size>"
   priority:
-    actionbar: "Priority queued for <server>: Position <pos>/<size>"
-    bossbar: "Priority queued for <server>: Position <pos>/<size>"
-    chat: "You are currently in position <pos>/<size>"
+    actionbar:
+      active: "Priority queued for <server>: Position <pos>/<size>"
+      paused: "Priority queued for <server>: Position <pos>/<size> - Paused"
+    bossbar:
+      active: "Priority queued for <server>: Position <pos>/<size>"
+      paused: "Priority queued for <server>: Position <pos>/<size> - Paused"
+    chat:
+      active: "You are currently in position <pos>/<size>"
+      paused: "You are currently in position <pos>/<size> - Paused"
     title:
-      title: "Currently in queue"
-      subtitle: "Position: <pos>/<size>"
+      active:
+        title: "Currently in queue"
+        subtitle: "Position: <pos>/<size>"
+      paused:
+        title: "Currently in queue"
+        subtitle: "Position: <pos>/<size>"
   staff:
-    actionbar: "Staff queued for <server>: Position <pos>/<size>"
-    bossbar: "Staff queued for <server>: Position <pos>/<size>"
-    chat: "You are currently in position <pos>/<size>"
+    actionbar:
+      active: "Staff queued for <server>: Position <pos>/<size>"
+      paused: "Staff queued for <server>: Position <pos>/<size> - Paused"
+    bossbar:
+      active: "Staff queued for <server>: Position <pos>/<size>"
+      paused: "Staff queued for <server>: Position <pos>/<size> - Paused"
+    chat:
+      active: "You are currently in position <pos>/<size>"
+      paused: "You are currently in position <pos>/<size> - Paused"
     title:
-      title: "Currently in queue"
-      subtitle: "Position: <pos>/<size>"
+      active:
+        title: "Currently in queue"
+        subtitle: "Position: <pos>/<size>"
+      paused:
+        title: "Currently in queue"
+        subtitle: "Position: <pos>/<size>"
+  paused: |-
+    The queue for <yellow><server><gold> has been paused.
+     <reasons>
+  pause-reason: "<gray> - <reason>"
+  unpaused: "The queue for <yellow><server><aqua> has resumed"
 commands:
   kick-success: "Kicked <yellow><player><aqua> from the <yellow><server><aqua> queue"
   join-success: "You have joined the queue for <yellow><server>"
   leave-success: "You have left the queue"
   clear-success: "The queue for <yellow><server><aqua> has been cleared"
+  pause-success: "The queue for <yellow><server><aqua> has been paused"
+  unpause-success: "The queue for <yellow><server><aqua> has been unpaused. Other plugins may still pause the queue"
   info-server-response: |-
     <light_purple><yellow><server> <light_purple>Queue Status
+    <status>
     <aqua>Players in queue: <yellow><size> <aqua>(<yellow><priority_size> <aqua>priority, <yellow><staff_size> <aqua>staff)
     <aqua>Players on Server: <yellow><connected_size> <aqua>(<yellow><priority_connected_size> <aqua>priority, <yellow><staff_connected_size> <aqua>staff)
 
@@ -43,6 +82,7 @@ commands:
 
     <aqua>Front 3 normal:
     <yellow><first>, <second>, <third>
+  info-pause-reason: " - <white><plugin>: <gray><reason>"
   info-player-response: |-
     <yellow><player> <light_purple>Status
     <aqua>Queued For: <yellow><server>
@@ -50,6 +90,10 @@ commands:
     <aqua>Position: <yellow><position>
     <aqua>Status: <status>
     <aqua>Queueing for: <yellow><queued_time>
+  info-status-active: "<green>Active"
+  info-status-paused: |-
+    <yellow>Paused
+    <reasons>
   info-status-online: "<green>Online"
   info-status-offline: "<red>Offline. <aqua>Last seen <yellow><last_seen><aqua> ago (<yellow><remaining><aqua> remaining)."
   reload-success: "You've successfully reloaded the configuration!"

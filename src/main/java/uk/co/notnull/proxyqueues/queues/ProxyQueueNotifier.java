@@ -24,32 +24,37 @@
 package uk.co.notnull.proxyqueues.queues;
 
 import com.velocitypowered.api.plugin.PluginContainer;
-import net.kyori.adventure.audience.MessageType;
-import net.kyori.adventure.identity.Identity;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.ComponentLike;
 import net.kyori.adventure.title.Title;
 import uk.co.notnull.platformdetection.PlatformDetectionVelocity;
 import uk.co.notnull.proxyqueues.Messages;
 import uk.co.notnull.proxyqueues.ProxyQueuesImpl;
+import uk.co.notnull.proxyqueues.api.MessageType;
 import uk.co.notnull.proxyqueues.api.queues.QueuePlayer;
 import uk.co.notnull.proxyqueues.configuration.sections.ConfigOptions;
 
+import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 public class ProxyQueueNotifier {
 
+    private final ProxyQueuesImpl plugin;
     private final ProxyQueueImpl queue;
 	private final String notifyMethod;
     private final boolean platformDetectionEnabled;
     private PlatformDetectionVelocity platformDetection;
 
-    public ProxyQueueNotifier(ProxyQueuesImpl proxyQueues, ProxyQueueImpl queue) {
+    public ProxyQueueNotifier(ProxyQueuesImpl plugin, ProxyQueueImpl queue) {
+		this.plugin = plugin;
 		this.queue = queue;
 
-		notifyMethod = proxyQueues.getSettingsHandler().getSettingsManager().getProperty(ConfigOptions.INFORM_METHOD);
+		notifyMethod = plugin.getSettingsHandler().getSettingsManager().getProperty(ConfigOptions.INFORM_METHOD);
 
-		Optional<PluginContainer> platformDetection = proxyQueues.getProxyServer().getPluginManager()
+		Optional<PluginContainer> platformDetection = plugin.getProxyServer().getPluginManager()
                 .getPlugin("platform-detection");
         platformDetectionEnabled = platformDetection.isPresent();
 
@@ -63,20 +68,20 @@ public class ProxyQueueNotifier {
      * @param player the player to check
      */
     public void notifyPlayer(QueuePlayer player) {
-        String key;
+        StringBuilder key;
 
         switch (player.getQueueType()) {
             case STAFF:
-                key = "notify.staff";
+                key = new StringBuilder("notify.staff");
                 break;
 
             case PRIORITY:
-                key = "notify.priority";
+                key = new StringBuilder("notify.priority");
                 break;
 
             case NORMAL:
             default:
-                key = "notify.normal";
+                key = new StringBuilder("notify.normal");
                 break;
         }
 
@@ -85,23 +90,26 @@ public class ProxyQueueNotifier {
                 updateBossBar(player);
                 break;
             case "actionbar":
-                player.getPlayer().sendActionBar(Messages.getComponent(key + ".actionbar", Map.of(
+                key.append(".actionbar").append(queue.isPaused() ? ".paused" : ".active");
+                player.getPlayer().sendActionBar(Messages.getComponent(key.toString(), Map.of(
                         "server", queue.getServer().getServerInfo().getName(),
                         "pos", String.valueOf(player.getPosition()),
                         "size", String.valueOf(queue.getQueueSize(player.getQueueType()))
                 ), Collections.emptyMap()));
                 break;
             case "text":
-                player.getPlayer().sendMessage(Messages.getComponent(key + ".chat", Map.of(
+                key.append(".chat").append(queue.isPaused() ? ".paused" : ".active");
+                player.getPlayer().sendMessage(Messages.getComponent(key.toString(), Map.of(
                         "server", queue.getServer().getServerInfo().getName(),
                         "pos", String.valueOf(player.getPosition()),
                         "size", String.valueOf(queue.getQueueSize(player.getQueueType()))
                 ), Collections.emptyMap()));
                 break;
             case "title":
+                key.append(".title").append(queue.isPaused() ? ".paused" : ".active");
                 player.getPlayer().showTitle(
-                        Title.title(Messages.getComponent(key + ".title.title"),
-                                    Messages.getComponent(key + ".title.subtitle", Map.of(
+                        Title.title(Messages.getComponent(key + ".title"),
+                                    Messages.getComponent(key + ".subtitle", Map.of(
                                             "server", queue.getServer().getServerInfo().getName(),
                                             "pos", String.valueOf(player.getPosition()),
                                             "size", String.valueOf(queue.getQueueSize(player.getQueueType()))
@@ -116,14 +124,14 @@ public class ProxyQueueNotifier {
 
         switch (player.getQueueType()) {
             case STAFF:
-                key = "notify.staff.bossbar";
+                key = queue.isPaused() ? "notify.staff.bossbar.paused" : "notify.staff.bossbar.active";
                 break;
             case PRIORITY:
-                key = "notify.priority.bossbar";
+                key = queue.isPaused() ? "notify.priority.bossbar.paused" : "notify.priority.bossbar.active";
                 break;
             case NORMAL:
             default:
-                key = "notify.normal.bossbar";
+                key = queue.isPaused() ? "notify.normal.bossbar.paused" : "notify.normal.bossbar.active";
                 break;
         }
 
@@ -143,4 +151,51 @@ public class ProxyQueueNotifier {
 	public String getNotifyMethod() {
     	return notifyMethod;
 	}
+
+    public void notifyPause() {
+        notifyPause(null);
+    }
+
+    public void notifyPause(@Nullable QueuePlayer player) {
+        Map<PluginContainer, String> pauses = queue.getPauses();
+        String reasons = pauses.values().stream()
+                .map(r -> Messages.get("notify.pause-reason", Collections.singletonMap("reason", r)))
+                .collect(Collectors.joining("\n"));
+
+        String message = Messages.getPrefixed("notify.paused", MessageType.WARNING,
+                                                          Map.of(
+                                                          "server", queue.getServer().getServerInfo().getName(),
+                                                          "reasons", reasons));
+
+        if(player != null) {
+            plugin.sendMessage(player.getPlayer(), message);
+        } else {
+            notifyAll(message);
+        }
+    }
+
+    public void notifyResume() {
+        notifyResume(null);
+    }
+
+    public void notifyResume(@Nullable QueuePlayer player) {
+        String message = Messages.getPrefixed(
+                "notify.unpaused", MessageType.INFO,
+                Collections.singletonMap("server", queue.getServer().getServerInfo().getName()));
+
+        if(player != null) {
+            plugin.sendMessage(player.getPlayer(), message);
+        } else {
+            notifyAll(message);
+        }
+    }
+
+    private void notifyAll(String message) {
+        queue.getQueue().stream().filter(p -> p.getPlayer().isActive()).map(QueuePlayerImpl::getPlayer)
+                .forEach(p -> plugin.sendMessage(p, message));
+        queue.getPriorityQueue().stream().filter(p -> p.getPlayer().isActive()).map(QueuePlayerImpl::getPlayer)
+                .forEach(p -> plugin.sendMessage(p, message));
+        queue.getStaffQueue().stream().filter(p -> p.getPlayer().isActive()).map(QueuePlayerImpl::getPlayer)
+                .forEach(p -> plugin.sendMessage(p, message));
+    }
 }

@@ -81,8 +81,8 @@ public class QueueMoveTask implements Runnable {
         handleQueue(priorityQueue);
         handleQueue(normalQueue);
 
-        // Nothing to do if no player to queue, or connection attempt already underway
-        if(targetPlayer == null || targetPlayer.isConnecting()) {
+        // Nothing to do if no player to queue, connection attempt already underway, or queue is paused
+        if(targetPlayer == null || targetPlayer.isConnecting() || queue.isPaused()) {
             return;
         }
 

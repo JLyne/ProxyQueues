@@ -39,6 +39,7 @@ import com.velocitypowered.api.event.proxy.ProxyInitializeEvent;
 import com.velocitypowered.api.plugin.annotation.DataDirectory;
 import com.velocitypowered.api.proxy.ProxyServer;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
+import net.kyori.adventure.text.ComponentLike;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.yaml.YAMLConfigurationLoader;
@@ -216,18 +217,21 @@ public final class ProxyQueuesImpl implements ProxyQueues {
         return instance;
     }
 
+    public void sendMessage(CommandSource player, String message) {
+        player.sendMessage(miniMessage.deserialize(message));
+    }
+
+    public void sendMessage(CommandSource player, ComponentLike message) {
+        player.sendMessage(message);
+    }
+
     public void sendMessage(CommandSource player, MessageType messageType, String message) {
         sendMessage(player, messageType, message, Collections.emptyMap());
     }
 
     public void sendMessage(CommandSource player, MessageType messageType, String message, Map<String, String> replacements) {
-        String result = Messages.get("prefix.info");
-
-        if(messageType.equals(MessageType.ERROR)) {
-            result = Messages.get("prefix.error");
-        }
-
-        player.sendMessage(miniMessage.deserialize(result + Messages.get(message, replacements)));
+        player.sendMessage(
+                miniMessage.deserialize(Messages.getPrefix(messageType) + Messages.get(message, replacements)));
     }
 
     public int getPlayerLimit() {

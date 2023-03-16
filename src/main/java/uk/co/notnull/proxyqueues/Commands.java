@@ -31,6 +31,7 @@ import cloud.commandframework.annotations.CommandPermission;
 import cloud.commandframework.annotations.specifier.Greedy;
 import cloud.commandframework.minecraft.extras.MinecraftHelp;
 import com.velocitypowered.api.command.CommandSource;
+import com.velocitypowered.api.plugin.PluginContainer;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ServerConnection;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
@@ -45,7 +46,9 @@ import uk.co.notnull.proxyqueues.utils.Constants;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
@@ -97,6 +100,7 @@ public class Commands {
     public void serverInfo(CommandSource sender, @Argument("server") RegisteredServer server) {
         ProxyQueue queue = queueHandler.getQueue(server);
         ProxyQueuesImpl proxyQueues = ProxyQueuesImpl.getInstance();
+        String status = Messages.get("commands.info-status-online");
 
         if(queue == null) {
             proxyQueues.sendMessage(sender, MessageType.ERROR, "errors.server-no-queue",
@@ -122,7 +126,22 @@ public class Commands {
         QueuePlayer[] priorityPlayers = queue.getTopPlayers(QueueType.PRIORITY, 3);
         QueuePlayer[] staffPlayers = queue.getTopPlayers(QueueType.STAFF, 3);
 
+        if(queue.isPaused()) {
+            Map<PluginContainer, String> pauses = queue.getPauses();
+            List<String> reasons = new ArrayList<>(pauses.size());
+
+            pauses.forEach((plugin, reason) -> {
+                reasons.add(Messages.get("commands.info-pause-reason", Map.of(
+                        "plugin", plugin.getDescription().getName().orElse(plugin.getDescription().getId()),
+                        "reason", reason)));
+            });
+
+            status = Messages.get("commands.info-status-paused",
+                                  Collections.singletonMap("reasons", String.join("\n", reasons)));
+        }
+
         proxyQueues.sendMessage(sender, MessageType.INFO, "commands.info-server-response", Map.ofEntries(
+                entry("status", status),
                 entry("server", server.getServerInfo().getName()),
                 entry("size", String.valueOf(normalSize)),
                 entry("priority_size", String.valueOf(prioritySize)),
@@ -250,6 +269,50 @@ public class Commands {
         }
 
         queueHandler.clearPlayer(player, false);
+    }
+
+    @CommandMethod("queue pause <server> <reason>")
+    @CommandDescription("Pauses a queue, stopping players from being connected to the server")
+    @CommandPermission(Constants.BASE_PERM + "pause")
+    public void pause(CommandSource sender,  @Argument("server") RegisteredServer server,
+                      @Argument("reason") @Greedy String reason) {
+        ProxyQueue queue = queueHandler.getQueue(server);
+        ProxyQueuesImpl proxyQueues = ProxyQueuesImpl.getInstance();
+
+        if(queue == null) {
+            proxyQueues.sendMessage(sender, MessageType.ERROR, "errors.server-no-queue",
+                                    Collections.singletonMap("server", server.getServerInfo().getName()));
+            return;
+        }
+
+        queue.addPause(plugin, reason);
+        proxyQueues.sendMessage(sender, MessageType.INFO, "commands.pause-success",
+                    Collections.singletonMap("server", server.getServerInfo().getName()));
+    }
+
+    @CommandMethod("queue unpause <server>")
+    @CommandDescription("Unpauses a queue. Has no effect on pauses added by other plugins")
+    @CommandPermission(Constants.BASE_PERM + "pause")
+    public void unpause(CommandSource sender,  @Argument("server") RegisteredServer server) {
+        ProxyQueue queue = queueHandler.getQueue(server);
+        ProxyQueuesImpl proxyQueues = ProxyQueuesImpl.getInstance();
+
+        if(queue == null) {
+            proxyQueues.sendMessage(sender, MessageType.ERROR, "errors.server-no-queue",
+                                    Collections.singletonMap("server", server.getServerInfo().getName()));
+            return;
+        }
+
+        if(!queue.hasPause(plugin)) {
+            proxyQueues.sendMessage(sender, MessageType.ERROR, "errors.queue-not-paused",
+                                    Collections.singletonMap("server", server.getServerInfo().getName()));
+
+            return;
+        }
+
+        queue.removePause(plugin);
+        proxyQueues.sendMessage(sender, MessageType.INFO, "commands.unpause-success",
+                    Collections.singletonMap("server", server.getServerInfo().getName()));
     }
 
     @CommandMethod("queue reload")

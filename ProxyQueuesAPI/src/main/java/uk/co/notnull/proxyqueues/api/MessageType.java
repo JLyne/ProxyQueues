@@ -25,5 +25,6 @@ package uk.co.notnull.proxyqueues.api;
 
 public enum MessageType {
 	INFO,
-	ERROR
+	ERROR,
+	WARNING
 }

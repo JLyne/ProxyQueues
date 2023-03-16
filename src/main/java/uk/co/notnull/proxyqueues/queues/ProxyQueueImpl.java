@@ -26,6 +26,7 @@
 package uk.co.notnull.proxyqueues.queues;
 
 import ch.jalu.configme.SettingsManager;
+import com.velocitypowered.api.plugin.PluginContainer;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ServerConnection;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
@@ -41,6 +42,8 @@ import uk.co.notnull.proxyqueues.tasks.QueueMoveTask;
 
 import java.time.Instant;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -85,6 +88,8 @@ public class ProxyQueueImpl implements uk.co.notnull.proxyqueues.api.queues.Prox
     private final ProxyQueueEventHandler eventHandler;
     private final ProxyQueueNotifier notifier;
     private final QueueMoveTask moveTask;
+
+    private final Map<PluginContainer, String> pauses = new HashMap<>();
 
     public ProxyQueueImpl(ProxyQueuesImpl proxyQueues, RegisteredServer server, int playersRequired, int maxSlots, int priorityMaxSlots, int staffMaxSlots) {
         this.proxyQueues = proxyQueues;
@@ -136,7 +141,7 @@ public class ProxyQueueImpl implements uk.co.notnull.proxyqueues.api.queues.Prox
             return queuePlayers.compute(player.getUniqueId(), (uuid, queuePlayer) -> {
                 if(queuePlayer == null) {  //New player
                     added.set(true);
-                    return new QueuePlayerImpl(player, queueType);
+                    return new QueuePlayerImpl(player, this, queueType);
                 } else if(!queuePlayer.getPlayer().equals(player)) { //Player was previous in queue before disconnecting, update and reuse object
                     queuePlayer.setPlayer(player);
                     queuePlayer.setLastSeen(Instant.now());
@@ -174,6 +179,10 @@ public class ProxyQueueImpl implements uk.co.notnull.proxyqueues.api.queues.Prox
                     } else {
                         proxyQueues.sendMessage(result.getPlayer(), MessageType.INFO, "reconnect.restore-position");
                     }
+                }
+
+                if(isPaused()) {
+                    notifier.notifyPause(result);
                 }
             }
         });
@@ -554,5 +563,51 @@ public class ProxyQueueImpl implements uk.co.notnull.proxyqueues.api.queues.Prox
     void clearConnectedState(UUID uuid) {
         connectedStaff.remove(uuid);
         connectedPriority.remove(uuid);
+    }
+
+    public void addPause(Object plugin, String reason) {
+        Optional<PluginContainer> container = this.proxyQueues.getProxyServer().getPluginManager().fromInstance(plugin);
+
+        if(container.isEmpty()) {
+            throw new IllegalArgumentException("plugin is not registered");
+        }
+
+        pauses.put(container.get(), reason);
+
+        if(pauses.size() == 1) {
+            notifier.notifyPause();
+        }
+    }
+
+    public void removePause(Object plugin) {
+       Optional<PluginContainer> container = this.proxyQueues.getProxyServer().getPluginManager().fromInstance(plugin);
+
+        if(container.isEmpty()) {
+            throw new IllegalArgumentException("plugin is not registered");
+        }
+
+        pauses.remove(container.get());
+
+        if(pauses.isEmpty()) {
+            notifier.notifyResume();
+        }
+    }
+
+    public boolean hasPause(Object plugin) {
+       Optional<PluginContainer> container = this.proxyQueues.getProxyServer().getPluginManager().fromInstance(plugin);
+
+        if(container.isEmpty()) {
+            throw new IllegalArgumentException("plugin is not registered");
+        }
+
+        return pauses.containsKey(container.get());
+    }
+
+    public boolean isPaused() {
+        return !pauses.isEmpty();
+    }
+
+    public Map<PluginContainer, String> getPauses() {
+        return Collections.unmodifiableMap(pauses);
     }
 }

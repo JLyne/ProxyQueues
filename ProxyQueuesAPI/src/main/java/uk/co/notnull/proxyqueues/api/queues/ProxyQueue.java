@@ -23,10 +23,12 @@
 
 package uk.co.notnull.proxyqueues.api.queues;
 
+import com.velocitypowered.api.plugin.PluginContainer;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
 import uk.co.notnull.proxyqueues.api.QueueType;
 
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -113,4 +115,36 @@ public interface ProxyQueue {
     void setPriorityMaxSlots(int priorityMaxSlots);
 
     void setStaffMaxSlots(int staffMaxSlots);
+
+    /**
+     * Pauses the queue, preventing players from being connected to the server even when space exists.
+     * This is recommended for situations where players will be unable to join servers, i.e lockdowns or restarts.
+     * A plugin can have one active pause at a time, calling addPause again will replace any existing pause for that plugin.
+     * @param plugin - The plugin pausing the queue
+     * @param reason - The reason for the pause
+     */
+    void addPause(Object plugin, String reason);
+
+    /**
+     * Removes a pause previously added by addPause.
+     * The queue will be unpaused if no pauses remain active.
+     * @param plugin - The plugin unpausing the queue
+     */
+    void removePause(Object plugin);
+
+    /**
+     * Returns whether the given plugin has an active pause
+     * @param plugin - The plugin to check
+     */
+    boolean hasPause(Object plugin);
+
+    /**
+     * Returns whether any pauses exist
+     */
+    boolean isPaused();
+
+    /**
+     * Returns all active pauses
+     */
+    Map<PluginContainer, String> getPauses();
 }

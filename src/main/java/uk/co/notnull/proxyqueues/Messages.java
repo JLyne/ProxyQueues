@@ -29,6 +29,7 @@ import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import ninja.leaping.configurate.ConfigurationNode;
+import uk.co.notnull.proxyqueues.api.MessageType;
 
 import java.util.Collections;
 import java.util.Map;
@@ -45,6 +46,10 @@ public class Messages {
         return get(id, Collections.emptyMap());
     }
 
+    public static String getPrefixed(String id, MessageType messageType) {
+        return getPrefixed(id, messageType, Collections.emptyMap());
+    }
+
     public static String get(String id, Map<String, String> replacements) {
         if(messages == null) {
             return "";
@@ -58,6 +63,10 @@ public class Messages {
         }
 
         return message;
+    }
+
+    public static String getPrefixed(String id, MessageType messageType, Map<String, String> replacements) {
+        return getPrefix(messageType) + get(id, replacements);
     }
 
     public static Component getComponent(String id) {
@@ -83,5 +92,15 @@ public class Messages {
         }
 
         return miniMessage.deserialize(message, placeholders.build());
+    }
+
+    public static String getPrefix(MessageType messageType) {
+        if(messageType.equals(MessageType.ERROR)) {
+            return Messages.get("prefix.error");
+        } else if(messageType.equals(MessageType.WARNING)) {
+            return Messages.get("prefix.warning");
+        } else {
+            return Messages.get("prefix.info");
+        }
     }
 }

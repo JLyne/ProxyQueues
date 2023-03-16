@@ -28,6 +28,7 @@ import com.velocitypowered.api.proxy.Player;
 import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.text.Component;
 import uk.co.notnull.proxyqueues.api.QueueType;
+import uk.co.notnull.proxyqueues.api.queues.ProxyQueue;
 import uk.co.notnull.proxyqueues.api.queues.QueuePlayer;
 
 import java.time.Instant;
@@ -39,15 +40,17 @@ public class QueuePlayerImpl implements QueuePlayer {
     private boolean connecting;
     private Player player;
     private int position = -1;
+    private final ProxyQueue queue;
     private final QueueType queueType;
 
     private Instant lastConnectionAttempt;
     private Instant lastSeen;
     private final Instant queued;
 
-    public QueuePlayerImpl(Player player, QueueType queueType) {
+    public QueuePlayerImpl(Player player, ProxyQueue queue, QueueType queueType) {
         this.player = player;
         this.connecting = false;
+        this.queue = queue;
         this.queueType = queueType;
         this.lastConnectionAttempt = Instant.EPOCH;
         this.lastSeen = null;
@@ -121,6 +124,10 @@ public class QueuePlayerImpl implements QueuePlayer {
     }
 
     public BossBar.Color getBossBarColor() {
+        if(queue.isPaused()) {
+            return BossBar.Color.WHITE;
+        }
+
         switch(queueType) {
             case PRIORITY:
                 return BossBar.Color.GREEN;
