@@ -96,7 +96,7 @@ public class ProxyQueueNotifier {
                         "server", queue.getServer().getServerInfo().getName(),
                         "pos", String.valueOf(player.getPosition()),
                         "size", String.valueOf(queue.getQueueSize(player.getQueueType()))
-                ), Collections.emptyMap()), MessageType.SYSTEM);
+                ), Collections.emptyMap()));
                 break;
             case "title":
                 player.getPlayer().showTitle(

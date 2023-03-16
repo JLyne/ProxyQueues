@@ -227,7 +227,7 @@ public final class ProxyQueuesImpl implements ProxyQueues {
             result = Messages.get("prefix.error");
         }
 
-        player.sendMessage(miniMessage.deserialize(result + Messages.get(message, replacements)), net.kyori.adventure.audience.MessageType.SYSTEM);
+        player.sendMessage(miniMessage.deserialize(result + Messages.get(message, replacements)));
     }
 
     public int getPlayerLimit() {
