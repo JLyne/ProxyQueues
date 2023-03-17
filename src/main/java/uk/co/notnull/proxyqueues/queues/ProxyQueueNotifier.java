@@ -24,6 +24,7 @@
 package uk.co.notnull.proxyqueues.queues;
 
 import com.velocitypowered.api.plugin.PluginContainer;
+import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.ComponentLike;
 import net.kyori.adventure.title.Title;
@@ -145,7 +146,7 @@ public class ProxyQueueNotifier {
                                               "server", queue.getServer().getServerInfo().getName(),
                                               "pos", String.valueOf(position),
                                               "size", String.valueOf(queue.getQueueSize(player.getQueueType()))),
-                                      Collections.emptyMap()));
+                                      Collections.emptyMap())).color(player.getBossBarColor());
     }
 
 	public String getNotifyMethod() {
