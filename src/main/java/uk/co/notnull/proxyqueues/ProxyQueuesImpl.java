@@ -120,7 +120,7 @@ public final class ProxyQueuesImpl implements ProxyQueues {
             new ProxyDiscordHandler(this);
         }
 
-        SuperVanishBridgeHelper superVanishBridgeHelper = new SuperVanishBridgeHelper(proxyServer);
+        new SuperVanishBridgeHelper(proxyServer);
     }
 
     @Subscribe
@@ -133,7 +133,7 @@ public final class ProxyQueuesImpl implements ProxyQueues {
 
     public void initCommands() {
         CommandManager<CommandSource> manager = new VelocityCommandManager<>(
-                proxyServer.getPluginManager().fromInstance(this).get(),
+                proxyServer.getPluginManager().fromInstance(this).orElseThrow(),
                 proxyServer,
                 CommandExecutionCoordinator.simpleCoordinator(),
                 Function.identity(),
@@ -232,10 +232,6 @@ public final class ProxyQueuesImpl implements ProxyQueues {
     public void sendMessage(CommandSource player, MessageType messageType, String message, Map<String, String> replacements) {
         player.sendMessage(
                 miniMessage.deserialize(Messages.getPrefix(messageType) + Messages.get(message, replacements)));
-    }
-
-    public int getPlayerLimit() {
-        return playerLimit;
     }
 
     public void setPlayerLimit(int playerLimit) {

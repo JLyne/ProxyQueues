@@ -128,14 +128,11 @@ public class QueuePlayerImpl implements QueuePlayer {
             return BossBar.Color.WHITE;
         }
 
-        switch(queueType) {
-            case PRIORITY:
-                return BossBar.Color.GREEN;
-            case STAFF:
-                return BossBar.Color.BLUE;
-            default:
-                return BossBar.Color.PURPLE;
-        }
+        return switch (queueType) {
+            case PRIORITY -> BossBar.Color.GREEN;
+            case STAFF -> BossBar.Color.BLUE;
+            default -> BossBar.Color.PURPLE;
+        };
     }
 
     @Override

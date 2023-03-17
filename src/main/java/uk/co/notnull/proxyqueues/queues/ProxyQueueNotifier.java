@@ -24,9 +24,7 @@
 package uk.co.notnull.proxyqueues.queues;
 
 import com.velocitypowered.api.plugin.PluginContainer;
-import net.kyori.adventure.bossbar.BossBar;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.ComponentLike;
+import com.velocitypowered.api.proxy.InboundConnection;
 import net.kyori.adventure.title.Title;
 import uk.co.notnull.platformdetection.PlatformDetectionVelocity;
 import uk.co.notnull.proxyqueues.Messages;
@@ -60,7 +58,8 @@ public class ProxyQueueNotifier {
         platformDetectionEnabled = platformDetection.isPresent();
 
         if(platformDetectionEnabled) {
-            this.platformDetection = (PlatformDetectionVelocity) platformDetection.get().getInstance().get();
+            this.platformDetection = (PlatformDetectionVelocity) platformDetection.orElseThrow().getInstance()
+                    .orElseThrow();
         }
 	}
 
@@ -69,44 +68,31 @@ public class ProxyQueueNotifier {
      * @param player the player to check
      */
     public void notifyPlayer(QueuePlayer player) {
-        StringBuilder key;
-
-        switch (player.getQueueType()) {
-            case STAFF:
-                key = new StringBuilder("notify.staff");
-                break;
-
-            case PRIORITY:
-                key = new StringBuilder("notify.priority");
-                break;
-
-            case NORMAL:
-            default:
-                key = new StringBuilder("notify.normal");
-                break;
-        }
+        StringBuilder key = switch (player.getQueueType()) {
+            case STAFF -> new StringBuilder("notify.staff");
+            case PRIORITY -> new StringBuilder("notify.priority");
+            default -> new StringBuilder("notify.normal");
+        };
 
         switch (notifyMethod.toLowerCase()) {
-            case "bossbar":
-                updateBossBar(player);
-                break;
-            case "actionbar":
+            case "bossbar" -> updateBossBar(player);
+            case "actionbar" -> {
                 key.append(".actionbar").append(queue.isPaused() ? ".paused" : ".active");
                 player.getPlayer().sendActionBar(Messages.getComponent(key.toString(), Map.of(
                         "server", queue.getServer().getServerInfo().getName(),
                         "pos", String.valueOf(player.getPosition()),
                         "size", String.valueOf(queue.getQueueSize(player.getQueueType()))
                 ), Collections.emptyMap()));
-                break;
-            case "text":
+            }
+            case "text" -> {
                 key.append(".chat").append(queue.isPaused() ? ".paused" : ".active");
                 player.getPlayer().sendMessage(Messages.getComponent(key.toString(), Map.of(
                         "server", queue.getServer().getServerInfo().getName(),
                         "pos", String.valueOf(player.getPosition()),
                         "size", String.valueOf(queue.getQueueSize(player.getQueueType()))
                 ), Collections.emptyMap()));
-                break;
-            case "title":
+            }
+            case "title" -> {
                 key.append(".title").append(queue.isPaused() ? ".paused" : ".active");
                 player.getPlayer().showTitle(
                         Title.title(Messages.getComponent(key + ".title"),
@@ -115,26 +101,17 @@ public class ProxyQueueNotifier {
                                             "pos", String.valueOf(player.getPosition()),
                                             "size", String.valueOf(queue.getQueueSize(player.getQueueType()))
                                     ), Collections.emptyMap())));
-                break;
+            }
         }
     }
 
     private void updateBossBar(QueuePlayer player) {
         int position = player.getPosition();
-        String key;
-
-        switch (player.getQueueType()) {
-            case STAFF:
-                key = queue.isPaused() ? "notify.staff.bossbar.paused" : "notify.staff.bossbar.active";
-                break;
-            case PRIORITY:
-                key = queue.isPaused() ? "notify.priority.bossbar.paused" : "notify.priority.bossbar.active";
-                break;
-            case NORMAL:
-            default:
-                key = queue.isPaused() ? "notify.normal.bossbar.paused" : "notify.normal.bossbar.active";
-                break;
-        }
+        String key = switch (player.getQueueType()) {
+            case STAFF -> queue.isPaused() ? "notify.staff.bossbar.paused" : "notify.staff.bossbar.active";
+            case PRIORITY -> queue.isPaused() ? "notify.priority.bossbar.paused" : "notify.priority.bossbar.active";
+            default -> queue.isPaused() ? "notify.normal.bossbar.paused" : "notify.normal.bossbar.active";
+        };
 
         if(platformDetectionEnabled && platformDetection.getPlatform(player.getPlayer()).isBedrock()) {
             player.hideBossBar();
@@ -192,11 +169,11 @@ public class ProxyQueueNotifier {
     }
 
     private void notifyAll(String message) {
-        queue.getQueue().stream().filter(p -> p.getPlayer().isActive()).map(QueuePlayerImpl::getPlayer)
+        queue.getQueue().stream().map(QueuePlayerImpl::getPlayer).filter(InboundConnection::isActive)
                 .forEach(p -> plugin.sendMessage(p, message));
-        queue.getPriorityQueue().stream().filter(p -> p.getPlayer().isActive()).map(QueuePlayerImpl::getPlayer)
+        queue.getPriorityQueue().stream().map(QueuePlayerImpl::getPlayer).filter(InboundConnection::isActive)
                 .forEach(p -> plugin.sendMessage(p, message));
-        queue.getStaffQueue().stream().filter(p -> p.getPlayer().isActive()).map(QueuePlayerImpl::getPlayer)
+        queue.getStaffQueue().stream().map(QueuePlayerImpl::getPlayer).filter(InboundConnection::isActive)
                 .forEach(p -> plugin.sendMessage(p, message));
     }
 }

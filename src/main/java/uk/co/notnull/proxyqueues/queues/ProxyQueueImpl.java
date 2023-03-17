@@ -155,21 +155,18 @@ public class ProxyQueueImpl implements uk.co.notnull.proxyqueues.api.queues.Prox
                 if(added.get()) {
                     proxyQueues.getLogger().info("Added " + player.getUsername() + " to queue");
                     switch (result.getQueueType()) {
-                        case STAFF:
+                        case STAFF -> {
                             staffQueue.add(result);
                             staffQueueSize.incrementAndGet();
-                            break;
-
-                        case PRIORITY:
+                        }
+                        case PRIORITY -> {
                             priorityQueue.add(result);
                             priorityQueueSize.incrementAndGet();
-                            break;
-
-                        case NORMAL:
-                        default:
+                        }
+                        default -> {
                             queue.add(result);
                             queueSize.incrementAndGet();
-                            break;
+                        }
                     }
                 } else {
                     proxyQueues.getLogger().info("Restoring queue position of " + player.getUsername());
@@ -222,44 +219,37 @@ public class ProxyQueueImpl implements uk.co.notnull.proxyqueues.api.queues.Prox
     public void removePlayer(QueuePlayer player, boolean connected) {
         boolean removed;
 
-        switch(player.getQueueType()) {
-            case STAFF:
-                removed = staffQueue.remove(player);
+        switch (player.getQueueType()) {
+            case STAFF -> {
+                removed = staffQueue.remove((QueuePlayerImpl) player);
 
                 //Update connected players cache
-                if(connected) {
-                    connectedStaff.add(player.getPlayer().getUniqueId()); //Is connected to queued server, add to connected
+                if (connected) {
+                    connectedStaff.add(
+                            player.getPlayer().getUniqueId()); //Is connected to queued server, add to connected
                 }
-
-                if(removed) {
+                if (removed) {
                     staffQueueSize.decrementAndGet();
                 }
-
-                break;
-
-            case PRIORITY:
-                removed = priorityQueue.remove(player);
+            }
+            case PRIORITY -> {
+                removed = priorityQueue.remove((QueuePlayerImpl) player);
 
                 //Update connected players cache
-                if(connected) {
-                    connectedPriority.add(player.getPlayer().getUniqueId()); //Is connected to queued server, add to connected
+                if (connected) {
+                    connectedPriority.add(
+                            player.getPlayer().getUniqueId()); //Is connected to queued server, add to connected
                 }
-
-                if(removed) {
+                if (removed) {
                     priorityQueueSize.decrementAndGet();
                 }
-
-                break;
-
-            case NORMAL:
-            default:
-                removed = queue.remove(player);
-
-                if(removed) {
+            }
+            default -> {
+                removed = queue.remove((QueuePlayerImpl) player);
+                if (removed) {
                     queueSize.decrementAndGet();
                 }
-
-                break;
+            }
         }
 
         if(!connected) {
@@ -432,27 +422,19 @@ public class ProxyQueueImpl implements uk.co.notnull.proxyqueues.api.queues.Prox
     }
 
     public int getMaxSlots(QueueType queueType) {
-        switch (queueType) {
-            case STAFF:
-                return staffMaxSlots;
-            case PRIORITY:
-                return priorityMaxSlots;
-            case NORMAL:
-            default:
-                return maxSlots;
-        }
+        return switch (queueType) {
+            case STAFF -> staffMaxSlots;
+            case PRIORITY -> priorityMaxSlots;
+            default -> maxSlots;
+        };
     }
 
     public int getQueueSize(QueueType queueType) {
-        switch (queueType) {
-            case STAFF:
-                return staffQueueSize.get();
-            case PRIORITY:
-                return priorityQueueSize.get();
-            case NORMAL:
-            default:
-                return queueSize.get();
-        }
+        return switch (queueType) {
+            case STAFF -> staffQueueSize.get();
+            case PRIORITY -> priorityQueueSize.get();
+            default -> queueSize.get();
+        };
     }
 
     public int getConnectedCount() {
@@ -460,33 +442,20 @@ public class ProxyQueueImpl implements uk.co.notnull.proxyqueues.api.queues.Prox
     }
 
     public int getConnectedCount(QueueType queueType) {
-        switch (queueType) {
-            case STAFF:
-                return connectedStaff.size();
-            case PRIORITY:
-                return connectedPriority.size();
-            case NORMAL:
-            default:
-                return server.getPlayersConnected().size() - connectedStaff.size() - connectedPriority.size();
-        }
+        return switch (queueType) {
+            case STAFF -> connectedStaff.size();
+            case PRIORITY -> connectedPriority.size();
+            default -> server.getPlayersConnected().size() - connectedStaff.size() - connectedPriority.size();
+        };
     }
 
     public QueuePlayer[] getTopPlayers(QueueType queueType, int count) {
         QueuePlayer[] players = new QueuePlayer[count];
-        ConcurrentLinkedQueue<QueuePlayerImpl> queue;
-
-        switch (queueType) {
-            case STAFF:
-                queue = staffQueue;
-                break;
-            case PRIORITY:
-                queue = priorityQueue;
-                break;
-            case NORMAL:
-            default:
-                queue = this.queue;
-                break;
-        }
+        ConcurrentLinkedQueue<QueuePlayerImpl> queue = switch (queueType) {
+            case STAFF -> staffQueue;
+            case PRIORITY -> priorityQueue;
+            default -> this.queue;
+        };
 
         int index = 0;
 

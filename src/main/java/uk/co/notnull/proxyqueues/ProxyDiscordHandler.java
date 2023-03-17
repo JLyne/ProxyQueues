@@ -48,7 +48,7 @@ public class ProxyDiscordHandler {
 		this.plugin = plugin;
 
 		ProxyDiscord proxyDiscord = (ProxyDiscord) plugin.getProxyServer().getPluginManager()
-				.getPlugin("proxydiscord").get().getInstance().get();
+				.getPlugin("proxydiscord").orElseThrow().getInstance().orElseThrow();
 		verificationManager = proxyDiscord.getVerificationManager();
 
 		plugin.getProxyServer().getEventManager().register(plugin, this);
@@ -88,16 +88,11 @@ public class ProxyDiscordHandler {
         	event.getPlayer().createConnectionRequest(linkingServer).fireAndForget();
 		}
 
-        switch(result) {
-            case NOT_LINKED:
-                event.setReason(Messages.get("errors.discord-not-linked"));
-                break;
-            case LINKED_NOT_VERIFIED:
-                event.setReason(Messages.get("errors.discord-not-verified"));
-                break;
-            default:
-                event.setReason("An error has occurred.");
-        }
+		switch (result) {
+			case NOT_LINKED -> event.setReason(Messages.get("errors.discord-not-linked"));
+			case LINKED_NOT_VERIFIED -> event.setReason(Messages.get("errors.discord-not-verified"));
+			default -> event.setReason("An error has occurred.");
+		}
 	}
 
 	@Subscribe(order = PostOrder.NORMAL)

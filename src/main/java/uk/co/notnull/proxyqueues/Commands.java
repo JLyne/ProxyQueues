@@ -130,11 +130,9 @@ public class Commands {
             Map<PluginContainer, String> pauses = queue.getPauses();
             List<String> reasons = new ArrayList<>(pauses.size());
 
-            pauses.forEach((plugin, reason) -> {
-                reasons.add(Messages.get("commands.info-pause-reason", Map.of(
-                        "plugin", plugin.getDescription().getName().orElse(plugin.getDescription().getId()),
-                        "reason", reason)));
-            });
+            pauses.forEach((plugin, reason) -> reasons.add(Messages.get("commands.info-pause-reason", Map.of(
+                    "plugin", plugin.getDescription().getName().orElse(plugin.getDescription().getId()),
+                    "reason", reason))));
 
             status = Messages.get("commands.info-status-paused",
                                   Collections.singletonMap("reasons", String.join("\n", reasons)));
@@ -182,7 +180,7 @@ public class Commands {
             return;
         }
 
-        QueuePlayer queuePlayer = queue.getQueuePlayer(uuid).get();
+        QueuePlayer queuePlayer = queue.getQueuePlayer(uuid).orElseThrow();
         String status;
         long queuedTime = queuePlayer.getQueuedTime();
 

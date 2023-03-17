@@ -199,7 +199,7 @@ public class QueueHandlerImpl implements QueueHandler {
                     maxPriority = Integer.parseInt(split[3]),
                     maxStaff = Integer.parseInt(split[4]);
 
-                RegisteredServer server = proxyQueues.getProxyServer().getServer(serverName).get();
+                RegisteredServer server = proxyQueues.getProxyServer().getServer(serverName).orElseThrow();
 
                 ProxyQueue queue = createQueue(server, requiredPlayers, maxNormal, maxPriority, maxStaff);
                 queue.setDelayLength(settingsManager.getProperty(ConfigOptions.DELAY_LENGTH));
