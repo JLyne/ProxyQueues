@@ -34,8 +34,8 @@ import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ServerConnection;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
+import uk.co.notnull.proxyqueues.Messages;
 import uk.co.notnull.proxyqueues.ProxyQueuesImpl;
 import uk.co.notnull.proxyqueues.api.QueueType;
 import uk.co.notnull.proxyqueues.api.queues.QueuePlayer;
@@ -84,9 +84,7 @@ public class ProxyQueueEventHandler {
                 if(waitingServer.isPresent()) {
                     event.setResult(ServerPreConnectEvent.ServerResult.allowed(waitingServer.get()));
                 } else {
-                    player.disconnect(Component.text(
-                            "This server has queueing enabled and can't be connected to directly. Please connect via playmc.rtgame.co.uk")
-                                              .color(NamedTextColor.RED));
+                    player.disconnect(Messages.getComponent("cannot-connect-directly"));
 
                     return;
                 }

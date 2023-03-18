@@ -59,6 +59,7 @@ notify:
      <reasons>
   pause-reason: "<gray> - <reason>"
   unpaused: "The queue for <yellow><server><aqua> has resumed"
+  joining: "Joining queue..."
 commands:
   kick-success: "Kicked <yellow><player><aqua> from the <yellow><server><aqua> queue"
   join-success: "You have joined the queue for <yellow><server>"
@@ -112,6 +113,7 @@ errors:
     You need to link your Discord account and have one of the required roles to join this server.
     Please follow the instructions to link your Discord account.
   discord-not-verified: "Your Discord account does not have any of the roles required to join this server."
+  cannot-connect-directly: "<red>This server has queueing enabled and can't be connected to directly. Please connect via playmc.rtgame.co.uk"
 reconnect:
   restore-position: |-
     Seems you lost connection to the server. We have <yellow>restored<aqua> your previous queue position.
