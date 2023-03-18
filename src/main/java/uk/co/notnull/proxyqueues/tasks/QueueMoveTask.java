@@ -30,6 +30,7 @@ import com.velocitypowered.api.proxy.server.RegisteredServer;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import uk.co.notnull.proxyqueues.api.MessageType;
 import uk.co.notnull.proxyqueues.ProxyQueuesImpl;
+import uk.co.notnull.proxyqueues.api.QueueType;
 import uk.co.notnull.proxyqueues.configuration.sections.ConfigOptions;
 import uk.co.notnull.proxyqueues.queues.ProxyQueueImpl;
 import uk.co.notnull.proxyqueues.queues.QueuePlayerImpl;
@@ -81,8 +82,13 @@ public class QueueMoveTask implements Runnable {
         handleQueue(priorityQueue);
         handleQueue(normalQueue);
 
-        // Nothing to do if no player to queue, connection attempt already underway, or queue is paused
+        // Nothing to do if no player to queue, connection attempt already underway
         if(targetPlayer == null || targetPlayer.isConnecting() || queue.isPaused()) {
+            return;
+        }
+
+        // Nothing to do if queue is paused and queued player isn't staff
+        if(queue.isPaused() && targetPlayer.getQueueType() != QueueType.STAFF) {
             return;
         }
 
