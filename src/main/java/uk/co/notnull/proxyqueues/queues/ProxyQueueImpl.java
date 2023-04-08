@@ -555,9 +555,7 @@ public class ProxyQueueImpl implements uk.co.notnull.proxyqueues.api.queues.Prox
             throw new IllegalArgumentException("plugin is not registered");
         }
 
-        pauses.remove(container.get());
-
-        if(pauses.isEmpty()) {
+        if(pauses.remove(container.get()) != null && pauses.isEmpty()) {
             notifier.notifyResume();
         }
     }
