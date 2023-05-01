@@ -35,7 +35,7 @@ jobs:
       - name: Gradle Command
         # You may pin to the exact commit or the version.
         # uses: gradle/gradle-build-action@90ccf054e6b9905f30f98c938bce4c6acd323b6b
-        uses: gradle/gradle-build-action@v1.3.3
+        uses: gradle/gradle-build-action@v2.4.2
         with:
           arguments: build
           
