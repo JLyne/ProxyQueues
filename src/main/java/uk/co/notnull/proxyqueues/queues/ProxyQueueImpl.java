@@ -561,7 +561,7 @@ public class ProxyQueueImpl implements uk.co.notnull.proxyqueues.api.queues.Prox
     }
 
     public boolean hasPause(Object plugin) {
-       Optional<PluginContainer> container = this.proxyQueues.getProxyServer().getPluginManager().fromInstance(plugin);
+        Optional<PluginContainer> container = this.proxyQueues.getProxyServer().getPluginManager().fromInstance(plugin);
 
         if(container.isEmpty()) {
             throw new IllegalArgumentException("plugin is not registered");
