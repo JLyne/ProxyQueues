@@ -26,6 +26,7 @@ package uk.co.notnull.proxyqueues.queues;
 import com.velocitypowered.api.plugin.PluginContainer;
 import com.velocitypowered.api.proxy.InboundConnection;
 import net.kyori.adventure.title.Title;
+import org.jetbrains.annotations.Nullable;
 import uk.co.notnull.platformdetection.PlatformDetectionVelocity;
 import uk.co.notnull.proxyqueues.Messages;
 import uk.co.notnull.proxyqueues.ProxyQueuesImpl;
@@ -33,7 +34,6 @@ import uk.co.notnull.proxyqueues.api.MessageType;
 import uk.co.notnull.proxyqueues.api.queues.QueuePlayer;
 import uk.co.notnull.proxyqueues.configuration.sections.ConfigOptions;
 
-import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
