@@ -41,8 +41,8 @@ import com.velocitypowered.api.proxy.ProxyServer;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
 import net.kyori.adventure.text.ComponentLike;
 import net.kyori.adventure.text.minimessage.MiniMessage;
-import ninja.leaping.configurate.ConfigurationNode;
-import ninja.leaping.configurate.yaml.YAMLConfigurationLoader;
+import org.spongepowered.configurate.ConfigurationNode;
+import org.spongepowered.configurate.yaml.YamlConfigurationLoader;
 import uk.co.notnull.proxyqueues.api.MessageType;
 import uk.co.notnull.proxyqueues.api.ProxyQueues;
 import uk.co.notnull.proxyqueues.api.queues.QueueHandler;
@@ -98,7 +98,7 @@ public final class ProxyQueuesImpl implements ProxyQueues {
         ConfigurationNode messagesConfiguration;
 
         try {
-			messagesConfiguration = YAMLConfigurationLoader.builder().setFile(
+			messagesConfiguration = YamlConfigurationLoader.builder().file(
 					new File(dataFolder.toAbsolutePath().toString(), "messages.yml")).build().load();
 		    Messages.set(messagesConfiguration);
 		} catch (IOException e) {

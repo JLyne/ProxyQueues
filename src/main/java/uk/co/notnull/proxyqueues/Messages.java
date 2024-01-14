@@ -28,7 +28,7 @@ import net.kyori.adventure.text.ComponentLike;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
-import ninja.leaping.configurate.ConfigurationNode;
+import org.spongepowered.configurate.ConfigurationNode;
 import uk.co.notnull.proxyqueues.api.MessageType;
 
 import java.util.Collections;
@@ -55,7 +55,7 @@ public class Messages {
             return "";
         }
 
-        String message = messages.getNode((Object[]) id.split("\\."))
+        String message = messages.node((Object[]) id.split("\\."))
                 .getString("Message " + id + " does not exist");
 
         for (Map.Entry<String, String> entry : replacements.entrySet()) {
@@ -78,7 +78,7 @@ public class Messages {
             return Component.empty();
         }
 
-        String message = messages.getNode((Object[]) id.split("\\."))
+        String message = messages.node((Object[]) id.split("\\."))
                 .getString("Message " + id + " does not exist");
 
         TagResolver.Builder placeholders = TagResolver.builder();

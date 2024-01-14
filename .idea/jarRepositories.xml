@@ -96,5 +96,10 @@
       <option name="name" value="maven3" />
       <option name="url" value="https://repo.not-null.co.uk/snapshots/" />
     </remote-repository>
+    <remote-repository>
+      <option name="id" value="maven" />
+      <option name="name" value="maven" />
+      <option name="url" value="https://s01.oss.sonatype.org/content/repositories/snapshots" />
+    </remote-repository>
   </component>
 </project>
