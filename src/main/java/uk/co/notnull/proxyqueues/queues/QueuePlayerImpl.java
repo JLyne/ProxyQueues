@@ -34,7 +34,7 @@ import uk.co.notnull.proxyqueues.api.queues.QueuePlayer;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 
-public class QueuePlayerImpl implements QueuePlayer {
+public final class QueuePlayerImpl implements QueuePlayer {
 
     private final BossBar bossBar;
     private boolean connecting;

@@ -40,7 +40,7 @@ import uk.co.notnull.proxyqueues.api.queues.QueuePlayer;
 import java.util.Optional;
 import java.util.UUID;
 
-public class ProxyDiscordHandler {
+public final class ProxyDiscordHandler {
 	private final ProxyQueuesImpl plugin;
 	private static VerificationManager verificationManager;
 

@@ -40,7 +40,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class QueueHandlerImpl implements QueueHandler {
+public final class QueueHandlerImpl implements QueueHandler {
 
     private final ConcurrentHashMap<RegisteredServer, ProxyQueue> queues;
     private final SettingsManager settingsManager;

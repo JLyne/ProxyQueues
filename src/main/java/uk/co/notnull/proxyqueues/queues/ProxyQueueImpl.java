@@ -55,7 +55,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 
-public class ProxyQueueImpl implements uk.co.notnull.proxyqueues.api.queues.ProxyQueue {
+public final class ProxyQueueImpl implements uk.co.notnull.proxyqueues.api.queues.ProxyQueue {
 
     private final ProxyQueuesImpl proxyQueues;
 
