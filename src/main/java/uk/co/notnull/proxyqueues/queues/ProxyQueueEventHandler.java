@@ -105,8 +105,14 @@ public class ProxyQueueEventHandler {
 		RegisteredServer server = event.getPlayer().getCurrentServer()
 				.map(ServerConnection::getServer).orElse(null);
 
-		if(server != null && server.equals(queue.getServer())) {
-			queue.removePlayer(event.getPlayer(), true);
+		if(server != null) {
+			if(server.equals(queue.getServer())) {
+				queue.removePlayer(event.getPlayer(), true);
+			} else {
+				queue.getQueuePlayer(event.getPlayer(), true).ifPresent(p -> {
+					queue.getNotifier().notifyPlayer(p);
+				});
+			}
 		}
 
         RegisteredServer previousServer = event.getPreviousServer();

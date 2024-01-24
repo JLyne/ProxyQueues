@@ -113,9 +113,9 @@ public class ProxyQueueNotifier {
             default -> queue.isPaused() ? "notify.normal.bossbar.paused" : "notify.normal.bossbar.active";
         };
 
-        if(platformDetectionEnabled && platformDetection.getPlatform(player.getPlayer()).isBedrock()) {
+        //if(platformDetectionEnabled && platformDetection.getPlatform(player.getPlayer()).isBedrock()) {
             player.hideBossBar();
-        }
+        //}
 
         player.showBossBar();
         player.getBossBar().name(
