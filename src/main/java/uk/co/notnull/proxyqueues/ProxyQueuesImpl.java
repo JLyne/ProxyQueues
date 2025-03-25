@@ -113,7 +113,11 @@ public final class ProxyQueuesImpl implements ProxyQueues {
         initCommands();
 
         if(this.getProxyServer().getPluginManager().isLoaded("prometheus-exporter")) {
-            new Metrics();
+            try {
+                new Metrics();
+            } catch(IllegalArgumentException e) {
+                logger.warn("Failed to register prometheus metrics", e);
+            }
         }
 
         if(this.getProxyServer().getPluginManager().isLoaded("proxydiscord")) {

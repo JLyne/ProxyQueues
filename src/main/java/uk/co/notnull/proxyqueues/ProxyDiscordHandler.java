@@ -95,7 +95,7 @@ public final class ProxyDiscordHandler {
 		}
 	}
 
-	@Subscribe(order = PostOrder.NORMAL)
+	@Subscribe()
 	public void onPlayerVerifyStateChange(PlayerVerifyStateChangeEvent e) {
     	//Remove player from any queue
         if(e.getPreviousState() != VerificationResult.UNKNOWN && !e.getState().isVerified()) {

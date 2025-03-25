@@ -55,7 +55,7 @@ public class ProxyQueueEventHandler {
 		this.queue = queue;
 	}
 
-	@Subscribe(order = PostOrder.LATE)
+	@Subscribe(priority = Short.MIN_VALUE / 2)
     public void onPreConnect(ServerPreConnectEvent event) {
         if(!event.getResult().isAllowed()) {
             return;
@@ -100,7 +100,7 @@ public class ProxyQueueEventHandler {
 		}
     }
 
-	@Subscribe(order = PostOrder.LATE)
+	@Subscribe(priority = Short.MIN_VALUE / 2)
     public void onConnected(ServerPostConnectEvent event) {
 		RegisteredServer server = event.getPlayer().getCurrentServer()
 				.map(ServerConnection::getServer).orElse(null);
@@ -128,7 +128,7 @@ public class ProxyQueueEventHandler {
      * Otherwise they will be added to the priority queue with a lastSeen time set
      * @param event - The event
      */
-    @Subscribe(order = PostOrder.EARLY)
+    @Subscribe(priority = Short.MAX_VALUE / 2)
     public void onLeave(DisconnectEvent event) {
         Player player = event.getPlayer();
         Optional<QueuePlayer> queuePlayer = queue.getQueuePlayer(player, false);
@@ -152,7 +152,7 @@ public class ProxyQueueEventHandler {
         });
     }
 
-    @Subscribe(order = PostOrder.LAST)
+    @Subscribe(priority = Short.MIN_VALUE + 1)
     public void onKick(KickedFromServerEvent event) {
 		if (!event.getServer().equals(queue.getServer()) || event.kickedDuringServerConnect()) {
 			return;
