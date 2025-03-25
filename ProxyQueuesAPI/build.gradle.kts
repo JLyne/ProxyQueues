@@ -22,51 +22,39 @@
  */
 
 plugins {
-    id 'java'
-    id 'maven-publish'
+    id("proxy-queues.java-conventions")
+    id("maven-publish")
 }
 
-dependencies {
-    compileOnly 'org.jetbrains:annotations:24.1.0'
-    compileOnly 'com.velocitypowered:velocity-api:3.2.0-SNAPSHOT'
-}
-
-description = 'ProxyQueues API'
+description = "ProxyQueues API"
 
 publishing {
     publications {
-        mavenJava(MavenPublication) {
-            from components.java
+        create<MavenPublication>("library") {
+            from(components.getByName("java"))
             pom {
-                description = 'ProxyQueues API'
-                url = 'https://github.com/JLyne/ProxyQueues'
+                url = "https://github.com/JLyne/ProxyQueues"
                 developers {
                     developer {
-                        id = 'jim'
-                        name = 'James Lyne'
+                        id = "jim"
+                        name = "James Lyne"
                     }
                 }
                 scm {
-                    connection = 'scm:git:git://github.com/JLyne/ProxyQueues.git'
-                    developerConnection = 'scm:git:ssh://github.com/JLyne/ProxyQueues.git'
-                    url = 'https://github.com/JLyne/ProxyQueues'
+                    connection = "scm:git:git://github.com/JLyne/ProxyQueues.git"
+                    developerConnection = "scm:git:ssh://github.com/JLyne/ProxyQueues.git"
+                    url = "https://github.com/JLyne/ProxyQueues"
                 }
             }
         }
     }
     repositories {
         maven {
-            credentials {
-                username = rootProject.ext.mavenUserName
-                password = rootProject.ext.mavenPassword
-            }
-            authentication {
-                basic(BasicAuthentication)
-            }
-
-            def releasesRepoUrl = "https://repo.not-null.co.uk/releases/" // gradle -Prelease publish
-            def snapshotsRepoUrl = "https://repo.not-null.co.uk/snapshots/"
-            url = project.hasProperty('release') ? releasesRepoUrl : snapshotsRepoUrl
+            name = "notnull"
+            credentials(PasswordCredentials::class)
+            val releasesRepoUrl = uri("https://repo.not-null.co.uk/releases/") // gradle -Prelease publish
+            val snapshotsRepoUrl = uri("https://repo.not-null.co.uk/snapshots/")
+            url = if (project.hasProperty("release")) releasesRepoUrl else snapshotsRepoUrl
         }
     }
 }

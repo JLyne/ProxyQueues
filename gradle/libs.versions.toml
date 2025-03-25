@@ -1,0 +1,25 @@
+[versions]
+velocityApi = "3.4.0-SNAPSHOT"
+shadow = "8.3.6"
+cloud = "1.8.4"
+superVanishBridge = "1.1"
+configme = "1.4.1"
+jetbrainsAnnotations = "26.0.2"
+platformDetection="2.2"
+proxyDiscordApi="1.2"
+prometheusClient="0.11.0"
+
+[libraries]
+velocityApi = { group = "com.velocitypowered", name = "velocity-api", version.ref="velocityApi" }
+cloudVelocity = { group = "cloud.commandframework", name = "cloud-velocity", version.ref="cloud" }
+cloudMinecraftExtras = { group = "cloud.commandframework", name = "cloud-minecraft-extras", version.ref="cloud" }
+cloudAnnotations = { group = "cloud.commandframework", name = "cloud-annotations", version.ref="cloud" }
+superVanishBridgeHelper = { group = "uk.co.notnull", name = "SuperVanishBridge-helper", version.ref="superVanishBridge" }
+configMe = { group = "ch.jalu", name = "configme", version.ref="configme" }
+jetbrainsAnnotations = { group = "org.jetbrains", name = "annotations", version.ref="jetbrainsAnnotations" }
+platformDetection = { group = "uk.co.notnull", name = "PlatformDetection-velocity", version.ref="platformDetection" }
+proxyDiscordApi = { group = "uk.co.notnull", name = "ProxyDiscordAPI", version.ref="proxyDiscordApi" }
+prometheusClient = { group = "io.prometheus", name = "simpleclient_common", version.ref="prometheusClient" }
+
+[plugins]
+shadow = { id = "com.gradleup.shadow", version.ref = "shadow" }
