@@ -32,7 +32,7 @@ dependencies {
     implementation(libs.cloudVelocity)
     implementation(libs.cloudMinecraftExtras)
     implementation(libs.cloudAnnotations)
-    implementation(libs.superVanishBridgeHelper)
+    implementation(libs.vanishBridgeHelper)
 
     compileOnly(libs.platformDetection)
     compileOnly(libs.proxyDiscordApi)
