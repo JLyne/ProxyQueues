@@ -35,9 +35,11 @@ import com.velocitypowered.api.command.CommandSource;
 import com.velocitypowered.api.event.ResultedEvent;
 import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.connection.LoginEvent;
+import com.velocitypowered.api.event.connection.PluginMessageEvent;
 import com.velocitypowered.api.event.proxy.ProxyInitializeEvent;
 import com.velocitypowered.api.plugin.annotation.DataDirectory;
 import com.velocitypowered.api.proxy.ProxyServer;
+import com.velocitypowered.api.proxy.messages.MinecraftChannelIdentifier;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
 import net.kyori.adventure.text.ComponentLike;
 import net.kyori.adventure.text.minimessage.MiniMessage;
@@ -66,6 +68,8 @@ import java.util.Optional;
 import java.util.function.Function;
 
 public final class ProxyQueuesImpl implements ProxyQueues {
+    public static final MinecraftChannelIdentifier playerWaitingIdentifier =
+            MinecraftChannelIdentifier.create("proxyqueues", "player_waiting");
 
     private static ProxyQueuesImpl instance;
     private final SettingsHandler settingsHandler;
@@ -124,6 +128,7 @@ public final class ProxyQueuesImpl implements ProxyQueues {
             new ProxyDiscordHandler(this);
         }
 
+        proxyServer.getChannelRegistrar().register(playerWaitingIdentifier);
         new SuperVanishBridgeHelper(proxyServer);
     }
 
@@ -132,6 +137,14 @@ public final class ProxyQueuesImpl implements ProxyQueues {
         if(playerLimit > -1 && proxyServer.getPlayerCount() >= playerLimit &&
                 !event.getPlayer().hasPermission("proxyqueues.bypass-limit")) {
             event.setResult(ResultedEvent.ComponentResult.denied(Messages.getComponent("errors.player-limit")));
+        }
+    }
+
+    @Subscribe
+    public void onPluginMessageFromPlayer(PluginMessageEvent event) {
+        // Don't allow spoofing of plugin messages
+        if (playerWaitingIdentifier.equals(event.getIdentifier())) {
+            event.setResult(PluginMessageEvent.ForwardResult.handled());
         }
     }
 

@@ -94,6 +94,8 @@ public class QueueMoveTask implements Runnable {
 
         // Check if the max amount of players on the server are the max slots
         if (queue.isServerFull(targetPlayer.getQueueType())) {
+            // Tell the backend server a player is waiting to allow proactive freeing of slots
+            queue.getServer().sendPluginMessage(ProxyQueuesImpl.playerWaitingIdentifier, new byte[0]);
             return;
         }
 
