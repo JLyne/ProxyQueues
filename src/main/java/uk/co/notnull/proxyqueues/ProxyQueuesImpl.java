@@ -118,7 +118,7 @@ public final class ProxyQueuesImpl implements ProxyQueues {
 
         if(this.getProxyServer().getPluginManager().isLoaded("prometheus-exporter")) {
             try {
-                new Metrics();
+                new Metrics(this);
             } catch(IllegalArgumentException e) {
                 logger.warn("Failed to register prometheus metrics", e);
             }

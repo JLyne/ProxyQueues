@@ -1,13 +1,14 @@
 [versions]
 velocityApi = "3.4.0-SNAPSHOT"
-shadow = "8.3.6"
+shadow = "8.3.7"
 cloud = "1.8.4"
 vanishBridge = "2.0-SNAPSHOT"
 configme = "1.4.1"
 jetbrainsAnnotations = "26.0.2"
 platformDetection="2.2"
 proxyDiscordApi="1.2"
-prometheusClient="0.11.0"
+prometheusExporter = "3.0-SNAPSHOT"
+prometheus = "1.3.8"
 
 [libraries]
 velocityApi = { group = "com.velocitypowered", name = "velocity-api", version.ref="velocityApi" }
@@ -19,7 +20,8 @@ configMe = { group = "ch.jalu", name = "configme", version.ref="configme" }
 jetbrainsAnnotations = { group = "org.jetbrains", name = "annotations", version.ref="jetbrainsAnnotations" }
 platformDetection = { group = "uk.co.notnull", name = "PlatformDetection-velocity", version.ref="platformDetection" }
 proxyDiscordApi = { group = "uk.co.notnull", name = "ProxyDiscordAPI", version.ref="proxyDiscordApi" }
-prometheusClient = { group = "io.prometheus", name = "simpleclient_common", version.ref="prometheusClient" }
+prometheusExporter =  { group = "uk.co.notnull", name = "MinecraftPrometheusExporter-velocity", version.ref  = "prometheusExporter" }
+prometheusCore = { group = "io.prometheus", name = "prometheus-metrics-core", version.ref="prometheus" }
 
 [plugins]
 shadow = { id = "com.gradleup.shadow", version.ref = "shadow" }

@@ -22,6 +22,10 @@ repositories {
     maven {
         url = uri("https://repo.not-null.co.uk/releases/")
     }
+
+    maven {
+        url = uri("https://repo.not-null.co.uk/snapshots/")
+    }
 }
 
 dependencies {

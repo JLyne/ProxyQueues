@@ -23,9 +23,10 @@
 
 package uk.co.notnull.proxyqueues.metrics;
 
-public class Metrics {
-	private final PlayersQueued playersQueued = new PlayersQueued().register();
+import uk.co.notnull.proxyqueues.api.ProxyQueues;
 
-	public Metrics() {
+public class Metrics {
+	public Metrics(ProxyQueues plugin) {
+		new PlayersQueued(plugin).enable();
 	}
 }

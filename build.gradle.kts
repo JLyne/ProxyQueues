@@ -38,7 +38,8 @@ dependencies {
     compileOnly(libs.proxyDiscordApi)
     compileOnly(libs.platformDetection)
     compileOnly(libs.proxyDiscordApi)
-    compileOnly(libs.prometheusClient)
+    compileOnly(libs.prometheusCore)
+    compileOnly(libs.prometheusExporter)
 
     annotationProcessor(libs.velocityApi)
 }
