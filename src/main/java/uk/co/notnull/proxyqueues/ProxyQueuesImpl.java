@@ -53,8 +53,8 @@ import uk.co.notnull.proxyqueues.configuration.sections.ConfigOptions;
 import uk.co.notnull.proxyqueues.metrics.Metrics;
 import uk.co.notnull.proxyqueues.queues.QueueHandlerImpl;
 import org.slf4j.Logger;
-import uk.co.notnull.supervanishbridge.helper.CloudHelper;
-import uk.co.notnull.supervanishbridge.helper.SuperVanishBridgeHelper;
+import uk.co.notnull.vanishbridge.helper.CloudHelper;
+import uk.co.notnull.vanishbridge.helper.VanishBridgeHelper;
 
 import javax.inject.Inject;
 import java.io.File;
@@ -129,7 +129,7 @@ public final class ProxyQueuesImpl implements ProxyQueues {
         }
 
         proxyServer.getChannelRegistrar().register(playerWaitingIdentifier);
-        new SuperVanishBridgeHelper(proxyServer);
+        new VanishBridgeHelper(proxyServer);
     }
 
     @Subscribe
