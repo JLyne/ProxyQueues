@@ -2,7 +2,7 @@
   "id": "proxyqueues",
   "name": "ProxyQueues",
   "version": "${version}",
-  "authors": ["Jim (NotKatuen)"],
+  "authors": ["Jim (AnEnragedPigeon)"],
   "dependencies": [
     {
       "id": "prometheus-exporter",
