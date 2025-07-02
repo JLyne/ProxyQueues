@@ -51,7 +51,7 @@ tasks {
         archiveClassifier = ""
         relocate("cloud.commandframework", "uk.co.notnull.proxyqueues.shaded.cloud")
         relocate("io.leangen.geantyref", "uk.co.notnull.proxyqueues.shaded.typetoken")
-        relocate("uk.co.notnull.SuperVanishBridge", "uk.co.notnull.proxyqueues.shaded.supervanishbridge")
+        relocate("uk.co.notnull.VanishBridge", "uk.co.notnull.proxyqueues.shaded.vanishbridge")
     }
 
     build {
