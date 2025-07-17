@@ -1,6 +1,6 @@
 [versions]
 velocityApi = "3.4.0-SNAPSHOT"
-shadow = "8.3.7"
+shadow = "8.3.8"
 cloud = "1.8.4"
 vanishBridge = "2.0-SNAPSHOT"
 configme = "1.4.1"
@@ -8,7 +8,7 @@ jetbrainsAnnotations = "26.0.2"
 platformDetection="2.2"
 proxyDiscordApi="1.2"
 prometheusExporter = "3.0-SNAPSHOT"
-prometheus = "1.3.8"
+prometheus = "1.3.10"
 
 [libraries]
 velocityApi = { group = "com.velocitypowered", name = "velocity-api", version.ref="velocityApi" }
