@@ -30,7 +30,6 @@ repositories {
 
 dependencies {
     compileOnly(libs.velocityApi)
-    compileOnly(libs.jetbrainsAnnotations)
 }
 
 java {
