@@ -31,6 +31,7 @@ import cloud.commandframework.execution.CommandExecutionCoordinator;
 import cloud.commandframework.meta.SimpleCommandMeta;
 import cloud.commandframework.minecraft.extras.MinecraftExceptionHandler;
 import cloud.commandframework.velocity.VelocityCommandManager;
+import com.google.inject.Inject;
 import com.velocitypowered.api.command.CommandSource;
 import com.velocitypowered.api.event.ResultedEvent;
 import com.velocitypowered.api.event.Subscribe;
@@ -56,7 +57,6 @@ import org.slf4j.Logger;
 import uk.co.notnull.vanishbridge.helper.CloudHelper;
 import uk.co.notnull.vanishbridge.helper.VanishBridgeHelper;
 
-import javax.inject.Inject;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
