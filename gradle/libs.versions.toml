@@ -7,7 +7,7 @@ configme = "1.4.1"
 platformDetection="2.2"
 proxyDiscordApi="1.2"
 prometheusExporter = "3.0-SNAPSHOT"
-prometheus = "1.4.3"
+prometheus = "1.5.0"
 
 [libraries]
 velocityApi = { group = "com.velocitypowered", name = "velocity-api", version.ref="velocityApi" }
