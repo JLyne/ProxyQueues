@@ -46,9 +46,9 @@ public class PlayersQueued extends AbstractMetric {
                     if(queue != null) {
                         String serverName = server.getServerInfo().getName();
 
-                        callback.call(queue.getQueueSize(QueueType.NORMAL), serverName, "normal");
-                        callback.call(queue.getQueueSize(QueueType.PRIORITY), serverName, "priority");
-                        callback.call(queue.getQueueSize(QueueType.STAFF), serverName, "staff");
+                        callback.call(queue.getQueueSize(QueueType.NORMAL), "normal", serverName);
+                        callback.call(queue.getQueueSize(QueueType.PRIORITY), "priority", serverName);
+                        callback.call(queue.getQueueSize(QueueType.STAFF), "staff", serverName);
                     }
                 }
             })

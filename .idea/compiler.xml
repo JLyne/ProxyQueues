@@ -43,8 +43,8 @@
       <profile name="Gradle Imported" enabled="true">
         <outputRelativeToContentRoot value="true" />
         <processorPath useClasspath="false">
-          <entry name="$USER_HOME$/.local/share/gradle/caches/modules-2/files-2.1/com.velocitypowered/velocity-api/3.5.0-SNAPSHOT/8119dde681695e7e2ad9e45c33739a2910ac7fca/velocity-api-3.5.0-SNAPSHOT.jar" />
-          <entry name="$MAVEN_REPOSITORY$/com/moandjiezana/toml/toml4j/0.7.2/toml4j-0.7.2.jar" />
+          <entry name="$USER_HOME$/.local/share/gradle/caches/modules-2/files-2.1/com.velocitypowered/velocity-api/3.5.0-SNAPSHOT/b051cfa99bfa66b736cbf827047472d90e2005fc/velocity-api-3.5.0-SNAPSHOT.jar" />
+          <entry name="$USER_HOME$/.local/share/gradle/caches/modules-2/files-2.1/io.hotmoka/toml4j/0.7.3/81cf97d724c0741c646ac34a9a85d8050c1ac2ab/toml4j-0.7.3.jar" />
           <entry name="$USER_HOME$/.local/share/gradle/caches/modules-2/files-2.1/org.spongepowered/configurate-gson/4.2.0/8bc56bc3d77e45b66324be9dbf1fc688bf528969/configurate-gson-4.2.0.jar" />
           <entry name="$USER_HOME$/.local/share/gradle/caches/modules-2/files-2.1/net.kyori/adventure-text-logger-slf4j/4.26.1/f18d40094ec8f64087f420069f06e024558d74d6/adventure-text-logger-slf4j-4.26.1.jar" />
           <entry name="$USER_HOME$/.local/share/gradle/caches/modules-2/files-2.1/net.kyori/adventure-text-minimessage/4.26.1/9983d86668d6adba7e600dac20a5e61af703a6c6/adventure-text-minimessage-4.26.1.jar" />
