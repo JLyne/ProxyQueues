@@ -1,6 +1,6 @@
 [versions]
 velocityApi = "3.5.0-SNAPSHOT"
-shadow = "9.3.1"
+shadow = "9.3.2"
 cloud = "1.8.4"
 vanishBridge = "2.0-SNAPSHOT"
 configme = "1.4.1"
