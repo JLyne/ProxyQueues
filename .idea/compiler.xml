@@ -43,7 +43,7 @@
       <profile name="Gradle Imported" enabled="true">
         <outputRelativeToContentRoot value="true" />
         <processorPath useClasspath="false">
-          <entry name="$USER_HOME$/.local/share/gradle/caches/modules-2/files-2.1/com.velocitypowered/velocity-api/3.5.0-SNAPSHOT/3747536b91f604ce042c475dcb1898af4f8adfd8/velocity-api-3.5.0-SNAPSHOT.jar" />
+          <entry name="$USER_HOME$/.local/share/gradle/caches/modules-2/files-2.1/com.velocitypowered/velocity-api/3.5.0-SNAPSHOT/94dff924af62be8647fc34495d0f5d656d4d9a37/velocity-api-3.5.0-SNAPSHOT.jar" />
           <entry name="$MAVEN_REPOSITORY$/com/moandjiezana/toml/toml4j/0.7.2/toml4j-0.7.2.jar" />
           <entry name="$USER_HOME$/.local/share/gradle/caches/modules-2/files-2.1/org.spongepowered/configurate-gson/4.2.0/8bc56bc3d77e45b66324be9dbf1fc688bf528969/configurate-gson-4.2.0.jar" />
           <entry name="$USER_HOME$/.local/share/gradle/caches/modules-2/files-2.1/net.kyori/adventure-text-serializer-ansi/4.26.1/7b441092ed57af2445872daa652ba2fce5deba31/adventure-text-serializer-ansi-4.26.1.jar" />
