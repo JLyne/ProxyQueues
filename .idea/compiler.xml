@@ -43,14 +43,14 @@
       <profile name="Gradle Imported" enabled="true">
         <outputRelativeToContentRoot value="true" />
         <processorPath useClasspath="false">
-          <entry name="$USER_HOME$/.local/share/gradle/caches/modules-2/files-2.1/com.velocitypowered/velocity-api/3.5.0-SNAPSHOT/94dff924af62be8647fc34495d0f5d656d4d9a37/velocity-api-3.5.0-SNAPSHOT.jar" />
+          <entry name="$USER_HOME$/.local/share/gradle/caches/modules-2/files-2.1/com.velocitypowered/velocity-api/3.5.0-SNAPSHOT/acccc7d4f2477dbc30d46e6e5a42da0609c0639e/velocity-api-3.5.0-SNAPSHOT.jar" />
           <entry name="$MAVEN_REPOSITORY$/com/moandjiezana/toml/toml4j/0.7.2/toml4j-0.7.2.jar" />
           <entry name="$USER_HOME$/.local/share/gradle/caches/modules-2/files-2.1/org.spongepowered/configurate-gson/4.2.0/8bc56bc3d77e45b66324be9dbf1fc688bf528969/configurate-gson-4.2.0.jar" />
           <entry name="$USER_HOME$/.local/share/gradle/caches/modules-2/files-2.1/net.kyori/adventure-text-serializer-ansi/4.26.1/7b441092ed57af2445872daa652ba2fce5deba31/adventure-text-serializer-ansi-4.26.1.jar" />
           <entry name="$MAVEN_REPOSITORY$/net/kyori/adventure-text-serializer-gson/4.26.1/adventure-text-serializer-gson-4.26.1.jar" />
-          <entry name="$USER_HOME$/.local/share/gradle/caches/modules-2/files-2.1/com.google.code.gson/gson/2.13.2/48b8230771e573b54ce6e867a9001e75977fe78e/gson-2.13.2.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/google/code/gson/gson/2.13.2/gson-2.13.2.jar" />
           <entry name="$MAVEN_REPOSITORY$/com/google/inject/guice/7.0.0/guice-7.0.0.jar" />
-          <entry name="$USER_HOME$/.local/share/gradle/caches/modules-2/files-2.1/com.google.guava/guava/33.5.0-jre/8699de25f2f979108d6c1b804a7ba38cda1116bc/guava-33.5.0-jre.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/google/guava/guava/33.5.0-jre/guava-33.5.0-jre.jar" />
           <entry name="$MAVEN_REPOSITORY$/net/kyori/adventure-text-logger-slf4j/4.26.1/adventure-text-logger-slf4j-4.26.1.jar" />
           <entry name="$MAVEN_REPOSITORY$/net/kyori/adventure-text-minimessage/4.26.1/adventure-text-minimessage-4.26.1.jar" />
           <entry name="$MAVEN_REPOSITORY$/net/kyori/adventure-text-serializer-legacy/4.26.1/adventure-text-serializer-legacy-4.26.1.jar" />
@@ -65,12 +65,12 @@
           <entry name="$USER_HOME$/.local/share/gradle/caches/modules-2/files-2.1/org.spongepowered/configurate-yaml/4.2.0/a61bc2dcbce867a3909529bd02c8224cbabbe7c1/configurate-yaml-4.2.0.jar" />
           <entry name="$USER_HOME$/.local/share/gradle/caches/modules-2/files-2.1/com.github.ben-manes.caffeine/caffeine/3.2.3/c097f0f6d21a0e6db88ea55836e26419b30dfe19/caffeine-3.2.3.jar" />
           <entry name="$USER_HOME$/.local/share/gradle/caches/modules-2/files-2.1/com.google.errorprone/error_prone_annotations/2.43.0/a4f9062316c31850b03085e45717f564fd563ceb/error_prone_annotations-2.43.0.jar" />
-          <entry name="$USER_HOME$/.local/share/gradle/caches/modules-2/files-2.1/com.google.guava/failureaccess/1.0.3/aeaffd00d57023a2c947393ed251f0354f0985fc/failureaccess-1.0.3.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/google/guava/failureaccess/1.0.3/failureaccess-1.0.3.jar" />
           <entry name="$MAVEN_REPOSITORY$/com/google/guava/listenablefuture/9999.0-empty-to-avoid-conflict-with-guava/listenablefuture-9999.0-empty-to-avoid-conflict-with-guava.jar" />
           <entry name="$USER_HOME$/.local/share/gradle/caches/modules-2/files-2.1/org.spongepowered/configurate-core/4.2.0/7b322107fae38a6b8d30690b6b512696c49d9d66/configurate-core-4.2.0.jar" />
           <entry name="$MAVEN_REPOSITORY$/net/kyori/option/1.1.0/option-1.1.0.jar" />
           <entry name="$MAVEN_REPOSITORY$/org/jspecify/jspecify/1.0.0/jspecify-1.0.0.jar" />
-          <entry name="$USER_HOME$/.local/share/gradle/caches/modules-2/files-2.1/com.google.j2objc/j2objc-annotations/3.1/a892ca9507839bbdb900d64310ac98256cab992f/j2objc-annotations-3.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/google/j2objc/j2objc-annotations/3.1/j2objc-annotations-3.1.jar" />
           <entry name="$MAVEN_REPOSITORY$/net/kyori/adventure-key/4.26.1/adventure-key-4.26.1.jar" />
           <entry name="$MAVEN_REPOSITORY$/net/kyori/adventure-text-serializer-commons/4.26.1/adventure-text-serializer-commons-4.26.1.jar" />
           <entry name="$MAVEN_REPOSITORY$/jakarta/inject/jakarta.inject-api/2.0.1/jakarta.inject-api-2.0.1.jar" />
