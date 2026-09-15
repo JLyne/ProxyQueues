@@ -1,5 +1,5 @@
 [versions]
-velocityApi = "4.1.2-SNAPSHOT"
+velocityApi = "4.2.0"
 shadow = "9.6.1"
 cloud = "1.8.4"
 vanishBridge = "2.0-SNAPSHOT"

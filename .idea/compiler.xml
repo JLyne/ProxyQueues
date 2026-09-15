@@ -43,9 +43,9 @@
       <profile name="Gradle Imported" enabled="true">
         <outputRelativeToContentRoot value="true" />
         <processorPath useClasspath="false">
-          <entry name="$USER_HOME$/.local/share/gradle/caches/modules-2/files-2.1/com.velocitypowered/velocity-api/4.1.2-SNAPSHOT/5d0f5283478f7f8b9f08fd02b37a9cd865cebfcb/velocity-api-4.1.2-SNAPSHOT.jar" />
+          <entry name="$USER_HOME$/.local/share/gradle/caches/modules-2/files-2.1/com.velocitypowered/velocity-api/4.2.0/75b701cc958eacfe433a939211cae225d3437b70/velocity-api-4.2.0.jar" />
           <entry name="$MAVEN_REPOSITORY$/com/google/inject/guice/7.0.0/guice-7.0.0.jar" />
-          <entry name="$MAVEN_REPOSITORY$/com/google/guava/guava/33.6.0-jre/guava-33.6.0-jre.jar" />
+          <entry name="$USER_HOME$/.local/share/gradle/caches/modules-2/files-2.1/com.google.guava/guava/33.7.1-jre/77e37866fb969b4ff6710faaefd3a86067730ada/guava-33.7.1-jre.jar" />
           <entry name="$USER_HOME$/.local/share/gradle/caches/modules-2/files-2.1/com.github.ben-manes.caffeine/caffeine/3.2.4/c63b303adf59c733d2a96125ad6670e938a2c15d/caffeine-3.2.4.jar" />
           <entry name="$USER_HOME$/.local/share/gradle/caches/modules-2/files-2.1/net.kyori/adventure-text-serializer-ansi/5.2.0/93324035cacedec89eec4117d56387fb22e7765f/adventure-text-serializer-ansi-5.2.0.jar" />
           <entry name="$MAVEN_REPOSITORY$/net/kyori/adventure-text-logger-slf4j/5.2.0/adventure-text-logger-slf4j-5.2.0.jar" />
@@ -65,11 +65,11 @@
           <entry name="$USER_HOME$/.local/share/gradle/caches/modules-2/files-2.1/org.jspecify/jspecify/1.0.1/3d60fd98eb8ade73004f4195c37b6317e02cf3d7/jspecify-1.0.1.jar" />
           <entry name="$MAVEN_REPOSITORY$/com/moandjiezana/toml/toml4j/0.7.2/toml4j-0.7.2.jar" />
           <entry name="$MAVEN_REPOSITORY$/com/google/code/gson/gson/2.14.0/gson-2.14.0.jar" />
-          <entry name="$USER_HOME$/.local/share/gradle/caches/modules-2/files-2.1/org.yaml/snakeyaml/2.6/2bc14918a2f8d5414749ab12d0c590cd3198b8c1/snakeyaml-2.6.jar" />
-          <entry name="$USER_HOME$/.local/share/gradle/caches/modules-2/files-2.1/org.slf4j/slf4j-api/2.0.18/78a9e7a37cd6360e0b818e86341b24123d28d4df/slf4j-api-2.0.18.jar" />
-          <entry name="$USER_HOME$/.local/share/gradle/caches/modules-2/files-2.1/org.checkerframework/checker-qual/4.2.1/3682819352501a44fd79ccdfc0c54c6f80b3656d/checker-qual-4.2.1.jar" />
+          <entry name="$USER_HOME$/.local/share/gradle/caches/modules-2/files-2.1/org.yaml/snakeyaml/2.7/47713fda569f07641538ff7f2fa9cb3ead4603e5/snakeyaml-2.7.jar" />
+          <entry name="$USER_HOME$/.local/share/gradle/caches/modules-2/files-2.1/org.slf4j/slf4j-api/2.0.19/efad9817997b3a6ce9e058f92e612917a744c290/slf4j-api-2.0.19.jar" />
+          <entry name="$USER_HOME$/.local/share/gradle/caches/modules-2/files-2.1/org.checkerframework/checker-qual/4.2.3/d2a10af5c8574adfe24f5e35ff56cca92af2e916/checker-qual-4.2.3.jar" />
           <entry name="$MAVEN_REPOSITORY$/com/velocitypowered/velocity-brigadier/1.0.0-SNAPSHOT/velocity-brigadier-1.0.0-SNAPSHOT.jar" />
-          <entry name="$USER_HOME$/.local/share/gradle/caches/modules-2/files-2.1/com.google.errorprone/error_prone_annotations/2.49.0/8b42a2e3865f6e0576da3fad51dbb96732ff0f14/error_prone_annotations-2.49.0.jar" />
+          <entry name="$USER_HOME$/.local/share/gradle/caches/modules-2/files-2.1/com.google.errorprone/error_prone_annotations/2.50.0/74ba43e49ab1184d41634af2ef0047e82c4064b0/error_prone_annotations-2.50.0.jar" />
           <entry name="$MAVEN_REPOSITORY$/com/google/guava/failureaccess/1.0.3/failureaccess-1.0.3.jar" />
           <entry name="$MAVEN_REPOSITORY$/com/google/guava/listenablefuture/9999.0-empty-to-avoid-conflict-with-guava/listenablefuture-9999.0-empty-to-avoid-conflict-with-guava.jar" />
           <entry name="$MAVEN_REPOSITORY$/com/google/j2objc/j2objc-annotations/3.1/j2objc-annotations-3.1.jar" />
